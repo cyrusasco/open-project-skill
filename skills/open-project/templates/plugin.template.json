@@ -1,0 +1,12 @@
+{
+  "name": "<PLUGIN>",
+  "version": "0.1.0",
+  "description": "<一句話：呢個 plugin 為 <PROJECT> 提供 agent、營運 skill、slash command 同 <CLI> 工具>",
+  "author": {
+    "name": "<AUTHOR>"
+  },
+  "license": "MIT",
+  "agents": "agents",
+  "skills": "skills",
+  "commands": "commands"
+}
