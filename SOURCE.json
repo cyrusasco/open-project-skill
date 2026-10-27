@@ -1,9 +1,13 @@
 {
   "upstream_repository": "https://github.com/cyrusasco/open-project-skill",
-  "upstream_commit": "44f5d3129cfe46e9646286a49ee552c0429d608c",
-  "edition": "zcode",
-  "skill_version": "3.0.0",
+  "reviewed_base_commit": "44f5d3129cfe46e9646286a49ee552c0429d608c",
+  "upstream_commit": "f4e32bed5a11b9d83567c8e580db82cd908d9ba3",
+  "edition": "codex",
+  "skill_version": "3.0.0-codex.1",
   "plugin_version": "0.1.0",
   "contract_version": "1.0",
-  "native_manual_only_verified": false
+  "allow_implicit_invocation": false,
+  "actual_host_invocation_verified": false,
+  "distribution_repository": "https://github.com/cyrusasco/open-project-skill",
+  "distribution_branch": "codex-port"
 }

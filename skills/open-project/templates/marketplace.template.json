@@ -1,11 +1,17 @@
 {
-  "name": "<NAME>-local",
-  "description": "<PROJECT> local marketplace：<一句話講呢個 plugin pack 做咩>",
+  "name": "<project>-local",
   "plugins": [
     {
-      "name": "<PLUGIN>",
-      "source": "./plugin",
-      "description": "<PLUGIN>：<包含 agent／skill／command／CLI 嘅一句話描述>"
+      "name": "<plugin-name>",
+      "source": {
+        "source": "local",
+        "path": "./plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
     }
   ]
 }

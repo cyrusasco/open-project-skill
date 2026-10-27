@@ -1,83 +1,85 @@
-# open-project — ZCode edition
+# Open Project · Codex
 
-Explicitly requested project start / reorganization, with full drafts before approval.
+A manually invoked Codex plugin for project start/reorganization, full drafts, approval and handover.
 
-通用開案／重整流程，**只喺用戶明確叫用 open-project 時啟動**。保留 Phase 0–9、全文 MD 草稿、product specification、離線 HTML、advisory 預設及 N/A。此 repo 保持 ZCode harness；Codex 版使用獨立來源，不覆寫 ZCode 設定。
+只喺你明確選取 open-project 時用；平時修 bug、開新 project 或讀 repo，不應自動導入完整流程。
 
-## Source and compatibility
+## Edition boundary
 
-- Skill revision: **3.0.0**; packet contract: **1.0**; first plugin package: **0.1.0**.
-- ZCode conventions retained: Agent / subagent_type, ReadSessionContext, .zcode-plugin, command $ARGUMENTS, current agent model/provider rules.
-- Model selection is resolved. This release fixes parsing and integrity, and does not change working backend/model configuration.
-- SOURCE.json records the reviewed upstream commit. Generated package manifests record exact content hashes.
-- No command changes the installed skill, host config, plugin cache or another project automatically.
+This is the **codex-port branch** of cyrusasco/open-project-skill. Main remains the ZCode edition. Do not merge this entire branch into main or copy its host settings into ZCode.
 
-## Explicit invocation
+Shared contract, checker, renderer, promote and generic templates come from the reviewed common source. Codex has separate invocation policy, JSONL discovery, native agent templates and portable manifests. PORTING.md and SOURCE.json record provenance.
 
-Use the command exposed by ZCode, for example:
+- Plugin: open-project-codex 0.1.0
+- Skill: open-project (3.0.0-codex.1)
+- Packet contract: 1.0
+- Python 3.11+ for standard-library tools and native-agent TOML checks
+- No MCP server, automatic hook or global instruction installation
 
-    /open-project new <goal or folder>
-    /open-project reorg <project folder>
+## Use
 
-Plugin namespaces can change the displayed command name. Select the actual command shown by the host, and verify which package it resolves to.
+After selecting this plugin in a supported Codex surface, explicitly select the open-project skill or request:
 
-**ZCode native manual-only enforcement is not yet verified.** The description and workflow require explicit invocation, but packaging a discoverable skill is not a host-level guarantee. Do not copy Codex or Claude flags into ZCode. Until native behavior is verified, disable the plugin when not using it, and use a dedicated explicitly invoked task when enabled. This fallback has an extra step; it is not advertised as an enabled-but-never-automatic guarantee.
+    用 open-project 幫我重整 <project folder>，先出完整草稿同離線報告。
 
-Before migrating, inventory old standalone skills and global commands so another copy cannot keep auto-triggering or shadow the plugin. Back up and disable only the chosen old entry; do not delete unrelated user setup. Installation/load/invocation verification are separate from building.
+agents/openai.yaml uses the YAML boolean allow_implicit_invocation:false. Metadata may remain visible; it does not authorize workflow execution. Inventory independently installed duplicates separately.
 
-## Build a plugin without installing
+Phase4 delivers PLAN, every full MD draft/specification, JSON, offline HTML and gate evidence before formal writes. Continue within concrete existing authorization, without asking the same approval repeatedly. Completing or stopping a task does not permanently activate the workflow.
+
+## Local marketplace
+
+Check installed CLI help first. Supported clients can use:
+
+    codex plugin marketplace add cyrusasco/open-project-skill --ref codex-port --json
+    codex plugin add open-project-codex@open-project-codex --json
+    codex plugin list --marketplace open-project-codex --available --json
+
+The catalog source is relative to the repository root on this branch. Do not register main as the Codex edition. This is repo/local marketplace distribution, not public directory submission.
+
+To disable a local-marketplace plugin in a trusted project:
+
+    [plugins."open-project-codex@open-project-codex"]
+    enabled = false
+
+This Codex-specific choice is not applied automatically. The package does not rewrite global AGENTS or touch ZCode settings.
+
+## Build without installing
 
     python scripts/build-plugin.py
 
-This writes an isolated package to build/zcode/open-project/ and verifies the resource allowlist. It includes no database, session history, secrets, permanent service or automatic hook. Existing different output is not overwritten; choose another --output for a new build. Rebuilding identical bytes is a no-op.
-
-The repo contains a native ZCode manifest and marketplace entry using the ZCode plugins[].source string convention. JSON validity and a complete package do not prove that a particular ZCode version loads it. Use the host's plugin installation flow, then test in a new session. No installation or restart is performed by the build script.
+Output: build/codex/open-project-codex/. Resource allowlist excludes DB/history/secrets/tests. Different existing output is never overwritten; use --output for another candidate. PACKAGE-MANIFEST.json records source hashes and starts at PACKAGED, not INSTALLED or INVOCATION_VERIFIED.
 
 ## Runtime tools
 
-All tools are under skills/open-project/scripts/:
+Under skills/open-project/scripts/:
 
-    python discover-sessions.py --db <ZCode db.sqlite> --keyword <project-alias> --output <task-local-report.json>
+    python discover-sessions.py --sessions-root <whole CLI sessions root> --keyword <alias> --output <task-local-report.json>
     python render-plan.py <PROJECT>
     python gate-check.py <PROJECT> --json
     python gate-check.py <PROJECT> --strict
     python promote.py <PROJECT> --approval <approval.json>
     python promote.py <PROJECT> --approval <approval.json> --apply
 
-- Discovery searches system-wide visible conversation text before directory/title signals. Search hits are candidates, not full review. Coverage, source identity, read depth and snapshot limits are explicit.
-- Rendering consumes md-drafts/plan-data.json and writes only the two staging views. Full draft text is embedded in the offline HTML.
-- Gate checking validates schema, required drafts/specification, content hashes, host-specific agent syntax and exact generated views. Advisory can exit zero with ready=false; strict fails required errors.
-- Promote defaults to dry-run. Applying needs an exact approval record and unchanged hashes; backups, journal, no-op and recovery states are recorded. An approval record is evidence of a decision, not an OS permission boundary.
-- Supported deterministic transforms: exact draft marker removal and UTF-8/LF normalization. Other edits must be made in the staged draft before approval.
-- Capture target hashes when reading the source. Do not regenerate a baseline after writing a draft.
+Prefer available native app list/read/archived tools. CLI JSONL does not cover all app/cloud histories. The adapter retains source/hash/snapshot/coverage, no cwd/title prefilter, unread depth until deep-read, and no hidden reasoning evidence.
 
-See references/workflow-contract.md, references/host-zcode.md and the schema inside the skill for packet fields and limitations.
+Rendering reads schema1.0 md-drafts/plan-data.json and every full draft, including specification. It produces matching Markdown and static offline HTML with full draft text. Advisory exit0 is not ready=true.
 
-## Workflow
+Promote defaults to dry-run. Apply requires an authentic user approval record matching plan/draft/target/baseline/expected hashes and fixed transforms. Approval records are evidence, not OS security boundaries. Never regenerate a baseline after drafting.
 
-| Phase | Output |
-|---|---|
-| 0 | Intent, route, scale, targeted interview |
-| 1 | Facts, unknowns, read-time baseline |
-| 2 | Whole-system discovery, relationships, deep-read tags, coverage |
-| 3 | Files/code/git/secret review |
-| 4 | PLAN + every full MD draft + specification + JSON + offline HTML + gate report; approval |
-| 5 | Approved writes only, drift checks, byte backups, deterministic promote |
-| 6 | Build justified tools/agents; N/A is valid |
-| 7 | Package the target project's plugin only if needed |
-| 8 | Independent review; required unresolved findings prevent acceptance |
-| 9 | Handover; LOCAL COMPLETE / NOT_PUSHED are valid |
-
-## Tests
+## Tests and host verification
 
     python -m unittest discover -s tests -v
 
-Tests use synthetic files/SQLite databases, never the live ZCode database. They include malformed packet/agent negatives, numeric/unknown-value rendering, cross-directory discovery, WAL and promote drift/recovery cases. A test pass is not a fresh-session host-loading claim. SELFTEST.md and historical percentage scores are not prerequisites or current evidence.
+All fixtures are synthetic files/SQLite/JSONL. Common ZCode-policy fixtures validate the shared parser, not operation of a ZCode harness. Port-specific tests cover Codex JSONL and native agents. Parsing/loading tests do not prove actual model invocation; fresh-session behavior is reported separately.
 
-Python **3.10+** for ZCode tools; Python 3.11+ only for TOML checking in the separate Codex edition. No runtime package dependency is required for ZCode.
+Model/reasoning remains user/host-controlled. Native agent TOML is optional; fields cannot expand parent permissions.
 
-MIT — retain LICENSE in derived packages.
+MIT; preserve LICENSE and upstream attribution.
 
-## Migrating a v2 packet
+## Verified native name
 
-Version 3 uses the breaking schema1.0 packet contract. Legacy Markdown-only or loose JSON packets intentionally report INCOMPLETE. Preserve old packets and approvals as history. Rebuild the structured packet and complete drafts from verified evidence, preserving known first-read baselines; if a baseline is unknown or drifted, read/review the new source and make a new revision. Regenerate both views and obtain an exact new approval. Never silently infer a legacy approval or recapture a baseline after drafting.
+Codex CLI0.154.0 exposes this Git/local plugin skill as open-project-codex:open-project. In a Codex message, explicit CLI-style invocation is:
+
+    $open-project-codex:open-project reorg <project folder>
+
+Use the actual skill picker/registry name on other surfaces. This is prompt text, not a PowerShell command.

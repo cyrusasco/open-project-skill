@@ -1,0 +1,18 @@
+{
+  "cli_version": "codex-cli 0.154.0",
+  "local_marketplace_registered": true,
+  "installed_in_isolated_home": true,
+  "loaded_skill": "open-project-codex:open-project",
+  "verified_runtime_resources": 26,
+  "loader_errors": 0,
+  "enabled": true,
+  "policy_field_exposed": false,
+  "policy_file_checked": true,
+  "model_calls": 0,
+  "real_user_host_modified": false,
+  "status": "LOAD_VERIFIED_ISOLATED",
+  "limits": [
+    "Native skill metadata does not expose invocation policy.",
+    "No model turn was requested; actual implicit/explicit workflow behavior remains unverified."
+  ]
+}

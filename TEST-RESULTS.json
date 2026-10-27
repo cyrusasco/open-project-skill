@@ -1,10 +1,10 @@
 {
-  "edition": "zcode",
-  "skill_version": "3.0.0",
-  "run_at": "2026-10-27T23:13:51+08:00",
+  "edition": "codex",
+  "skill_version": "3.0.0-codex.1",
+  "run_at": "2026-10-27T23:25:35+08:00",
   "python": "3.14.4",
-  "tests_run": 89,
-  "passed": 88,
+  "tests_run": 92,
+  "passed": 91,
   "failures": 0,
   "errors": 0,
   "skipped": [

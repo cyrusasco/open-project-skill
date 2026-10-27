@@ -1,0 +1,10 @@
+# Conditional native Codex custom-agent draft. Replace placeholders before approval.
+name = "<AGENT_NAME>"
+description = "<WHEN_THIS_AGENT_IS_APPROPRIATE>"
+developer_instructions = """
+<APPROVED_ROLE_SCOPE_AND_CHECKS>
+Use the approved project root and current specification.
+Record evidence and unknowns. Do not broaden parent permissions.
+"""
+# model and model_reasoning_effort are deliberately omitted: inherit parent.
+# This file cannot override the parent sandbox or approval policy.

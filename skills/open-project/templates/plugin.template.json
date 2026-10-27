@@ -1,12 +1,10 @@
 {
-  "name": "<PLUGIN>",
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "<plugin-name>",
   "version": "0.1.0",
-  "description": "<一句話：呢個 plugin 為 <PROJECT> 提供 agent、營運 skill、slash command 同 <CLI> 工具>",
+  "description": "<APPROVED_PLUGIN_PURPOSE>",
   "author": {
     "name": "<AUTHOR>"
   },
-  "license": "<VERIFIED_LICENSE>",
-  "agents": "agents",
-  "skills": "skills",
-  "commands": "commands"
+  "license": "<VERIFIED_LICENSE>"
 }
