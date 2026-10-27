@@ -1,8 +1,8 @@
 ---
 name: <NAME>
-description: "<PROJECT> 嘅 <責任>；只喺 <明確任務觸發條件> 時委派。"
+description: "<一句話：呢個 agent 負責 <PROJECT> 嘅咩，幾時派佢>"
 tools: [Read, Edit, Write, Bash, Grep, Glob, Agent, Skill]
-model: <PROVIDER/MODEL>
+model: <PROVIDER/MODEL — 必填！Phase 4 問用戶攞佢後台揀嘅有效字串，例 <provider>/<model-id>>
 ---
 
 # <PROJECT> — <NAME> 操作契約
