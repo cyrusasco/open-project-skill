@@ -1,57 +1,66 @@
-# product_specification.md — <PROJECT> 產品憲法（開案契約）
+# <PROJECT> — Product specification
 
-> 快照時間：<YYYY-MM-DD HH:MM（當地時區）>
-> **呢份係咩**：開案時定嘅**功能契約**——產品要做咩、每個功能點樣驗收；開發、agent、review 一律跟呢份做（AP-18）。
-> **內容來源**：new＝Phase 0 訪談答案＋用戶明確要求；reorg＝由現有產品行為（代碼／用戶可見行為）實讀返嚟。
-> **禁歷史**：fine-tuning 輪次、修復紀錄、驗證過程、踩坑——一律入 memory／PROJECT／FROZEN，**唔准入呢份**。呢份只寫「要做咩＋點算過」，唔寫「做過咩」。
-> 規則：需求／驗收嘅唯一權威。改需求先改呢份，再同步 agent.md／project_status.md。
+> Contract revision：<ID>　capture time：<ISO8601_WITH_OFFSET>
+> 本文件只定義產品應做嘅功能、來源及可判定驗收。observed status、修復史、fine-tuning 輪次、驗證過程寫 status／memory／review（AP-18）。
+> 新案來源＝明確用戶要求／訪談。reorg 分開實讀現況同 desired behavior；現存 bug／workaround 唔自動變需求。
 
----
+## §1 定位與邊界
 
-## §1 定位
+- 一句話：<邊個喺咩場景解決咩問題／得到咩結果>。
+- 使用者／情境：<roles and journeys>。
+- In scope：<adopted scope>。
+- Out of scope：<explicit exclusions>。
+- 約束：<platform/time/budget/compatibility>。
 
-- **一句話**：<PROJECT 一句話：邊個用／解決乜痛／點解唔同現有方案>
-- **使用者**：<邊個人／邊個角色用，使用場景>
-- **範圍**：做咩／唔做咩（明列 out-of-scope）
+## §2 成功準則
 
-## §2 成功準則（可測，產品層）
-
-| # | 準則 | 量度方法 | 現況 |
+| ID | desired success | 量度方法／固定門檻 | requirement IDs |
 |---|---|---|---|
-| S1 | <例：核心流程 N 分鐘內完成> | <命令／log 關鍵字／實測步驟> | 未達／已達（證據出處） |
+| S1 | <desired outcome> | <measurable threshold + method> | <REQ IDs> |
 
-## §3 功能規格矩陣（核心——每行＝行為＋驗收）
+本節不放「已達／未達」；實際結果放 project_status／review 並引用相同 ID。
 
-> 按功能域分小節（§3.1、§3.2…自訂）。**每行必填「驗收準則」**——寫到可以用實測判定過唔過；寫唔出準則＝需求未想清楚。
+## §3 功能矩陣
 
-### §3.1 <功能域 A>
+每項有穩定 requirement ID、來源 ID＋版本、desired behavior 及可客觀判定 acceptance。描述 input／trigger→處理→output／failure behavior，唔以「正常工作」代替準則。
 
-| 功能 | 行為規格（做咩） | 驗收準則（點算過） | 優先級 |
-|---|---|---|---|
-| <F1> | <觸發→處理→落點；錯誤路徑（fail-closed／retry／告警）> | <可實測嘅判定條件> | P0–P3 |
+| ID | 來源／版本 | 功能／desired behavior | acceptance（pass/fail） | priority／required |
+|---|---|---|---|---|
+| REQ1 | <explicit request/interview/source ID> | <trigger, processing, output, errors> | <given/when/then; measurable expected result> | <P0–P3; true/false> |
 
-## §4 流程（核心 user journey）
+### §3.1 <功能域>
 
-1. <步驟 1：觸發 → 處理 → 落點>
-2. <錯誤路徑：fail 時點算>
+| ID | 角色／前置條件 | desired flow | 錯誤／邊界行為 | acceptance |
+|---|---|---|---|---|
+| <REQ ID> | <user/state> | <expected steps> | <failure/retry/permission> | <fixed criterion> |
 
-## §5 非功能
+## §4 User journey
 
-- **性能**：<延遲／吞吐目標＋量度方法>
-- **穩定性**：<可用性目標；宣稱穩定必須帶 baseline 對照（AP-12）>
-- **安全**：<secret 放邊、邊啲端口只聽 localhost、認證方法>
-- **可觀測**：<log 位置／health endpoint／doctor 項目>
+1. <角色／觸發→處理→可見結果；引用 requirement ID>。
+2. <拒絕／空值／錯誤路徑及回復行為>。
+3. <完成後可觀察輸出／後續操作>。
 
-## §6 已知限制（產品層）
+## §5 非功能要求
 
-- <限制＋原因＋繞道>（歷史事故紀錄唔入呢度——入 memory）
+| ID | 類別 | desired requirement | acceptance／量度方法 | source ID |
+|---|---|---|---|---|
+| NFR1 | 性能 | <target> | <fixed test and threshold> | <source> |
+| NFR2 | 穩定性 | <desired reliability> | <baseline and measurable result> | <source> |
+| NFR3 | 安全／私隱 | <secret/access/data boundary> | <observable criterion> | <source> |
+| NFR4 | 可觀測性 | <logs/health/evidence> | <verification method> | <source> |
 
-## §7 名詞
+N/A 要有需求層理由。無 baseline 唔宣稱穩定（AP-12），未確認門檻列未知，唔杜撰。
 
-| 名詞 | 定義 |
+## §6 外部依賴與產品限制
+
+| ID | 依賴／限制 | desired contract | 失效時行為 | 來源 |
+|---|---|---|---|---|
+| L1 | <service/platform> | <required behavior> | <fallback/error> | <ref> |
+
+## §7 名詞與追溯
+
+| 名詞／ID | 定義／來源 |
 |---|---|
-| <term> | <定義> |
+| <term> | <definition> |
 
----
-
-> 維護：每次 Phase 8 review 後同步；功能狀態改變要更新 §3「驗收準則」欄並寫證據出處。
+requirements→planned drafts→驗收證據 ID 需可追溯。需求變更更新本契約 revision，重建 packet／hash／對應批准；觀察結果不反向改 acceptance 去迎合現況。

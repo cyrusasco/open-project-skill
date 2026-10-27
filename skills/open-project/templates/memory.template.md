@@ -1,79 +1,98 @@
-# memory.md — <PROJECT> 試錯總賬
+# <PROJECT> — Memory event log
 
-> 規則：**append-only**——唔准刪舊行；錯咗加更正行（刪除線保留原行）。
-> **條目狀態欄（每行必填）**：`current`（現行有效）｜`superseded`（被新結論取代，原文保留）｜`revoked`（撤回）。**現行指令只認 current 鏈最新**；開工時 superseded／revoked 只做歷史參考。
-> 未驗證嘅嘢只准入 §D，唔准入 §A／§G「已修」。
-> 每條必填：症狀／根因／解法／現況／**出處**（commit／檔案／issue／log／session ref）。
+> **append-only**：舊 entries／rows／狀態／原文都不修改或刪除。更正、取代、撤回只 append 新 event。
+> 當前狀態係事件鏈計算結果：current／superseded／revoked；唔回頭改舊 row 成 superseded，唔用刪線覆寫舊內容。
+> 每 entry／event 有唯一 ID、time、source-version ref；新事件引用舊 ID。未知不進已驗證事實。
 
-## §0 FROZEN 指引
+## §0 FROZEN 關係
 
-- 不變量收藏喺 `FROZEN_*.md`；呢度只記「邊條 FROZEN 同呢個坑有關」。
-- Rule #0：FROZEN 唔准改；例外要用途經變更管制嘅新版本。
+適用不變量見 `FROZEN_*.md` 及**外部 manifest**。舊 frozen bytes 唔改，supersedes 映射／hash／授權放外部。此處只 append 為何凍結或更換版本嘅證據事件。
 
-## §A 已驗證事實
+## §A 已驗證事實 entries
 
-| # | 事實 | 證據出處 | 狀態 |
+| entry ID | time | 事實 | evidence ID／version／scope |
 |---|---|---|---|
-| A1 | <例：服務 X 聽 <port>> | <檔案:行／命令輸出> | current |
+| A1 | <ISO time+offset> | <verified fact> | <ref/hash/command output> |
 
-## §B 坑 → 解法
+不要在原 row 寫可變「current」狀態。狀態由 §K events 推導，未被有效 supersedes／revokes 嘅最新鏈端先 current。
 
-| # | 症狀 | 根因 | 解法 | 出處 | 狀態 |
+## §B 坑與解法 entries
+
+| entry ID | time | 症狀 | 有證據根因 | 解法／observed result | source refs |
 |---|---|---|---|---|---|
-| B1 | <症狀> | <根因> | <解法> | <出處> | current |
+| B1 | <time> | <symptom> | <evidence-backed cause> | <solution/result> | <refs> |
 
-## §C 誤判誠實帳（曾經判錯嘅嘢）
+無證據歸因去 §D；唔將臨時 workaround 自動升格需求。
 
-| # | 當時判斷 | 實際真相 | 教訓 |
+## §C 誤判紀錄
+
+| entry ID | time | 當時判斷 | 核實後事實 | 教訓／來源 |
+|---|---|---|---|---|
+| C1 | <time> | <old claim> | <verified correction> | <ref> |
+
+寫新 entry，再 append correction event 指向舊 claim，唔回頭改舊字句。
+
+## §D 待驗證 entries（UNVERIFIED）
+
+| entry ID | time | 說法／缺失 | 原因 | 驗證方法／所需授權 | source ref |
+|---|---|---|---|---|---|
+| D1 | <time> | <unknown> | <reason> | <next check> | <ref> |
+
+驗證後新增 §A／§B entry，再以 supersedes event 指向舊未知；原未知保留。
+
+## §E 用戶明確指示
+
+| entry ID | time | 原文／具體範圍 | decision/source ref |
 |---|---|---|---|
-| C1 | <例：以為 crash 係自己 hook 造成> | <系統錯誤報告顯示唔關事> | <歸因前先查錯誤報告（AP-03）> |
+| E1 | <time> | <explicit request/authorization> | <session ref + source version> |
 
-## §D 未驗證（UNVERIFIED）
+撤回以新 revokes event 指向 E1，唔刪 E1。已有相同範圍明確授權持續有效；不由模糊舊偏好推導破壞性操作授權。
 
-| # | 講法 | 點解未驗 | 驗證方法 | 所需批准？ |
-|---|---|---|---|---|
-| D1 |  |  |  |  |
+## §F 事件時間線
 
-## §E 用戶指示（明確要求，優先級最高）
+| entry ID | time | 事件／里程碑 | evidence refs |
+|---|---|---|---|
+| F1 | <time> | <milestone> | <refs> |
 
-| # | 指示 | 日期 | 出處 | 狀態 |
-|---|---|---|---|---|
-| E1 | <例：發送一律用正式接口，UI 自動化否決> | <date> | <session ref> | current |
+capture time、source 修改時間分開；mtime 不證明作者。
 
-> 用戶收回指示→原行狀態改 `revoked`＋加新行講明邊日收回；唔准刪舊行。
+## §G 歷史問題 entries
 
-## §F 時間線
-
-| 日期 | 事件 |
-|---|---|
-| <date> | <里程碑／大改動／事故> |
-
-## §G 歷史問題總賬（<N> 項，`<REPO>`）
-
-| # | 問題 | 原因／繞道 | 現況 | 出處 | 狀態 |
+| entry ID | time | 問題 | 根因／解法或繞道 | 當時 observed 狀態 | source refs |
 |---|---|---|---|---|---|
-| 1 |  |  | 已修／未修／繞過 |  | current |
+| G1 | <time> | <issue> | <evidence-backed explanation> | <resolved/open/unknown> | <refs> |
 
-> 編號續號規則：新項目由 `<N+1>` 起；宣稱總數必須等於實際行數（Phase 8 會對賬）。
+後續結果寫新 entry＋event，不編輯當時狀態。序號持續追加，宣稱總數由實際 entry counts 計。
 
-## §H 重複出現嘅模式
+## §H 重複模式
 
-| # | 模式 | 出現次數 | 對策 | 狀態 |
+| entry ID | time | 模式／次數／範圍 | 證據 | 工具化評估連結 |
 |---|---|---|---|---|
-| 1 | <例：單槽變數並發覆寫> | <n> | <位置判定> | current |
+| H1 | <time> | <pattern/count/scope> | <command/query + refs> | <PLAN §6 ID or N/A> |
 
-## §I 仍未修清單
+重複不代表必須自建工具，N/A 可合法。
 
-1. <問題＋現況>
-2. …
+## §I 歷史未解項
 
-> 更正格式：`~~原行~~ → **<date> 已 <做法>**（保留原行＋更正）`；狀態欄同時改 superseded。
+| entry ID | time | 問題／當時缺口 | 下一步 acceptance | ref |
+|---|---|---|---|---|
+| I1 | <time> | <open item> | <criterion> | <ref> |
 
-## §J 格式規則
+即時目前清單放 project_status，呢度保留事件歷史。
 
-1. append-only：唔准刪舊行；錯咗加更正行。
-2. 編號續號（§G 由 <N+1> 起）。
-3. 每條必填：症狀／根因／解法／現況／出處。
-4. 未驗證一律入 §D，唔准寫入 §A／§G「已修」。
-5. 每次 session 收工：新坑入 §B／§G，狀態入 `project_status.md`。
-6. 狀態欄 current／superseded／revoked 必填；「而家應該信邊條」永远以 current 鏈最新為準。
+## §J 記錄規則
+
+1. 每條有 unique ID、time、來源與範圍，數字連可重跑方法。
+2. 同時有新說法與舊說法時，append correction／supersedes event，不改舊 row。
+3. current 只由有效事件鏈推導；revoked 不當現行指示，superseded 只當歷史。
+4. 新 session 收尾 append 新坑／新證據／新決定；當前狀態放 status。
+5. 不記 secret 值；只記存在／位置。不要將整庫私人內容貼入 memory。
+6. 設計 acceptance 放 specification；觀察、修復史、fine-tuning 過程留本文件／status／review。
+
+## §K Append-only 狀態／更正事件
+
+| event ID | time | type | target entry/event ID | replacement entry ID | reason／decision evidence |
+|---|---|---|---|---|---|
+| EVT1 | <time> | <supersedes/revokes/correction> | <old ID> | <new ID or N/A> | <source ref> |
+
+supersedes＝新 entry 取代舊 entry；revokes＝撤回該 entry 效力；correction＝明確指出舊說法錯誤並連新 evidence。原文原行原狀保留；若更正事件本身有誤，再 append event 指向該 event。不要 rewrite 舊狀態為 current／superseded／revoked。

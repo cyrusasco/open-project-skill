@@ -1,52 +1,83 @@
-# open-project (ZCode skill)
+# open-project — ZCode edition
 
-A generic ZCode skill for **starting a new project or reorganizing an existing one** — evidence-first, drafts-before-approval, N/A-friendly.
+Explicitly requested project start / reorganization, with full drafts before approval.
 
-通用 ZCode skill：開新 project／重整舊 project 嘅端到端流程——先攞證據，草稿全文俾你過目，批准先落正式檔。
+通用開案／重整流程，**只喺用戶明確叫用 open-project 時啟動**。保留 Phase 0–9、全文 MD 草稿、product specification、離線 HTML、advisory 預設及 N/A。此 repo 保持 ZCode harness；Codex 版使用獨立來源，不覆寫 ZCode 設定。
 
-## What it does
+## Source and compatibility
 
-Phase 0–9, one pipeline for both routes:
+- Skill revision: **3.0.0**; packet contract: **1.0**; first plugin package: **0.1.0**.
+- ZCode conventions retained: Agent / subagent_type, ReadSessionContext, .zcode-plugin, command $ARGUMENTS, current agent model/provider rules.
+- Model selection is resolved. This release fixes parsing and integrity, and does not change working backend/model configuration.
+- SOURCE.json records the reviewed upstream commit. Generated package manifests record exact content hashes.
+- No command changes the installed skill, host config, plugin cache or another project automatically.
 
-| Phase | What |
+## Explicit invocation
+
+Use the command exposed by ZCode, for example:
+
+    /open-project new <goal or folder>
+    /open-project reorg <project folder>
+
+Plugin namespaces can change the displayed command name. Select the actual command shown by the host, and verify which package it resolves to.
+
+**ZCode native manual-only enforcement is not yet verified.** The description and workflow require explicit invocation, but packaging a discoverable skill is not a host-level guarantee. Do not copy Codex or Claude flags into ZCode. Until native behavior is verified, disable the plugin when not using it, and use a dedicated explicitly invoked task when enabled. This fallback has an extra step; it is not advertised as an enabled-but-never-automatic guarantee.
+
+Before migrating, inventory old standalone skills and global commands so another copy cannot keep auto-triggering or shadow the plugin. Back up and disable only the chosen old entry; do not delete unrelated user setup. Installation/load/invocation verification are separate from building.
+
+## Build a plugin without installing
+
+    python scripts/build-plugin.py
+
+This writes an isolated package to build/zcode/open-project/ and verifies the resource allowlist. It includes no database, session history, secrets, permanent service or automatic hook. Existing different output is not overwritten; choose another --output for a new build. Rebuilding identical bytes is a no-op.
+
+The repo contains a native ZCode manifest and marketplace entry using the ZCode plugins[].source string convention. JSON validity and a complete package do not prove that a particular ZCode version loads it. Use the host's plugin installation flow, then test in a new session. No installation or restart is performed by the build script.
+
+## Runtime tools
+
+All tools are under skills/open-project/scripts/:
+
+    python discover-sessions.py --db <ZCode db.sqlite> --keyword <project-alias> --output <task-local-report.json>
+    python render-plan.py <PROJECT>
+    python gate-check.py <PROJECT> --json
+    python gate-check.py <PROJECT> --strict
+    python promote.py <PROJECT> --approval <approval.json>
+    python promote.py <PROJECT> --approval <approval.json> --apply
+
+- Discovery searches system-wide visible conversation text before directory/title signals. Search hits are candidates, not full review. Coverage, source identity, read depth and snapshot limits are explicit.
+- Rendering consumes md-drafts/plan-data.json and writes only the two staging views. Full draft text is embedded in the offline HTML.
+- Gate checking validates schema, required drafts/specification, content hashes, host-specific agent syntax and exact generated views. Advisory can exit zero with ready=false; strict fails required errors.
+- Promote defaults to dry-run. Applying needs an exact approval record and unchanged hashes; backups, journal, no-op and recovery states are recorded. An approval record is evidence of a decision, not an OS permission boundary.
+- Supported deterministic transforms: exact draft marker removal and UTF-8/LF normalization. Other edits must be made in the staged draft before approval.
+- Capture target hashes when reading the source. Do not regenerate a baseline after writing a draft.
+
+See references/workflow-contract.md, references/host-zcode.md and the schema inside the skill for packet fields and limitations.
+
+## Workflow
+
+| Phase | Output |
 |---|---|
-| 0 | Intent / interview (new route asks targeted questions) + size S/M/L |
-| 1 | Facts vs unknowns (every fact has a source; unknowns marked UNVERIFIED) |
-| 2 | Session review (whole-system discovery, depth tags, pain points, role stats) |
-| 3 | File / code / git / secret review (code map, conflicts, authority order) |
-| 4 | PLAN + **full MD drafts (md-drafts/ staging)** + offline HTML report + gate-check — **stops for your approval** |
-| 5 | Drift check → byte-level backups → promote (whitelisted transforms only) |
-| 6 | Build only what the evaluation says (SKILL / MCP / CLI / Plugin / agent — **N/A is a valid answer**) |
-| 7 | Plugin packaging (PACKAGED vs INSTALLED states) |
-| 8 | Independent read-only review (12 checks, PASS/FAIL/UNVERIFIED) |
-| 9 | Handover (LOCAL COMPLETE / NOT_PUSHED are legal endings) |
+| 0 | Intent, route, scale, targeted interview |
+| 1 | Facts, unknowns, read-time baseline |
+| 2 | Whole-system discovery, relationships, deep-read tags, coverage |
+| 3 | Files/code/git/secret review |
+| 4 | PLAN + every full MD draft + specification + JSON + offline HTML + gate report; approval |
+| 5 | Approved writes only, drift checks, byte backups, deterministic promote |
+| 6 | Build justified tools/agents; N/A is valid |
+| 7 | Package the target project's plugin only if needed |
+| 8 | Independent review; required unresolved findings prevent acceptance |
+| 9 | Handover; LOCAL COMPLETE / NOT_PUSHED are valid |
 
-`scripts/gate-check.py` — advisory mechanical checks (missing drafts, stale HTML vs plan-data, agent model placeholder, fake timestamps, stale references). Suggestions at the end of the report; `--strict` makes any FAIL exit non-zero.
+## Tests
 
-## Install
+    python -m unittest discover -s tests -v
 
-1. Copy this repo's `skills/open-project/` folder → `~/.zcode/skills/open-project/`
-2. Copy `commands/open-project.md` → `~/.zcode/commands/open-project.md`
-3. Restart ZCode (skills load in **new** sessions only), then:
+Tests use synthetic files/SQLite databases, never the live ZCode database. They include malformed packet/agent negatives, numeric/unknown-value rendering, cross-directory discovery, WAL and promote drift/recovery cases. A test pass is not a fresh-session host-loading claim. SELFTEST.md and historical percentage scores are not prerequisites or current evidence.
 
-```
-/open-project new <goal or folder>
-/open-project reorg <existing project folder>
-```
+Python **3.10+** for ZCode tools; Python 3.11+ only for TOML checking in the separate Codex edition. No runtime package dependency is required for ZCode.
 
-## Requirements
+MIT — retain LICENSE in derived packages.
 
-- ZCode
-- Python 3.10+ (for `scripts/gate-check.py`)
-- git + GitHub CLI (`gh`) — optional, used for open-source candidate search in Phase 4
+## Migrating a v2 packet
 
-## Repo layout
-
-```
-skills/open-project/          <- the skill (SKILL.md, templates/ x10, scripts/)
-commands/open-project.md      <- /open-project slash command
-```
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+Version 3 uses the breaking schema1.0 packet contract. Legacy Markdown-only or loose JSON packets intentionally report INCOMPLETE. Preserve old packets and approvals as history. Rebuild the structured packet and complete drafts from verified evidence, preserving known first-read baselines; if a baseline is unknown or drifted, read/review the new source and make a new revision. Regenerate both views and obtain an exact new approval. Never silently infer a legacy approval or recapture a baseline after drafting.

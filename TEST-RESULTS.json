@@ -1,0 +1,23 @@
+{
+  "edition": "zcode",
+  "skill_version": "3.0.0",
+  "run_at": "2026-10-27T23:13:51+08:00",
+  "python": "3.14.4",
+  "tests_run": 89,
+  "passed": 88,
+  "failures": 0,
+  "errors": 0,
+  "skipped": [
+    {
+      "test": "test_output_symlink_is_rejected_even_when_target_is_inside (test_renderer.RendererTests.test_output_symlink_is_rejected_even_when_target_is_inside)",
+      "reason": "Real symlink creation is not permitted by this Windows test environment."
+    }
+  ],
+  "status": "PASSED_WITH_SKIPS",
+  "scope": "Synthetic fixtures; no live session history, databases or host configuration modified.",
+  "limits": [
+    "Actual ZCode host loading is not covered.",
+    "LLM implicit/explicit invocation behavior is not proved by unit tests.",
+    "Python 3.10 was not installed here; optional tomllib absence is simulated."
+  ]
+}

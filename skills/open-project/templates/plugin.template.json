@@ -5,7 +5,7 @@
   "author": {
     "name": "<AUTHOR>"
   },
-  "license": "MIT",
+  "license": "<VERIFIED_LICENSE>",
   "agents": "agents",
   "skills": "skills",
   "commands": "commands"

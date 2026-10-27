@@ -1,16 +1,24 @@
 ---
-description: 開新 project／重整舊 project（open-project：review → PLAN＋草稿 → 批 → promote → 實作 → review）
+description: 明確調用 open-project：開案／重整嘅完整 PLAN、MD 草稿、審批、受控 promote、驗收及交接
 argument-hint: "[new|reorg] <project folder or goal>"
 skills: open-project
 ---
 
-用 `open-project` skill 處理呢個請求，按 Phase 0–9 執行。全程受 skill「全域執行安全規則」約束（執行前審副作用＋授權；未批→NOT_RUN 唔阻塞）。
+用 `open-project` skill 處理以下明確請求。只涵蓋本次任務生命週期；普通新 project／一般 coding 唔自動啟動。ZCode 原生 manual-only enforcement 未核實＝UNKNOWN；本入口及 checker 係 advisory，唔聲稱 OS／host 強制。
 
-流程重點：
-1. Phase 0：定路線＋規模（new 行兩輪訪談；reorg 快速意圖登記）——唔出計劃。
-2. Phase 1–3：事實／舊 session（範圍制＋深度 tag）／舊檔＋代碼 review。
-3. Phase 4（核心）：staging `md-drafts/` 三件套——PLAN.DRAFT.md（§1–§11，含工具化評估＋批准請求表）＋逐檔完整 MD 草稿（禁一句交差）＋plan-data.json＋離線 HTML 證據視圖。**停喺待批位，老闆批 §11＋過目草稿先繼續。**
-4. Phase 5：逐檔漂移核對（§8 baseline）→位元組備份→逐字 promote（白名單轉換）。
-5. Phase 6–9：照評估實作（N/A 合法）→plugin（PACKAGED/INSTALLED 狀態制）→獨立 review 12 項→handover（LOCAL COMPLETE/NOT_PUSHED 合法收尾）。
+先確認 PLUGIN_ROOT／SKILL_ROOT 同用戶指定 PROJECT_ROOT，使用原始 authoring 文件；第一次 raw-byte 讀取先記 baseline，先起草。唔自動更新 installed cache、global rules、host config 或安裝／啟用。
+
+Phase 0–9：
+1. 意圖／訪談、new/reorg、S/M/L；已有答案沿用。
+2. 事實＋首讀 baseline；reorg 全系統 metadata／可見 content discovery 先於 directory/title，parent closure、opaque IDs、WAL 短 read-only、來源版本與 coverage／深讀 tags。
+3. 檔案／代碼／git／secret review，desired requirements 與 observed 歷史分開。
+4. 完整 packet：11 節 PLAN、必交 product specification、每份 planned MD 完整草稿、schema 1.0 JSON、同源離線 HTML、gate 報告及尾部 suggestions；S 不減交付。
+5. 獨立批准 JSON 綁 plan／digest／draft／target／baseline／expected／transforms／effects；promote 預設 dry-run，已授權先 apply／resume，原始 bytes 備份及 drift 檢查。
+6. 按 §6 評估實作；CLI／agent／MCP／Plugin 可 N/A。保留 AP-17 已確認模型／provider 政策，唔再開模型修復工程。Agent／subagent_type、RSC、.zcode-plugin 按 host reference。
+7. 打包與 installed／loaded 分開，PACKAGED 合法交貨。
+8. 唯讀獨立 12 項 review；required P1 未解／required coverage UNKNOWN 都唔可 ACCEPTED，即使零 P0。
+9. status、append-only memory events、immutable FROZEN＋外部 manifest、follow-up；LOCAL COMPLETE／NOT_PUSHED 合法。已有明確授權持續有效，唔重複請批。
+
+所有命令按實際副作用與既有授權執行；未跑記 NOT_RUN／UNVERIFIED，不假綠。使用本 skill 嘅 scripts/render-plan.py、gate-check.py、promote.py、discover-sessions.py，明傳 PROJECT_ROOT，唔依賴 cwd。
 
 $ARGUMENTS

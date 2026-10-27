@@ -1,67 +1,87 @@
-# project_status.md — <PROJECT> 現況＋下一步
+# <PROJECT> — Project status／handover
 
-> 快照時間：**<YYYY-MM-DD HH:MM（當地時區）>**
-> 規則：每次 session 開工先做即時快照；收工更新本文件。
+> capture time：<ISO8601_WITH_OFFSET>　source snapshot／revision：<ID>
+> 本文件係當前 observed 狀態；desired behavior／固定 acceptance 見 product_specification。
+> completion：<LOCAL COMPLETE/PARTIAL/CHANGES REQUIRED>　repo：<NOT_PUSHED/PUSHED+REMOTE VERIFIED>
+> package：<N/A/PACKAGED/INSTALLED/LOAD VERIFIED>；四狀態不混用。
 
----
+## §0 事實、未知與證據
 
-## §0 事實表／未知表
-
-| # | 事實 | 值 | 證據出處 |
+| fact ID | observed fact／值 | evidence ID | capture time／source version／scope |
 |---|---|---|---|
-| F1 |  |  |  |
+| F1 | <observed value> | <ref> | <time/hash/range> |
 
-| # | 未知（全部標 UNVERIFIED） | 建議驗證方法 |
+| unknown ID | UNVERIFIED／原因 | 影響 required coverage | 下一步驗證 |
+|---|---|---|---|
+| U1 | <missing or NOT_RUN reason> | <impact> | <safe check/needed authorization> |
+
+## §1 目前快照
+
+| 項目 | 狀態 | evidence／命令／exit |
 |---|---|---|
-| U1 | UNVERIFIED： |  |
+| PROJECT_ROOT | <resolved path> | <ref> |
+| canonical packet | md-drafts/plan-data.json | <plan_id; revision; packet digest> |
+| rendered views | <PLAN/HTML paths> | <same digest; last render evidence> |
+| gate／ready | <advisory/strict; ready/status> | <report; missing; suggestions> |
+| approval | <separate JSON ref or pending> | <plan/revision/digest/selected IDs> |
+| promote | <per-file states/journal ref> | <draft/target/baseline/expected refs> |
+| CLI | <adopted path or NOT_APPLICABLE> | <§6 decision; actual checks> |
+| host enforcement／loaded | <UNKNOWN or observed proof> | <fresh-session/role evidence> |
+| git | <branch; HEAD; dirty> | <command/time> |
 
-## §1 狀態快照（實測）
+## §2 Repo／package review
 
-| 項目 | 狀態 | 證據（命令＋輸出摘要） |
-|---|---|---|
-| <服務 1> | ✅／❌／⏸ | <命令＋關鍵輸出> |
-| git | branch `<branch>` @ `<sha>`，dirty <n> | <git 指令輸出> |
-
-## §2 Repo review
-
-| 項目 | 結果 |
+| 項目 | observed 結果／來源 |
 |---|---|
-| Repo | `<OWNER>/<REPO>`（PRIVATE／public） |
-| 遠端 tip | `<branch>` @ `<sha>`（<date> push） |
-| 本地 checkout 們 | <每個 checkout／worktree：路徑＋branch＋sha＋同步狀態> |
-| Issues／PR／Releases | <open issue 數／draft PR／release 數> |
-| 分岔／漂移 | <邊個 checkout 同遠端分岔、邊份副本過期> |
+| repo | <owner/repo or N/A> |
+| local checkout／worktrees | <path; branch; SHA; dirty> |
+| remote tip | <verified SHA/time or NOT_VERIFIED/NOT_PUSHED> |
+| issues／PR／releases | <evidence or NOT_RUN reason> |
+| source／package／installed／loaded | <separate paths/hashes/evidence> |
+| secret coverage | <SCANNED count; NOT_SCANNED paths/reasons; findings counts only> |
 
-## §3 已完成（有證據）
+push 未授權可 NOT_PUSHED 合法交貨；已 push 需驗遠端 tip，唔只信本地。
 
-| # | 完成項 | 證據 |
-|---|---|---|
-| 1 |  | <命令輸出／commit> |
+## §3 本輪已完成
 
-## §4 未完成（誠實清單）
+| ID | 完成結果 | requirement／acceptance ID | evidence／command／exit／scope |
+|---|---|---|---|
+| DONE1 | <observed completion> | <REQ/test ID> | <ref> |
 
-| # | 未完成項 | 卡喺邊 |
-|---|---|---|
-| 1 |  |  |
+不要用舊 SELFTEST／SKILL-REPORT 當當前 PASS；寫當前 source revision、可重跑命令及實際 exit。
+
+## §4 未完成與覆蓋限制
+
+| ID | 未完成／UNKNOWN／NOT_RUN | 具體原因／授權缺口 | acceptance／下一步 |
+|---|---|---|---|
+| OPEN1 | <item> | <reason> | <criterion> |
+
+full／partial／summary-only／unread、global metadata/content coverage、missing sources、WAL／併發 delta、fresh session／browser／live integration 分開記。reorg 不因 S 規模省掉全域 discovery。無 CLI／Plugin／deploy 可 N/A＋理由。
 
 ## §5 Roadmap（P0–Pn）
 
-| 優先級 | 項目 | 驗收準則 | 預計 |
+| priority | action／owner | 固定 acceptance | 依賴／現有授權／缺口 |
 |---|---|---|---|
-| P0 |  |  |  |
-| P1 |  |  |  |
-| P2 |  |  |  |
+| P0 | <action> | <criterion> | <dependency> |
+| P1 | <action> | <criterion> | <dependency> |
+| P2 | <action or N/A> | <criterion> | <dependency> |
 
-## §6 風險
+## §6 風險／恢復
 
-| 風險 | 影響 | 緩解 |
-|---|---|---|
-|  |  |  |
+| risk ID | observed 風險／來源 | 影響 | 緩解／剩餘限制 |
+|---|---|---|---|
+| R1 | <risk> | <impact> | <action> |
 
-## §7 Handoff（今輪）
+promote journal／backups：`.open-project-promotion/`，內部 .gitignore 保護記錄。FAILED_RECOVERED／FAILED_UNRECOVERED 只指 target_file_bytes；journal／backup／新空 parent directories 可保留。合作鎖不阻外部 writer。FROZEN 舊 bytes 以外部 manifest 指版本；memory correction events append。
 
-**今輪做咗**：
-1. <項目＋證據>
+## §7 Handoff／新 session 入口
 
-**下一步（P0 先行）**：
-1. <動作＋驗收準則＋相關文件／命令>
+- 明確任務／範圍：<request ref>。
+- 根目錄與 canonical files：<PROJECT_ROOT; packet; spec; status; memory; frozen manifest>。
+- 本輪證據：<source/evidence IDs; revision; tests/report>。
+- 下一步先做：<P0 action＋acceptance＋可重跑命令>。
+- 授權邊界：<already authorized / concrete missing authorization>。
+- 最終 review：<ACCEPTED/CHANGES REQUIRED/PARTIAL; required coverage; P0/P1 status>。
+- 收尾：<LOCAL COMPLETE/NOT_PUSHED/PACKAGED 等具體結果>。
+
+新 session 讀到入口不自動觸發 open-project；只有用戶明確要求先按本流程續行。

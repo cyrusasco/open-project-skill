@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+build/
+dist/
+.coverage
+test-results/
+*.log
+.open-project-promotion/

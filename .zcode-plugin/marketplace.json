@@ -1,0 +1,11 @@
+{
+  "name": "open-project-zcode",
+  "description": "ZCode open-project plugin source",
+  "plugins": [
+    {
+      "name": "open-project",
+      "source": "./",
+      "description": "明確叫用嘅開案／重整流程"
+    }
+  ]
+}

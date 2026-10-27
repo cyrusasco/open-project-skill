@@ -1,138 +1,246 @@
-# -*- coding: utf-8 -*-
-"""
-gate-check.py — open-project 機械閘（v2.2.4）
-用法：python gate-check.py <PROJECT_DIR> [--strict] [--out <file>]
-預設 advisory：出報告＋建議，exit 0（保留彈性，老闆裁量）。
---strict：有任何 FAIL 先 exit 1（要硬閘嗰陣用）。
-檢查項：
-  G1 §8 manifest 逐檔存在（AP-16 草稿齊件）
-  G2 PLAN 新過 plan-data.json/HTML → 要重生成（AP-15）
-  G3 agent 草稿 frontmatter model 必須有效字串（AP-17：留空/inherit/placeholder 都會靜默跌錯 provider）
-  G4 PLAN 時間戳 vs 檔案 mtime（人手作假時間戳）
-  G5 草稿引用嘅 .md 檔存在性（陳舊引用）
-"""
-import os, re, sys, datetime, io
+"""Read-only packet checks. Advisory reports never imply promotion approval."""
+from __future__ import annotations
+import argparse
+import json
+import os
+from pathlib import Path, PurePosixPath
+import posixpath
+import re
+import sys
+from urllib.parse import unquote, urlsplit
+from plan_contract import PacketError, load_plan, validate_plan, resolve_inside, sha256, packet_digest, read_draft, expected_content
 
-def perr(s): print(s)
-def main():
-    args = [a for a in sys.argv[1:]]
-    strict = "--strict" in args
-    out = None
-    if "--out" in args: out = args[args.index("--out") + 1]
-    proj = args[0] if args and not args[0].startswith("--") else "."
-    md = os.path.join(proj, "md-drafts")
-    lines = []
-    def emit(s=""): lines.append(s)
 
-    emit("=" * 62)
-    emit("open-project gate-check — " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    emit("project: " + os.path.abspath(proj) + ("   [STRICT]" if strict else "   [advisory－預設]"))
-    emit("=" * 62)
-    fails, warns = [], []
+def _yaml_scalar(raw):
+    """One-line YAML scalar subset; never consume a following key as a value."""
+    value = raw.lstrip(' ')
+    if not value or value.startswith('#'):
+        return ''
+    if value[0] == "'":
+        result = ''
+        index = 1
+        while index < len(value):
+            if value[index] == "'":
+                if index + 1 < len(value) and value[index+1] == "'":
+                    result += "'"
+                    index += 2
+                    continue
+                trailing = value[index+1:].strip()
+                if trailing and not trailing.startswith('#'):
+                    raise PacketError('invalid YAML quoted scalar')
+                return result
+            result += value[index]
+            index += 1
+        raise PacketError('unterminated YAML scalar')
+    if value[0] == '"':
+        try:
+            decoded, end = json.JSONDecoder().raw_decode(value)
+        except ValueError as exc:
+            raise PacketError('invalid YAML quoted scalar') from exc
+        if not isinstance(decoded,str):
+            raise PacketError('invalid YAML scalar type')
+        trailing = value[end:].strip()
+        if trailing and not trailing.startswith('#'):
+            raise PacketError('invalid YAML scalar suffix')
+        return decoded
+    value = re.split(r'\s+#',value,maxsplit=1)[0].strip()
+    if value in ('null','Null','NULL','~'):
+        return ''
+    if value.casefold() in ('true','false','yes','no','on','off','.inf','+.inf','-.inf','.nan') or re.fullmatch(r'[-+]?(?:[0-9][0-9_]*(?:\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?|\.[0-9]+(?:[eE][-+]?[0-9]+)?|0[xob][0-9a-fA-F_]+)',value):
+        raise PacketError('YAML model scalar must be literal text')
+    if re.search(r':(?:\s|$)',value):
+        raise PacketError('invalid YAML plain scalar')
+    if value.startswith(('|','>','[','{','&','*','!')):
+        raise PacketError('unsupported YAML scalar syntax')
+    return value
 
-    def finding(level, gate, msg, suggest):
-        (fails if level == "FAIL" else warns).append(gate)
-        emit("[" + level + "] " + gate + "｜" + msg)
-        emit("        建議：" + suggest)
 
-    if not os.path.isdir(md):
-        emit("[FAIL] 環境｜搵唔到 md-drafts/ staging 目錄"); emit("        建議：確認行緊 open-project Phase 4/5，或者檢查 project 路徑")
-        report = "\n".join(lines) + flexibility_note(len(fails))
-        print(report)
-        if out: io.open(out, "w", encoding="utf-8", newline="\n").write(report)
-        sys.exit(1 if strict else 0)
+def _agent_error(draft, raw):
+    if draft['kind'] not in ('zcode-agent','codex-agent'):
+        return None
+    text = raw.decode('utf-8').replace('\r\n','\n').replace('\r','\n')
+    if draft['kind'] == 'codex-agent':
+        try:
+            import tomllib
+        except ImportError:
+            return 'G3: native Codex TOML validation requires Python 3.11 or newer: ' + draft['path']
+        try:
+            values = tomllib.loads(text)
+        except tomllib.TOMLDecodeError:
+            return 'G3: codex-agent requires valid native TOML: ' + draft['path']
+        for field in ('name','description','developer_instructions'):
+            if not isinstance(values.get(field),str) or not values[field].strip():
+                return 'G3: codex-agent requires non-empty ' + field + ': ' + draft['path']
+        if 'model' in values and (not isinstance(values['model'],str) or not values['model'].strip()):
+            return 'G3: codex-agent model must be non-empty text when supplied: ' + draft['path']
+        return None
+    if not text.startswith('---\n'):
+        return 'G3: zcode-agent frontmatter must begin on line 1: ' + draft['path']
+    lines = text.split('\n')
+    try:
+        end = lines.index('---',1)
+    except ValueError:
+        return 'G3: zcode-agent frontmatter is not closed: ' + draft['path']
+    fields = {}
+    try:
+        for line in lines[1:end]:
+            if not line.strip() or line.lstrip().startswith('#'):
+                continue
+            match = re.fullmatch(r'([A-Za-z_][A-Za-z0-9_-]*):[ \t]*(.*)',line)
+            if not match:
+                raise PacketError('unsupported YAML frontmatter line')
+            key,value = match.groups()
+            if key in fields:
+                raise PacketError('duplicate YAML frontmatter key')
+            # Other native fields such as tools arrays remain opaque.
+            fields[key] = _yaml_scalar(value) if key in ('name','description','model') else value
+    except PacketError:
+        return 'G3: invalid one-line YAML scalar frontmatter: ' + draft['path']
+    model = fields.get('model','').strip()
+    if not model or model.casefold() == 'inherit' or '<' in model or '>' in model or re.search(r'placeholder|待確認|待填|待定',model,re.I):
+        return 'G3: zcode-agent model must be an explicit literal; empty/inherit/placeholder forbidden: ' + draft['path']
+    return None
 
-    # ---- G1 §8 manifest 逐檔 ----
-    plan_path = os.path.join(md, "PLAN.DRAFT.md")
-    if not os.path.exists(plan_path): plan_path = os.path.join(proj, "PLAN.md")
-    plan_txt = io.open(plan_path, encoding="utf-8").read() if os.path.exists(plan_path) else ""
-    sec8 = re.search(r"##\s*§8.*?(?=\n##\s*§9|\Z)", plan_txt, re.S)
-    manifest = []
-    if sec8:
-        for row in sec8.group(0).splitlines():
-            m = re.match(r"\|\s*(md-drafts/[\w.\- ]+?\.DRAFT\.md)\s*\|", row)
-            if m: manifest.append(m.group(1))
-    if not manifest:
-        finding("WARN", "G1", "PLAN §8 manifest 解析唔到（或冇草稿行）", "檢查 §8 表格格式：每行第一格係 md-drafts/<name>.DRAFT.md")
-    for f in manifest:
-        if not os.path.exists(os.path.join(proj, f.replace("/", os.sep))):
-            finding("FAIL", "G1", "§8 列咗但檔案唔存在：" + f, "補返草稿，或者喺 §8 移除嗰行（寫明理由）——呈交缺件＝AP-16")
-    listed = set(manifest)
-    for f in sorted(os.listdir(md)):
-        if f.endswith(".DRAFT.md") and ("md-drafts/" + f) not in listed:
-            finding("WARN", "G1", "草稿存在但未列入 §8 manifest：md-drafts/" + f, "加入 §8（有 DoD＋baseline），或者唔屬於交付物就移出去 staging")
 
-    # ---- G2 AP-15 三方新鮮度 ----
-    plan_mtime = os.path.getmtime(plan_path) if os.path.exists(plan_path) else 0
-    for dep in ["plan-data.json", "PLAN-REPORT.DRAFT.html"]:
-        p = os.path.join(md, dep)
-        if os.path.exists(p) and os.path.getmtime(p) < plan_mtime - 5:
-            lag = int(plan_mtime - os.path.getmtime(p))
-            finding("FAIL", "G2", dep + " 舊過 PLAN " + str(lag) + " 秒——數據視圖脫鉤（AP-15）",
-                    "改完 PLAN 必須重新生成（跑返你個 gen-report / 生成流程）")
+def _markdown_refs(text):
+    # Match link destinations and inline-code relative Markdown paths, including Unicode.
+    text = re.sub(r'```.*?```','',text,flags=re.S)
+    for match in re.finditer(r'!?\[[^\]\n]*\]\(\s*(<[^>\n]+>|[^)\s]+)(?:\s+[^)]*)?\)',text):
+        yield match.group(1).strip('<>')
+    for match in re.finditer(r'^\s*\[[^\]\n]+\]:\s*(<[^>\n]+>|\S+)',text,re.M):
+        yield match.group(1).strip('<>')
+    for match in re.finditer(r'`([^`\n]+\.md(?:#[^`\n]*)?)`',text):
+        yield match.group(1)
 
-    # ---- G3 AP-17 agent model ----
-    for f in sorted(os.listdir(md)):
-        if not f.endswith(".DRAFT.md"): continue
-        t = io.open(os.path.join(md, f), encoding="utf-8").read()
-        m = re.match(r"^---\n(.*?)\n---", t, re.S)
-        if not m or "tools:" not in m.group(1): continue
-        mm = re.search(r"^model:\s*(.+)$", m.group(1), re.M)
-        if not mm:
-            finding("FAIL", "G3", f + " frontmatter 冇 model: 行——會靜默跌落 provider 清單第一個", "加 model: <provider/model>（問用戶攞後台揀嘅有效字串）")
-        else:
-            v = mm.group(1).strip()
-            if v.startswith("<") or "執行時填" in v or v == "inherit":
-                finding("FAIL", "G3", f + " model 係 placeholder／inherit（" + v[:40] + "）——唔會跟後台 default", "Phase 4 問老闆攞字串後填實（AP-17；例 <provider>/<model-id>）")
 
-    # ---- G4 時間戳 vs mtime ----
-    if plan_txt:
-        head = "\n".join(plan_txt.splitlines()[:12])
-        ts = re.search(r"(20\d{2}-\d{2}-\d{2})[ T]*(\d{1,2}:\d{2})?", head)
-        if ts:
+def _reference_warnings(project, draft, raw, targets):
+    warnings = []
+    seen = set()
+    for ref in _markdown_refs(raw.decode('utf-8')):
+        try:
+            parsed = urlsplit(ref)
+        except ValueError:
+            warnings.append('G5: malformed Markdown reference in ' + draft['target'])
+            continue
+        if parsed.scheme or parsed.netloc or not parsed.path or not parsed.path.lower().endswith('.md'):
+            continue
+        refpath = unquote(parsed.path)
+        if refpath.startswith('/'):
+            continue
+        relative = posixpath.normpath(posixpath.join(posixpath.dirname(draft['target']),refpath))
+        if relative in seen:
+            continue
+        seen.add(relative)
+        if relative in targets:
+            continue
+        try:
+            found = resolve_inside(project,relative).is_file()
+        except PacketError:
+            found = False
+        if not found:
+            warnings.append('G5: missing relative Markdown reference from ' + draft['target'] + ': ' + refpath)
+    return warnings
+
+
+def inspect_packet(project, plan=None):
+    result = {'ready':False,'errors':[],'warnings':[],'packet_sha256':None,'host':None}
+    errors,warnings = result['errors'],result['warnings']
+    try:
+        plan = load_plan(project) if plan is None else plan
+        validate_plan(plan)
+        result['packet_sha256'] = packet_digest(plan)
+        result['host'] = plan['host']
+    except (PacketError,OSError,ValueError,TypeError,KeyError) as exc:
+        errors.append('G1: invalid packet: ' + str(exc))
+        return result
+    targets = {d['target']:d for d in plan['drafts']}
+    target_locations = {}
+    for draft in plan['drafts']:
+        try:
+            canonical = os.path.normcase(os.fspath(resolve_inside(project,draft['target'])))
+            target_locations[canonical] = draft
+        except PacketError:
+            # Per-draft checks below report unsafe target paths.
+            continue
+    for source in plan['sources']:
+        label = source['id']
+        required = source.get('required',True)
+        if source.get('kind') == 'file' or 'path' in source:
             try:
-                claimed = datetime.datetime.strptime(ts.group(1) + " " + (ts.group(2) or "12:00"), "%Y-%m-%d %H:%M")
-                actual = datetime.datetime.fromtimestamp(plan_mtime)
-                if abs((claimed - actual).total_seconds()) > 3 * 3600:
-                    finding("WARN", "G4", "PLAN 頭時間戳(" + ts.group(0) + ")同檔案實際 mtime(" + actual.strftime("%m-%d %H:%M") + ")差好遠", "時間戳由腳本／實際執行時間注入，唔好手寫（今次差 " + str(int(abs((claimed-actual).total_seconds())/3600)) + " 小時）")
-            except ValueError: pass
+                location = resolve_inside(project,source['path'])
+                digest = sha256(location.read_bytes())
+                if digest != source['sha256']:
+                    draft = target_locations.get(os.path.normcase(os.fspath(location)))
+                    if draft and source['sha256'] == draft['baseline_sha256'] and digest == draft['expected_sha256']:
+                        warnings.append('G1: source is recorded pre-promotion evidence for expected target: ' + source['path'])
+                    else:
+                        raise PacketError('source hash mismatch: ' + source['path'])
+            except (PacketError,OSError) as exc:
+                (errors if required else warnings).append('G1: ' + (str(exc) if isinstance(exc,PacketError) else 'cannot read source: ' + source['path']))
+        else:
+            verified = source.get('verified') is True
+            captured = any(isinstance(source.get(k),str) and source[k].strip() for k in ('url','reference','locator'))
+            if source.get('kind','unknown') == 'unknown' or not verified or not captured:
+                (errors if required else warnings).append('G1: external source requires explicit verified captured reference: ' + label)
+    for draft in plan['drafts']:
+        try:
+            resolve_inside(project,draft['target'])
+            raw = read_draft(project,draft)
+            expected = expected_content(draft,raw)
+            body = expected.decode('utf-8-sig')
+            if body.startswith('<!-- open-project:draft -->'):
+                body = body[len('<!-- open-project:draft -->'):]
+            if draft['required'] and not body.strip():
+                raise PacketError('required draft has no content: ' + draft['path'])
+            if 'remove_draft_marker' in draft['transforms'] and b'<!-- open-project:draft -->' in raw and not (raw == b'<!-- open-project:draft -->' or raw.startswith((b'<!-- open-project:draft -->\n',b'<!-- open-project:draft -->\r'))):
+                raise PacketError('draft marker must be the exact first line when present: ' + draft['path'])
+            if sha256(expected) != draft['expected_sha256']:
+                raise PacketError('expected content hash mismatch: ' + draft['path'])
+            agent_error = _agent_error(draft,raw)
+            if agent_error:
+                errors.append(agent_error)
+            warnings.extend(_reference_warnings(project,draft,raw,targets))
+        except (PacketError,OSError,UnicodeError) as exc:
+            (errors if draft['required'] else warnings).append('G1: ' + (str(exc) if isinstance(exc,PacketError) else 'cannot inspect draft: ' + draft['path']))
+    # All views must be complete canonical derivations; mtime is not evidence of parity.
+    try:
+        from plan_render import render_views
+        expected_md,expected_html = render_views(project,plan)
+        for path,text in (('md-drafts/PLAN.DRAFT.md',expected_md),('md-drafts/PLAN-REPORT.DRAFT.html',expected_html)):
+            location = resolve_inside(project,path)
+            try:
+                actual = location.read_bytes()
+            except OSError:
+                errors.append('G2: missing generated view: ' + path)
+                continue
+            if actual != text.encode('utf-8'):
+                errors.append('G2: generated view differs from canonical packet: ' + path)
+    except (PacketError,OSError,ValueError,TypeError,KeyError) as exc:
+        errors.append('G2: cannot verify canonical views: ' + str(exc))
+    result['ready'] = not errors
+    return result
 
-    # ---- G5 陳舊 .md 引用 ----
-    proj_files = set()
-    for root, dirs, files in os.walk(proj):
-        dirs[:] = [d for d in dirs if d not in (".git", "node_modules")]
-        proj_files.update(files)
-    # 白名單：§8 正式目標欄嘅檔名＋各草稿 promote 後檔名＋標準交付檔（未出街係預期，唔算陳舊引用）
-    allow = {"PLAN.md", "README.md", "REVIEW_REPORT.md", "AGENTS.md", "PROJECT.md", "SKILL.md", "handoff.md"}
-    if sec8:
-        for row in sec8.group(0).splitlines():
-            m = re.match(r"\|[^|]+\|[^|]+\|[^|]*\|[^|]*\|\s*([^|]+?)\s*\|", row)
-            if m: allow.add(os.path.basename(m.group(1).strip()))
-    for f in os.listdir(md):
-        if f.endswith(".DRAFT.md"): allow.add(f[:-len(".DRAFT.md")] + ".md")
-    for f in sorted(os.listdir(md)):
-        if not f.endswith(".DRAFT.md"): continue
-        t = io.open(os.path.join(md, f), encoding="utf-8").read()
-        t = re.sub(r"<[^>\n]*>", "", t)  # 去掉 placeholder
-        for ref in set(re.findall(r"(?<![\w/.\\-])[A-Za-z][A-Za-z0-9_\-]*\.md(?![\w])", t)):
-            if ref in proj_files or ref in allow: continue
-            finding("WARN", "G5", f + " 引用咗 " + ref + " 但 project 入面搵唔到（又唔係 §8 將出街嘅檔）", "確認係咪已撤銷/改名嘅檔——改指而家嘅檔或者移除引用；如果喺另一個 repo，寫明 repo 路徑")
 
-    # ---- 總結 ----
-    emit()
-    emit("-" * 62)
-    emit("統計：FAIL " + str(len(fails)) + " 項｜WARN " + str(len(warns)) + " 項（advisory 模式：全部只係報告，唔阻你）")
-    report = "\n".join(lines) + flexibility_note(len(fails))
-    print(report)
-    if out: io.open(out, "w", encoding="utf-8", newline="\n").write(report)
-    sys.exit(1 if (strict and fails) else 0)
+def main(argv=None):
+    parser = argparse.ArgumentParser(description='Read-only plan packet gate (advisory by default)')
+    parser.add_argument('project',type=Path)
+    parser.add_argument('--strict',action='store_true')
+    parser.add_argument('--json',action='store_true',dest='as_json')
+    parser.add_argument('--out',type=Path,help='Optional report path explicitly selected by the caller')
+    args = parser.parse_args(argv)
+    result = inspect_packet(args.project)
+    if args.as_json:
+        output = json.dumps(result,ensure_ascii=False,sort_keys=True) + '\n'
+    else:
+        lines = ['READY' if result['ready'] else 'NOT_READY']
+        lines += ['[FAIL] ' + error for error in result['errors']]
+        lines += ['[WARN] ' + warning for warning in result['warnings']]
+        lines += ['Advisory mode reports readiness; it does not authorize promotion.']
+        output = '\n'.join(lines) + '\n'
+    if args.out:
+        args.out.write_text(output,encoding='utf-8',newline='\n')
+    print(output,end='')
+    return 1 if args.strict and not result['ready'] else 0
 
-def flexibility_note(n_fail):
-    return ("\n" + "-" * 62 +
-            "\n【彈性說明——保留俾老闆裁量】\n"
-            "· 本報告預設 advisory：列咗問題＋建議，唔强制；老闆可以逐項决定「修／接受並記入 PLAN §11」。\n"
-            "· 唯一建議無彈性嘅位：G3（agent model placeholder）——promote 前必須填實，因為佢會靜靜跌錯 provider，事後睇唔出。\n"
-            "· 想要硬閘（任何 FAIL 即擋）：加 --strict。\n" +
-            ("· 而家有 " + str(n_fail) + " 個 FAIL 建議喺呈交／promote 前清咗佢。\n" if n_fail else ""))
-
-if __name__ == "__main__": main()
+if __name__ == '__main__':
+    raise SystemExit(main())

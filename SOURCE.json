@@ -1,0 +1,9 @@
+{
+  "upstream_repository": "https://github.com/cyrusasco/open-project-skill",
+  "upstream_commit": "44f5d3129cfe46e9646286a49ee552c0429d608c",
+  "edition": "zcode",
+  "skill_version": "3.0.0",
+  "plugin_version": "0.1.0",
+  "contract_version": "1.0",
+  "native_manual_only_verified": false
+}
