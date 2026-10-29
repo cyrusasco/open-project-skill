@@ -1,10 +1,11 @@
 {
   "edition": "codex",
-  "skill_version": "3.0.0-codex.1",
-  "run_at": "2026-10-27T23:25:35+08:00",
+  "skill_version": "3.0.0-codex.2",
+  "plugin_version": "0.1.1",
+  "run_at": "2026-10-29T22:39:16+08:00",
   "python": "3.14.4",
-  "tests_run": 92,
-  "passed": 91,
+  "tests_run": 105,
+  "passed": 104,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -14,10 +15,10 @@
     }
   ],
   "status": "PASSED_WITH_SKIPS",
-  "scope": "Synthetic fixtures; no live session history, databases or host configuration modified.",
+  "scope": "Synthetic fixtures; G6 inclusion/strict/promotion/rendering regressions; no live GitNexus index, session history, catalog, backend or host configuration modified.",
   "limits": [
-    "Actual ZCode host loading is not covered.",
-    "LLM implicit/explicit invocation behavior is not proved by unit tests.",
-    "Python 3.10 was not installed here; optional tomllib absence is simulated."
+    "G6 verifies declared plan structure and statuses; independent review must verify artifact completeness and receipt authenticity.",
+    "Actual GitNexus onboarding is not performed; installed onboarding Skill is a fixture-only MVP.",
+    "Native load evidence in NATIVE-LOAD-RESULT.json belongs to plugin0.1.0; current release native loading and LLM invocation remain unverified."
   ]
 }

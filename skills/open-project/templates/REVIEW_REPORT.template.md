@@ -37,7 +37,7 @@
 |---|---|---|---|
 | <ID> | <suggestion> | <ref> | <action> |
 
-## §5 十二項檢查
+## §5 驗收檢查
 
 | # | 檢查 | required／適用理由 | PASS/FAIL/UNVERIFIED/N/A | evidence ID／命令／exit／範圍 |
 |---|---|---|---|---|
@@ -48,13 +48,16 @@
 | 5 | Secret SCANNED／NOT_SCANNED 逐檔原因／findings；不輸出值 | <publish scope> | | |
 | 6 | 適用 verifier／doctor／verify 實跑；無 CLI 可有理由 N/A | <adopted tools> | | |
 | 7 | Git branch／HEAD／dirty；有 push 授權且已 push 才驗遠端 tip | <scope> | | |
-| 8 | Native agent line1 frontmatter、host kind／角色與現有模型政策 | <agents or N/A> | | |
+| 8 | Codex native agent TOML、host kind／角色與用戶／host模型繼承政策 | <agents or N/A> | | |
 | 9 | agent SOP／skill／CLI 一致；命令無假 pipeline／強迫 push | true | | |
 | 10 | 抽查過時宣稱；source versions、capture times、未知未假綠 | true | | |
 | 11 | rendered PLAN／HTML 完整草稿、離線、escape、安全連結、顯示保真 | true | | |
 | 12 | separate approval 綁定 plan／digest／draft／target／baseline／expected／transforms／effects；正式 MD 對帳 | <promote scope> | | |
+| 13 | GitNexus onboarding tools row完整；每個採用／建立Skill及Plugin有artifact、owner／source identity、適用graph／catalog驗收及freshness證據 | true；無產物有理由N/A | | |
 
-ZCode AP-17 保留：專屬 agent 有有效用戶確認 provider/model，不空／inherit；模型問題已 RESOLVED，不開 runtime mapping 工程。實際 loaded definition 未可見＝UNKNOWN。fresh session／host enforcement 不由 synthetic tests 推論。
+Codex model／reasoning由用戶及host管理；native agent可省略相關欄位繼承parent，不引入其他harness模型限制。實際loaded definition未可見＝UNKNOWN。fresh session／host enforcement不由synthetic tests推論。
+
+GitNexus PLAN齊件／G6通過不代表onboarding完成。PLANNED／BLOCKED／staged結果不能當VERIFIED；fixture oracle PASS不能推論真實專案。每個artifact對照既有graph／catalog owner、scope／source版本、receipts及可查結果；graph N/A要有該artifact理由，catalog仍需評估。required onboarding缺證據＝PARTIAL，保留缺口，唔為過關擴大現有fixture adapter權限。
 
 ## §6 Coverage 與結果限制
 
@@ -66,6 +69,7 @@ ZCode AP-17 保留：專屬 agent 有有效用戶確認 provider/model，不空�
 | host／fresh session | <loaded role/evidence> | <UNKNOWN if untested> | <impact> |
 | browser／offline HTML | <actual inspected behavior> | <unverified parts> | <impact> |
 | live／network integration | <actual evidence> | <NOT_RUN reasons> | <impact> |
+| GitNexus graph／catalog | <per-artifact IDs; source/pin; receipt; structural query/catalog lookup; freshness; capture time> | <PLANNED/BLOCKED; missing real-project/catalog adapter; graph N/A reason> | <required incomplete→PARTIAL> |
 
 ## §7 Promotion／恢復與最終快照
 

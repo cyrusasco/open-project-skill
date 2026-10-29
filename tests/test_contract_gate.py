@@ -17,7 +17,7 @@ sys.path.insert(0,str(SCRIPTS))
 from plan_contract import (PacketError,DRAFT_MARKER,validate_plan,load_plan,packet_digest,
     sha256,read_draft,expected_content,resolve_inside,schema_document)
 import plan_render
-from support import make_packet,save_packet
+from support import make_packet,save_packet,gitnexus_plan_row
 spec = importlib.util.spec_from_file_location('packet_gate',SCRIPTS/'gate-check.py')
 gate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gate)
@@ -46,6 +46,8 @@ class ContractGateTests(unittest.TestCase):
 
     def add_agent(self,raw,host='zcode'):
         self.plan['host'] = host
+        if host == 'codex':
+            self.plan['tools'].append(gitnexus_plan_row())
         draft = {'id':'agent','path':'md-drafts/agents/worker.DRAFT.md',
             'target':'.zcode/agents/worker.md' if host=='zcode' else '.codex/agents/worker.toml',
             'template':'agent.template.md','kind':host+'-agent','required':True,

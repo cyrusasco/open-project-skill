@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "open-project-codex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Explicitly invoked project planning, complete drafts, approval and handover for Codex.",
   "author": {
     "name": "cyrusasco"
@@ -13,7 +13,7 @@
       "interface": {
         "displayName": "Open Project · Codex",
         "shortDescription": "按需開案、重整及草稿審批",
-        "longDescription": "只在明確選取時啟動：全系統歷史發現、完整草稿與離線報告、批准、promote及交接。",
+        "longDescription": "只在明確選取時啟動：全系統歷史發現、完整草稿與離線報告、GitNexus onboarding 計劃、批准、promote及交接。",
         "developerName": "cyrusasco",
         "category": "Productivity",
         "capabilities": [],

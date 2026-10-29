@@ -4,6 +4,14 @@ import json
 from pathlib import Path
 
 
+def gitnexus_plan_row():
+    """Explicit non-applicability for tests that produce no Skill/Plugin/code."""
+    return {"id": "gitnexus-project-onboarding", "status": "NOT_APPLICABLE",
+            "skill_ref": "synthetic-fixture:no-installed-skill-read",
+            "reason": "Synthetic document-only packet; no Skill, Plugin or code is adopted.",
+            "artifacts": [], "steps": [], "acceptance": [], "blockers": [], "evidence": []}
+
+
 def make_packet(project, host="zcode"):
     from plan_contract import DRAFT_MARKER, expected_content
     project = Path(project)
@@ -23,6 +31,8 @@ def make_packet(project, host="zcode"):
     for key in ("facts", "unknowns", "conflicts", "pains", "roles", "tools", "oss", "sources",
                 "folder_changes", "risks", "requirements", "code_map", "timeline", "approval_requests"):
         packet[key] = []
+    if host == "codex":
+        packet["tools"].append(gitnexus_plan_row())
     return packet
 
 

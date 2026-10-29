@@ -57,6 +57,16 @@ N/A 要有需求層理由。無 baseline 唔宣稱穩定（AP-12），未確認�
 |---|---|---|---|---|
 | L1 | <service/platform> | <required behavior> | <fallback/error> | <ref> |
 
+### Codex Skill／Plugin onboarding依賴
+
+採用／建立Skill或Plugin時保留REQ-GN（或穩定對應ID）：逐artifact納入既有GitNexus graph／capability catalog owner嘅admission、來源身份及可查驗收。沒有產物可有具體N/A；純Markdown graph N/A不取消catalog需求。
+
+| ID | desired contract | 固定acceptance | 依賴失效行為／來源 |
+|---|---|---|---|
+| REQ-GN | <逐Skill／Plugin ID、canonical source root、project ID、graph／catalog owner> | <scope/source版本匹配；適用graph結構query、catalog lookup、receipts、freshness與rollback refs> | <缺Skill／real-project adapter／catalog入口→BLOCKED，不借fixture PASS；PLAN tools row及source refs> |
+
+本節只寫desired contract；PLANNED／BLOCKED／VERIFIED嘅實際進度放status及review。PLAN完整不等於實際onboarding完成；現有fixture-only adapter不改成本項產品驗收標準。
+
 ## §7 名詞與追溯
 
 | 名詞／ID | 定義／來源 |

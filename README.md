@@ -10,8 +10,8 @@ This is the **codex-port branch** of cyrusasco/open-project-skill. Main remains 
 
 Shared contract, checker, renderer, promote and generic templates come from the reviewed common source. Codex has separate invocation policy, JSONL discovery, native agent templates and portable manifests. PORTING.md and SOURCE.json record provenance.
 
-- Plugin: open-project-codex 0.1.0
-- Skill: open-project (3.0.0-codex.1)
+- Plugin: open-project-codex 0.1.1
+- Skill: open-project (3.0.0-codex.2)
 - Packet contract: 1.0
 - Python 3.11+ for standard-library tools and native-agent TOML checks
 - No MCP server, automatic hook or global instruction installation
@@ -25,6 +25,16 @@ After selecting this plugin in a supported Codex surface, explicitly select the 
 agents/openai.yaml uses the YAML boolean allow_implicit_invocation:false. Metadata may remain visible; it does not authorize workflow execution. Inventory independently installed duplicates separately.
 
 Phase4 delivers PLAN, every full MD draft/specification, JSON, offline HTML and gate evidence before formal writes. Continue within concrete existing authorization, without asking the same approval repeatedly. Completing or stopping a task does not permanently activate the workflow.
+
+## GitNexus onboarding in every Codex plan
+
+Every Codex packet includes a structured tools row named `gitnexus-project-onboarding`, rendered in PLAN section6 and offline HTML. Enumerate every adopted, created or updated Skill/Plugin and applicable project: canonical source/project identity, graph/catalog status, steps, acceptance, blockers and evidence. G6 rejects a missing, duplicate or malformed row. A task with no applicable artifact records NOT_APPLICABLE with its reason.
+
+Reuse the installed `gitnexus-project-onboarding` Skill; read its current instructions and references before planning. Keep project code/structure in the approved graph, capability metadata under its existing catalog owner, and minimized receipts under its existing casebook owner. Do not create a second catalog or index all chats/shared Skills.
+
+The inspected onboarding Skill is currently a copied-JavaScript synthetic-fixture MVP. It is not an adapter for arbitrary real projects or Markdown Skills. If the relevant real-project/catalog adapter is unavailable, retain each artifact and mark BLOCKED with the missing work. A complete blocked plan can be ready for review; this never means onboarding is complete or build is authorized. Building/verification/catalog writes have separate effects and use existing authorization where it covers them. See skills/open-project/references/gitnexus-onboarding.md.
+
+This release changes planning and validation only. It does not run GitNexus or modify any graph, catalog, casebook, host configuration or installed Skill.
 
 ## Local marketplace
 
@@ -63,6 +73,8 @@ Under skills/open-project/scripts/:
 Prefer available native app list/read/archived tools. CLI JSONL does not cover all app/cloud histories. The adapter retains source/hash/snapshot/coverage, no cwd/title prefilter, unread depth until deep-read, and no hidden reasoning evidence.
 
 Rendering reads schema1.0 md-drafts/plan-data.json and every full draft, including specification. It produces matching Markdown and static offline HTML with full draft text. Advisory exit0 is not ready=true.
+
+Earlier Codex packets need the onboarding tools row, a new revision and regenerated views. Changed packet content requires a matching new approval; do not reuse an old approval hash.
 
 Promote defaults to dry-run. Apply requires an authentic user approval record matching plan/draft/target/baseline/expected hashes and fixed transforms. Approval records are evidence, not OS security boundaries. Never regenerate a baseline after drafting.
 

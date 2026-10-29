@@ -96,6 +96,21 @@ class EditionBoundaryTests(unittest.TestCase):
             self.assertNotIn("subagent_type", skill)
 
 class CodexMetadataTests(unittest.TestCase):
+    def test_codex_onboarding_reference_is_a_required_runtime_resource(self):
+        with tempfile.TemporaryDirectory(dir=ROOT) as td:
+            root = Path(td) / "source"
+            root.mkdir()
+            for rel in ["LICENSE", "VERSION", "SOURCE.json", "skills/open-project", "plugin.json"]:
+                original = ROOT / rel
+                if original.is_dir():
+                    shutil.copytree(original, root / rel, ignore=shutil.ignore_patterns("__pycache__"))
+                elif original.is_file():
+                    (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(original, root / rel)
+            (root / "skills/open-project/references/gitnexus-onboarding.md").unlink()
+            with self.assertRaisesRegex(ValueError, "Missing runtime resource.*gitnexus-onboarding"):
+                builder.build(root, Path(td) / "package")
+
     def metadata(self, policy):
         return ('interface:\n  display_name: "Open Project"\n'
                 '  short_description: "Explicit workflow"\n' + policy).encode("utf-8")

@@ -28,6 +28,7 @@
 | CLI | <adopted path or NOT_APPLICABLE> | <§6 decision; actual checks> |
 | host enforcement／loaded | <UNKNOWN or observed proof> | <fresh-session/role evidence> |
 | git | <branch; HEAD; dirty> | <command/time> |
+| GitNexus onboarding | <overall PLANNED/BLOCKED/VERIFIED/NOT_APPLICABLE; each Skill／Plugin ID> | <tools row; source identity; graph／catalog owner; receipt／verification／freshness refs> |
 
 ## §2 Repo／package review
 
@@ -58,6 +59,14 @@ push 未授權可 NOT_PUSHED 合法交貨；已 push 需驗遠端 tip，唔只�
 
 full／partial／summary-only／unread、global metadata/content coverage、missing sources、WAL／併發 delta、fresh session／browser／live integration 分開記。reorg 不因 S 規模省掉全域 discovery。無 CLI／Plugin／deploy 可 N/A＋理由。
 
+### GitNexus逐產物進度
+
+| artifact ID／kind | source root／project ID | graph_status／catalog_status | owner／receipt／verification／freshness | blocker及下一步acceptance |
+|---|---|---|---|---|
+| <每個採用／建立Skill及Plugin一列；無產物有理由N/A> | <canonical identity; source revision/hash> | <PLANNED/BLOCKED/VERIFIED/NOT_APPLICABLE; N/A理由> | <actual refs or NOT_RUN> | <real-project／catalog adapter等依賴; owner> |
+
+plan ready／PACKAGED唔等於onboard。fixture-only能力唔借作真實project證據；required onboarding未完保留PARTIAL。STALE不自動UPDATE／build；既有project／task／native session／Project Pair不重綁，歷史搜尋報告不自動入graph。
+
 ## §5 Roadmap（P0–Pn）
 
 | priority | action／owner | 固定 acceptance | 依賴／現有授權／缺口 |
@@ -81,6 +90,7 @@ promote journal／backups：`.open-project-promotion/`，內部 .gitignore 保�
 - 本輪證據：<source/evidence IDs; revision; tests/report>。
 - 下一步先做：<P0 action＋acceptance＋可重跑命令>。
 - 授權邊界：<already authorized / concrete missing authorization>。
+- GitNexus交接：<逐artifact graph／catalog狀態、source／receipts／freshness、owner／blockers、下一步驗收；無產物N/A理由>。
 - 最終 review：<ACCEPTED/CHANGES REQUIRED/PARTIAL; required coverage; P0/P1 status>。
 - 收尾：<LOCAL COMPLETE/NOT_PUSHED/PACKAGED 等具體結果>。
 

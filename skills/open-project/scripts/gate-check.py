@@ -142,6 +142,75 @@ def _reference_warnings(project, draft, raw, targets):
     return warnings
 
 
+def _gitnexus_plan_checks(plan):
+    """Check Codex plan inclusion, not graph accuracy or lifecycle authorization."""
+    if plan['host'] != 'codex':
+        return [], []
+    rows = [item for item in plan['tools'] if isinstance(item, dict)
+            and item.get('id') == 'gitnexus-project-onboarding']
+    if len(rows) != 1:
+        return ['G6: Codex plan requires exactly one gitnexus-project-onboarding tools row'], []
+    row = rows[0]
+    errors = []
+    statuses = ('PLANNED', 'BLOCKED', 'VERIFIED', 'NOT_APPLICABLE')
+    text = lambda value: isinstance(value, str) and bool(value.strip())
+    if row.get('status') not in statuses:
+        errors.append('G6: invalid GitNexus onboarding status')
+    for field in ('skill_ref', 'reason'):
+        if not text(row.get(field)):
+            errors.append('G6: GitNexus onboarding requires nonblank ' + field)
+    for field in ('steps', 'acceptance', 'blockers', 'evidence'):
+        values = row.get(field)
+        if not isinstance(values, list) or not all(text(value) for value in values):
+            errors.append('G6: GitNexus onboarding requires a text list: ' + field)
+    artifacts = row.get('artifacts')
+    if not isinstance(artifacts, list):
+        errors.append('G6: GitNexus onboarding requires an artifacts list')
+        artifacts = []
+    artifact_ids = set()
+    for artifact in artifacts:
+        if not isinstance(artifact, dict):
+            errors.append('G6: GitNexus onboarding artifact must be an object')
+            continue
+        for field in ('id', 'source_root', 'project_id'):
+            if not text(artifact.get(field)):
+                errors.append('G6: GitNexus artifact requires nonblank ' + field)
+        identity = artifact.get('id')
+        if text(identity):
+            if identity in artifact_ids:
+                errors.append('G6: duplicate GitNexus artifact id: ' + identity)
+            artifact_ids.add(identity)
+        if artifact.get('kind') not in ('skill', 'plugin', 'project'):
+            errors.append('G6: invalid GitNexus artifact kind')
+        for field in ('graph_status', 'catalog_status'):
+            if artifact.get(field) not in statuses:
+                errors.append('G6: invalid GitNexus artifact ' + field)
+        if artifact.get('kind') in ('skill', 'plugin') and artifact.get('catalog_status') == 'NOT_APPLICABLE':
+            errors.append('G6: Skill and Plugin artifacts require catalog onboarding; unavailable support is BLOCKED')
+    status = row.get('status')
+    if status == 'NOT_APPLICABLE':
+        if artifacts:
+            errors.append('G6: NOT_APPLICABLE onboarding must have no admitted artifacts')
+    elif status in statuses:
+        for field, values in (('artifacts', artifacts), ('steps', row.get('steps')), ('acceptance', row.get('acceptance'))):
+            if not isinstance(values, list) or not values:
+                errors.append('G6: applicable GitNexus onboarding requires nonempty ' + field)
+    if status == 'BLOCKED' and not row.get('blockers'):
+        errors.append('G6: BLOCKED GitNexus onboarding requires blockers')
+    if status == 'VERIFIED':
+        if not row.get('evidence'):
+            errors.append('G6: VERIFIED GitNexus onboarding requires evidence')
+        if row.get('blockers'):
+            errors.append('G6: VERIFIED GitNexus onboarding cannot retain unresolved blockers')
+        if any(isinstance(artifact, dict) and any(artifact.get(field) not in ('VERIFIED', 'NOT_APPLICABLE')
+               for field in ('graph_status', 'catalog_status')) for artifact in artifacts):
+            errors.append('G6: VERIFIED onboarding has an unfinished graph or catalog status')
+    warnings = []
+    if not errors and status in ('PLANNED', 'BLOCKED'):
+        warnings.append('G6: GitNexus onboarding is ' + status + '; plan inclusion is complete, onboarding is not verified and no lifecycle effect is authorized')
+    return errors, warnings
+
+
 def inspect_packet(project, plan=None):
     result = {'ready':False,'errors':[],'warnings':[],'packet_sha256':None,'host':None}
     errors,warnings = result['errors'],result['warnings']
@@ -153,6 +222,9 @@ def inspect_packet(project, plan=None):
     except (PacketError,OSError,ValueError,TypeError,KeyError) as exc:
         errors.append('G1: invalid packet: ' + str(exc))
         return result
+    onboarding_errors, onboarding_warnings = _gitnexus_plan_checks(plan)
+    errors.extend(onboarding_errors)
+    warnings.extend(onboarding_warnings)
     targets = {d['target']:d for d in plan['drafts']}
     target_locations = {}
     for draft in plan['drafts']:

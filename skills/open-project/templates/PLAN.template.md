@@ -71,7 +71,7 @@
 | 缺失／併發／中斷 | <sources/delta/reconnect snapshots/limits> |
 | 可重跑方法 | <actual command/query/params; SQL only if actually used> |
 
-reorg S/M/L 都先全域 discovery；S 只縮深讀。WAL-aware read-only 短 transaction，discovery／必要匯出完即釋放；唔等 LLM／用戶。新 connection 深讀另記 snapshot。RSC 摘要只可 summary-only。不要用舊 directory/title WHERE 篩走全文候選。
+reorg S/M/L 都先全域 discovery；S 只縮深讀。採用實際來源一致性方法；native分頁／JSONL逐檔hash及併發觀察分開記，不假設全來源transaction。discovery／必要匯出完即釋放來源，不等LLM／用戶；深讀另記snapshot，native摘要只可summary-only。不要先用directory/title排除全文候選。
 
 ## §6 工具化評估及開源候選
 
@@ -80,6 +80,16 @@ reorg S/M/L 都先全域 discovery；S 只縮深讀。WAL-aware read-only 短 tr
 | T1 | <requirement/interview/pain ID> | <existing + limitation> | <cost> | <risk> | <impact> | <reuse/CLI/subagent/SKILL/MCP/Plugin/N/A> |
 
 重複 ≥3 係評估觸發器，唔代表必須自建。首輪 agents ≤3；new 預估 0–1。0 agents／不建 MCP／Plugin N/A 合法。
+
+### Codex必交：GitNexus onboarding
+
+每份PLAN嘅tools array必有唯一id=gitnexus-project-onboarding，完整欄位見references/gitnexus-onboarding.md；renderer會顯示同源決策及全文scope。每個採用／新建Skill及Plugin各列artifact，不用generic一行代替。
+
+| artifact ID／kind | source root／project ID | graph_status／理由 | catalog_status／owner | 步驟／依賴 | 固定acceptance／evidence | blocker／下一步 |
+|---|---|---|---|---|---|---|
+| <逐Skill／Plugin；無產物先整項N/A> | <canonical root; stable identity> | <PLANNED/BLOCKED/VERIFIED/NOT_APPLICABLE＋理由> | <同一status集合；既有catalog owner> | <admission→plan→review/approval→supported build→verify→freshness> | <query/catalog/receipt/source evidence refs> | <owner及缺口> |
+
+project code／structure入已批准graph；Skill／Plugin capability metadata入現有catalog，最少量receipts入既有immutable casebook。純Markdown可graph N/A但catalog仍需規劃；Skill／Plugin嘅catalog_status不可N/A，缺adapter入口就BLOCKED。實讀現有gitnexus-project-onboarding及references，記來源hash／版本；fixture-only adapter不支援真實產物時BLOCKED＋real-project／catalog adapter依賴，唔執行fixture CLI指向真實root。G6通過只證plan齊件，PLANNED／BLOCKED不表示onboarding完成。
 
 ### new 三層工具鏈
 
@@ -110,7 +120,7 @@ reorg S/M/L 都先全域 discovery；S 只縮深讀。WAL-aware read-only 短 tr
 |---|---|---|---|---|---|---|---|
 | D-SPEC | md-drafts/product_specification.DRAFT.md | product_specification.md | product_specification.template.md／<kind>／true | <draft hash> | <first-read hash or NOT_EXISTS> | <output hash> | <exact declared list> |
 
-每個 planned 正式 MD 一列、完整草稿逐檔呈交（包括 required:false）；未採用項目唔列 draft row、工具決策寫 N/A；**spec 必交**。DIRTY 另列，唔代替 baseline。transforms 係不重複字串 array，只准 remove_draft_marker（第一行精確 `<!-- open-project:draft -->`）及 normalize_utf8_lf；agent YAML line1，不強加 marker。原文搬移不得以「保留現有…」省略。
+每個 planned 正式 MD 一列、完整草稿逐檔呈交（包括 required:false）；未採用項目唔列 draft row、工具決策寫 N/A；**spec 必交**。DIRTY 另列，唔代替 baseline。transforms 係不重複字串 array，只准 remove_draft_marker（第一行精確 `<!-- open-project:draft -->`）及 normalize_utf8_lf；Codex native agent TOML保持合法格式，不強加 marker。原文搬移不得以「保留現有…」省略。
 
 | draft ID | 解決矛盾／需求 | DoD | 首讀 baseline source ID | 依賴／引用影響 |
 |---|---|---|---|---|
@@ -129,6 +139,9 @@ reorg S/M/L 都先全域 discovery；S 只縮深讀。WAL-aware read-only 短 tr
 | 次序 | Phase | 操作／依賴 | 輸出／驗收 | 授權 |
 |---|---|---|---|---|
 | 1 | <phase> | <action> | <evidence> | <existing/pending/N/A> |
+| GN1 | 1／4 | 逐artifact核實onboarding Skill／owner／adapter，admission scope及PLAN→獨立review | <source refs; exact manifest／scope; blockers> | <planning scope> |
+| GN2 | 6／7 | 依賴解決後才supported build／catalog register或update；verify有實際effects | <receipt; structural query; catalog identity> | <actual effects; valid approval ref or BLOCKED> |
+| GN3 | 8／9 | 逐artifact核source fingerprint、freshness、lookup及rollback；STALE不自動重建 | <verification/freshness refs; remaining owner/actions> | <scope/ref or NOT_RUN> |
 
 ## §10 風險與限制
 
@@ -143,6 +156,7 @@ reorg S/M/L 都先全域 discovery；S 只縮深讀。WAL-aware read-only 短 tr
 | requirement ID | 來源 ID／版本 | desired behavior | 固定 acceptance | required | 對應 draft／驗收 |
 |---|---|---|---|---|---|
 | REQ1 | <explicit request/source> | <desired behavior> | <measurable pass/fail> | true | <draft/test refs> |
+| REQ-GN | <Codex onboarding requirement/source> | 每個採用／建立Skill／Plugin納入既有graph／catalog admission及handover | <逐artifact identity／source匹配、適用graph query、catalog lookup、receipt及freshness；無產物有理由N/A> | <true if artifacts adopted> | <spec; tools row; review refs> |
 
 observed status／修復過程另放 status、memory、review，唔混入 desired contract。
 

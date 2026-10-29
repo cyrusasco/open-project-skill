@@ -1,4 +1,8 @@
 {
+  "tested_plugin_version": "0.1.0",
+  "tested_skill_version": "3.0.0-codex.1",
+  "tested_source_commit": "0ec62541b5f8fd3f20406f27b6e4f112eff1d4d2",
+  "current_release_load_verified": false,
   "cli_version": "codex-cli 0.154.0",
   "local_marketplace_registered": true,
   "installed_in_isolated_home": true,

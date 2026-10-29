@@ -5,7 +5,8 @@
 1. Invocation and package
 2. Sessions and coverage
 3. Agents and execution roots
-4. Verification and limitations
+4. GitNexus onboarding
+5. Verification and limitations
 
 ## Invocation and package
 
@@ -40,6 +41,14 @@ Use currently available native roles/tools. If custom agents are justified and s
 Custom agent fields do not grant permissions or override parent sandbox/approval. Capture requested role, child identity and observed behavior; a requested label alone does not prove which definition was loaded.
 
 Plugin resources are read relative to the selected installed skill. Project commands run from the approved project root, not the plugin cache. Use templates/agent.template.md for a project operation manual; use agent.template.toml only for actual native agent registration, with a separately scoped write target.
+
+## GitNexus onboarding
+
+Read [the Codex onboarding contract](gitnexus-onboarding.md) for every open-project plan. Reuse the installed gitnexus-project-onboarding Skill, resolved under CODEX_HOME or the configured skill root, and capture its current source identity. Do not bundle a copy, invent an MCP dependency or install it automatically. Missing Skill/adapter/catalog access is a BLOCKED dependency.
+
+Every adopted/created Skill and Plugin has a separate admission row in the plan. Project code/structure goes to the approved graph; capability metadata goes to its existing catalog owner; minimized receipts stay with the immutable casebook owner. The installed Skill inspected for this revision is fixture-only. Its fixed copied-JavaScript workspace and pin are not permission to index a real project, personal skill home or plugin cache. Real project/catalog admission needs its own reviewed adapter.
+
+Keep the active project/task/native session/Project Pair. Planning does not approve backend execution. Build, verify, catalog registration and UPDATE require their actual effect scope and valid existing authorization; stale detection never triggers a rebuild. No global hooks, history indexing or writes to frozen original_skills are added.
 
 ## Verification and limitations
 

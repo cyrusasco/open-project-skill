@@ -95,6 +95,26 @@ FROZEN 舊 bytes 永遠不改（包括 banner）；新版本＋external manifest
 
 所有 manifest drafts，包括 required:false，都必須有效、完整可讀、hash 相符；false 唔容許缺檔／半份。未採用工具唔列 draft row，喺 tools 寫 N/A。選填 packet 欄位包括 graph、code_map、timeline、execution、approval_requests、coverage、suggestions；approval_requests 唔係已批准證據。
 
+## Codex GitNexus plan profile
+
+Codex packet 保留 schema 1.0，使用既有 `tools` array 承載必交 onboarding 決策；不增加 root 欄位。每份 `host:codex` packet 必須恰有一列 `id:gitnexus-project-onboarding`。G6 缺列、重複或結構不完整即 NOT_READY，strict 非零。ZCode packet 不套用此 profile。
+
+| 欄位 | 契約 |
+|---|---|
+| status | PLANNED／BLOCKED／VERIFIED／NOT_APPLICABLE |
+| skill_ref／reason | 非空來源定位及本輪決策理由；讀已安裝 Skill 及相關 references，來源 hash／時間另記 sources／facts |
+| artifacts | 每份採用／新建／更新嘅 Skill、Plugin 及適用 project 一列：id、kind（skill／plugin／project）、source_root、project_id、graph_status、catalog_status；各狀態沿用上述四值 |
+| steps／acceptance | 非空字串 arrays；非 N/A 決策必須有具體步驟及可判定驗收 |
+| blockers／evidence | 字串 arrays；BLOCKED 必須列 blockers，VERIFIED 必須有可定位證據，且每 artifact graph／catalog 已 VERIFIED 或有理由 N/A |
+
+NOT_APPLICABLE 只用於本輪無適用產物，artifacts 必須空並寫理由；唔可以因 adapter 未支援而將已採用 Skill／Plugin 整項 N/A。Markdown-only Skill 嘅 graph 可以 N/A，但 kind 為 skill／plugin 嘅 catalog_status 不准 NOT_APPLICABLE；metadata adapter 缺失要 BLOCKED。G6 檢查結構及狀態一致性；reviewer 另對照採用清單／drafts 核實 artifacts 無漏項及證據內容，不能把字串存在當作實際註冊。
+
+PLANNED／BLOCKED 完整列出可以令計劃 ready，同時有 warning；ready 只表示可審閱，唔代表已 onboarding、已准 build 或項目 ACCEPTED。renderer 將整列及 nested artifacts 同源輸出到 PLAN §6／offline HTML；`execution`、`requirements`、`approval_requests` 分別補時序、驗收及已知副作用，不能代替本列。
+
+依 `references/gitnexus-onboarding.md` 沿用既有 onboarding Skill、capability catalog 及 casebook owner。當前核實版本只支援 copied-JS synthetic fixture；真實 project／Skill／Plugin 沒有經審閱 adapter 時記 BLOCKED，列所需 adapter 與可獨立完成工作。file promote 的 approval 只授 `write_file`；不順帶授索引 build、catalog write、verify、host config 或安裝。已有同範圍授權可引用；缺授權列待辦。不得更改現有 session／Project Pair 或執行全域聊天索引。
+
+更新前嘅 Codex packet 要補本列，提升 revision，重新 render／gate；任何 packet digest 改動均使舊 approval 不再匹配。
+
 ## 舊 packet 遷移
 
 v3 packet 1.0 係 breaking contract：舊 Markdown-only／寬鬆 JSON packet 會 INCOMPLETE。保留舊 packet、歷史與 approvals；由已驗證 read-time evidence 及完整 drafts 重建 structured packet。已知 baseline 作明確舊紀錄保留；未知或已漂移來源需要新讀取、新 revision，唔將晚補 hash 冒充首次 baseline。重新 render／gate，取得綁定新內容嘅具體 approval；唔推定舊 approval 自動有效。
