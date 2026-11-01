@@ -81,3 +81,7 @@ MIT — retain LICENSE in derived packages.
 ## Migrating a v2 packet
 
 Version 3 uses the breaking schema1.0 packet contract. Legacy Markdown-only or loose JSON packets intentionally report INCOMPLETE. Preserve old packets and approvals as history. Rebuild the structured packet and complete drafts from verified evidence, preserving known first-read baselines; if a baseline is unknown or drifted, read/review the new source and make a new revision. Regenerate both views and obtain an exact new approval. Never silently infer a legacy approval or recapture a baseline after drafting.
+
+## Two-host update handoff
+
+See [UPDATE-GUIDE.md](UPDATE-GUIDE.md) for the ZCode update prompt and Codex installation boundary. Update ZCode from main and Codex from codex-port; preserve each host's native settings. The Codex installer and GitNexus plan profile belong only to codex-port. This documentation update does not alter ZCode code, agent headers, models, commands, hooks or installed configuration.
