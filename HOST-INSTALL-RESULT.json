@@ -1,0 +1,28 @@
+{
+  "recorded_at": "2026-11-02T00:28:29+08:00",
+  "plugin": "open-project-codex@open-project-codex",
+  "plugin_version": "0.1.1",
+  "source_commit": "7d9399d669df174cb7fba55357571fbce7b15acb",
+  "cli_version": "codex-cli 0.154.0",
+  "typesafe": "BYPASSED_FOR_THIS_TASK_BY_EXPLICIT_USER_REQUEST",
+  "target": "actual user Codex home",
+  "native_command": "codex plugin marketplace add <verified-local-source-root> --json",
+  "native_exit_code": 1,
+  "status": "BLOCKED_FILESYSTEM_WRITE",
+  "failure_stage": "marketplace registration",
+  "observed_error": "failed to add marketplace 'open-project-codex' to user config.toml: Access is denied. (os error 5)",
+  "plugin_add_attempted": false,
+  "installed_entries_after_attempt": 0,
+  "installed_in_real_user_home": false,
+  "manual_only_policy_field": "policy.allow_implicit_invocation",
+  "isolated_load_status": "LOAD_VERIFIED_ISOLATED",
+  "isolated_runtime_resources_verified": 27,
+  "limits": [
+    "No privilege elevation or sandbox workaround was attempted.",
+    "The user must run the native installer from a normal PowerShell session with write access to their Codex profile.",
+    "Actual implicit/explicit model behavior remains untested."
+  ],
+  "allow_implicit_invocation": false,
+  "isolated_native_installer_status": "INSTALL_VERIFIED",
+  "isolated_native_installer_exit_code": 0
+}

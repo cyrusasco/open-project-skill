@@ -1,13 +1,13 @@
 {
-  "tested_plugin_version": "0.1.0",
-  "tested_skill_version": "3.0.0-codex.1",
-  "tested_source_commit": "0ec62541b5f8fd3f20406f27b6e4f112eff1d4d2",
-  "current_release_load_verified": false,
+  "tested_plugin_version": "0.1.1",
+  "tested_skill_version": "3.0.0-codex.2",
+  "tested_source_commit": "7d9399d669df174cb7fba55357571fbce7b15acb",
+  "current_release_load_verified": true,
   "cli_version": "codex-cli 0.154.0",
   "local_marketplace_registered": true,
   "installed_in_isolated_home": true,
   "loaded_skill": "open-project-codex:open-project",
-  "verified_runtime_resources": 26,
+  "verified_runtime_resources": 27,
   "loader_errors": 0,
   "enabled": true,
   "policy_field_exposed": false,
@@ -17,6 +17,7 @@
   "status": "LOAD_VERIFIED_ISOLATED",
   "limits": [
     "Native skill metadata does not expose invocation policy.",
-    "No model turn was requested; actual implicit/explicit workflow behavior remains unverified."
+    "No model turn was requested; actual implicit/explicit workflow behavior remains unverified.",
+    "This is an isolated-home loading test, not an installation into the actual user profile."
   ]
 }

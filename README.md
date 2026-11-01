@@ -36,6 +36,18 @@ The inspected onboarding Skill is currently a copied-JavaScript synthetic-fixtur
 
 This release changes planning and validation only. It does not run GitNexus or modify any graph, catalog, casebook, host configuration or installed Skill.
 
+## Local installation helper
+
+From this codex-port checkout in a PowerShell 7 session with permission to write your Codex profile (Python 3.11+):
+
+    .\scripts\install-plugin.ps1
+
+The helper validates the edition/version and manual-only metadata, checks the selected local marketplace identity, then uses the native Codex marketplace/plugin commands. It does not write config/cache files itself. It verifies the installed version and enabled state; a denied write or mismatched marketplace stops with failure. Python and PowerShell requirements are checked before changes. Do not run it from the ZCode branch.
+
+The latest actual-profile installation attempt was blocked while the native CLI wrote config.toml (Access denied). HOST-INSTALL-RESULT.json records that failure; the plugin is not installed in the real profile by this task. Separately, plugin0.1.1 was installed and loaded in an isolated test home:27 runtime hashes matched and the loader reported no errors. NATIVE-LOAD-RESULT.json does not certify model invocation behavior.
+
+See [UPDATE-GUIDE.md](UPDATE-GUIDE.md) for the two-host update handoff. Run the helper only when you request installation; it creates no automatic workflow hook. After installation, explicitly use the qualified skill name below.
+
 ## Local marketplace
 
 Check installed CLI help first. Supported clients can use:

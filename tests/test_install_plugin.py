@@ -1,0 +1,155 @@
+"""Native install flow tested with a disposable CLI double; no real home writes."""
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+PWSH = shutil.which('pwsh')
+
+
+@unittest.skipUnless(PWSH, 'PowerShell 7 is required for the native installer tests')
+class InstallPluginTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(dir=ROOT)
+        self.addCleanup(self.temp.cleanup)
+        self.work = Path(self.temp.name)
+        self.source = self.work / 'source with spaces'
+        self.source.mkdir()
+        for rel in ['LICENSE', 'VERSION', 'SOURCE.json', 'plugin.json', 'skills', '.agents', 'scripts']:
+            original = ROOT / rel
+            target = self.source / rel
+            if original.is_dir():
+                shutil.copytree(original, target, ignore=shutil.ignore_patterns('__pycache__'))
+            else:
+                shutil.copy2(original, target)
+        self.log = self.work / 'calls.jsonl'
+        self.config = self.work / 'scenario.json'
+        self.stub = self.work / 'codex-double.ps1'
+        self.stub.write_text(r'''$ErrorActionPreference = 'Stop'
+$scenario = Get-Content -LiteralPath $env:INSTALL_TEST_SCENARIO -Raw | ConvertFrom-Json
+ConvertTo-Json -InputObject @($args) -Compress | Add-Content -LiteralPath $env:INSTALL_TEST_LOG -Encoding utf8
+if (($args[0..2] -join ' ') -eq 'plugin marketplace list') {
+    @{marketplaces=$scenario.marketplaces} | ConvertTo-Json -Depth 10 -Compress
+    exit 0
+}
+if (($args[0..2] -join ' ') -eq 'plugin marketplace add') {
+    if ($scenario.deny_registration) { [Console]::Error.WriteLine('Access is denied'); exit 5 }
+    @{status='REGISTERED'} | ConvertTo-Json -Compress
+    exit 0
+}
+if (($args[0..1] -join ' ') -eq 'plugin add') {
+    if ($scenario.deny_installation) { [Console]::Error.WriteLine('Installation denied'); exit 5 }
+    @{status='INSTALLED'} | ConvertTo-Json -Compress
+    exit 0
+}
+if (($args[0..1] -join ' ') -eq 'plugin list') {
+    @{installed=$scenario.installed;available=@()} | ConvertTo-Json -Depth 10 -Compress
+    exit 0
+}
+throw 'Unexpected native call'
+''', encoding='utf-8')
+        version = json.loads((self.source / 'plugin.json').read_text(encoding='utf-8'))['version']
+        self.scenario = {'marketplaces': [], 'deny_registration': False, 'deny_installation': False,
+                         'installed': [{'pluginId': 'open-project-codex@open-project-codex',
+                                        'name': 'open-project-codex', 'marketplaceName': 'open-project-codex',
+                                        'version': version, 'installed': True, 'enabled': True,
+                                        'source': {'source': 'local', 'path': str(self.source)}}]}
+
+    def run_installer(self):
+        self.config.write_text(json.dumps(self.scenario), encoding='utf-8')
+        env = os.environ.copy()
+        env.update(INSTALL_TEST_SCENARIO=str(self.config), INSTALL_TEST_LOG=str(self.log))
+        result = subprocess.run([PWSH, '-NoLogo', '-NoProfile', '-File', str(ROOT / 'scripts/install-plugin.ps1'),
+                                 '-SourceRoot', str(self.source), '-CodexCommand', str(self.stub),
+                                 '-PythonCommand', sys.executable], capture_output=True, text=True,
+                                encoding='utf-8', env=env, timeout=30)
+        calls = [json.loads(line) for line in self.log.read_text(encoding='utf-8-sig').splitlines()] if self.log.exists() else []
+        return result, calls
+
+    def test_success_uses_native_registration_install_and_exact_state_verification(self):
+        result, calls = self.run_installer()
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        report = json.loads(result.stdout)
+        self.assertEqual(report['status'], 'INSTALL_VERIFIED')
+        self.assertFalse(report['allow_implicit_invocation'])
+        self.assertFalse(report['invocation_behavior_verified'])
+        self.assertEqual(calls, [
+            ['plugin', 'marketplace', 'list', '--json'],
+            ['plugin', 'marketplace', 'add', str(self.source.resolve()), '--json'],
+            ['plugin', 'add', 'open-project-codex@open-project-codex', '--json'],
+            ['plugin', 'list', '--marketplace', 'open-project-codex', '--available', '--json']])
+
+    def test_existing_matching_registration_is_not_added_again(self):
+        self.scenario['marketplaces'] = [{'name': 'open-project-codex', 'root': str(self.source)}]
+        result, calls = self.run_installer()
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(json.loads(result.stdout)['marketplace_registration'], 'EXISTING')
+        self.assertFalse(any(call[:3] == ['plugin', 'marketplace', 'add'] for call in calls))
+
+    def test_unrelated_same_name_marketplace_is_not_replaced(self):
+        other = self.work / 'other-source'
+        other.mkdir()
+        self.scenario['marketplaces'] = [{'name': 'open-project-codex', 'root': str(other)}]
+        result, calls = self.run_installer()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(len(calls), 1)
+        self.assertIn('another source', result.stderr)
+
+    def test_denied_registration_stops_before_plugin_installation(self):
+        self.scenario['deny_registration'] = True
+        result, calls = self.run_installer()
+        self.assertNotEqual(result.returncode, 0)
+        report = json.loads(result.stdout)
+        self.assertEqual(report['stage'], 'marketplace-registration')
+        self.assertFalse(report['installation_verified'])
+        self.assertEqual(len(calls), 2)
+        self.assertFalse(any(call[:2] == ['plugin', 'add'] for call in calls))
+
+    def test_denied_installation_reports_partial_registration_without_cleanup(self):
+        self.scenario['deny_installation'] = True
+        result, calls = self.run_installer()
+        self.assertNotEqual(result.returncode, 0)
+        report = json.loads(result.stdout)
+        self.assertEqual(report['marketplace_registration'], 'REGISTERED')
+        self.assertEqual(report['stage'], 'plugin-installation')
+        self.assertFalse(report['installation_verified'])
+        self.assertEqual(len(calls), 3)
+
+    def test_wrong_version_disabled_or_string_boolean_never_reports_verified(self):
+        original = self.scenario['installed'][0].copy()
+        for change in [{'version': '0.0.0'}, {'enabled': False}, {'installed': 'true'}]:
+            self.scenario['installed'] = [{**original, **change}]
+            with self.subTest(change=change):
+                result, _ = self.run_installer()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(json.loads(result.stdout)['status'], 'INSTALL_NOT_VERIFIED')
+
+    def test_invalid_manual_policy_stops_before_any_native_call(self):
+        policy = self.source / 'skills/open-project/agents/openai.yaml'
+        original = policy.read_text(encoding='utf-8')
+        for replacement in ['allow_implicit_invocation: true', 'allow_implicit_invocation: "false"',
+                            'missing_policy: false']:
+            policy.write_text(original.replace('allow_implicit_invocation: false', replacement), encoding='utf-8')
+            with self.subTest(replacement=replacement):
+                result, calls = self.run_installer()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(calls, [])
+                self.assertEqual(json.loads(result.stdout)['stage'], 'source-validation')
+
+    def test_catalog_cannot_redirect_install_to_another_source(self):
+        path = self.source / '.agents/plugins/marketplace.json'
+        catalog = json.loads(path.read_text(encoding='utf-8'))
+        catalog['plugins'][0]['source']['path'] = '..'
+        path.write_text(json.dumps(catalog), encoding='utf-8')
+        result, calls = self.run_installer()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(calls, [])
+
+
+if __name__ == '__main__':
+    unittest.main()

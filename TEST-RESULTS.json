@@ -2,10 +2,10 @@
   "edition": "codex",
   "skill_version": "3.0.0-codex.2",
   "plugin_version": "0.1.1",
-  "run_at": "2026-10-29T22:39:16+08:00",
+  "run_at": "2026-11-02T00:31:49+08:00",
   "python": "3.14.4",
-  "tests_run": 105,
-  "passed": 104,
+  "tests_run": 113,
+  "passed": 112,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -15,10 +15,10 @@
     }
   ],
   "status": "PASSED_WITH_SKIPS",
-  "scope": "Synthetic fixtures; G6 inclusion/strict/promotion/rendering regressions; no live GitNexus index, session history, catalog, backend or host configuration modified.",
+  "scope": "Synthetic runtime and native-installer CLI-double fixtures. Actual native CLI0.154.0 installer and skills loading were separately verified in an isolated home. No GitNexus index/catalog or live session writes.",
   "limits": [
-    "G6 verifies declared plan structure and statuses; independent review must verify artifact completeness and receipt authenticity.",
-    "Actual GitNexus onboarding is not performed; installed onboarding Skill is a fixture-only MVP.",
-    "Native load evidence in NATIVE-LOAD-RESULT.json belongs to plugin0.1.0; current release native loading and LLM invocation remain unverified."
+    "Actual user-profile installation failed AccessDenied during native marketplace registration; see HOST-INSTALL-RESULT.json.",
+    "Installed-source manual policy and isolated loading do not prove model invocation behavior.",
+    "G6 checks declared inclusion/state; reviewer verifies artifact completeness and receipt authenticity."
   ]
 }
