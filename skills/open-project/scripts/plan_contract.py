@@ -142,7 +142,7 @@ def expected_content(draft, raw):
             raise PacketError('unsupported transform')
     return output
 
-def validate_plan(data):
+def _validate_plan_v1(data):
     _json_value(data)
     _keys(data,REQUIRED_FIELDS,OPTIONAL_FIELDS,'plan')
     if data['schema_version'] != '1.0':
@@ -266,7 +266,7 @@ def load_plan(project):
     return data
 
 
-def schema_document():
+def _schema_document_v1():
     """JSON Schema mirrors the structural validator; path/DAG rules are semantic."""
     text = {'type':'string','minLength':1,'pattern':r'\S'}
     digest = {'type':'string','pattern':'^[a-f0-9]{64}$'}
@@ -304,3 +304,38 @@ def schema_document():
         '$id':'https://open-project.local/plan.schema.json','title':'open-project packet 1.0',
         'type':'object','required':list(REQUIRED_FIELDS),'properties':properties,'additionalProperties':False,
         '$comment':'Semantic validation in plan_contract additionally enforces finite JSON/valid Unicode, safe and reserved paths, unique IDs/paths/targets, no ancestor target collisions, known acyclic draft dependencies, host/kind agreement and normalization-only native agent transforms.'}
+
+
+def validate_plan(data):
+    """Read legacy packets diagnostically; require typed obligations for version 2."""
+    _json_value(data)
+    if not isinstance(data, dict) or data.get('schema_version') != '2.0':
+        return _validate_plan_v1(data)
+    base = dict(data)
+    base.pop('workflow', None)
+    base['schema_version'] = '1.0'
+    if isinstance(base.get('sources'), list):
+        base['sources'] = [{k: v for k, v in source.items() if k != 'root_id'}
+                           if isinstance(source, dict) else source for source in base['sources']]
+    _validate_plan_v1(base)
+    from workflow_contract import validate_workflow_structure
+    validate_workflow_structure(data)
+
+
+def schema_document(version='2.0'):
+    """Version 2 structural schema; legacy 1 remains available for diagnosis."""
+    schema = _schema_document_v1()
+    if version == '1.0':
+        return schema
+    if version != '2.0':
+        raise PacketError('supported schemas are 1.0 and 2.0')
+    from workflow_contract import workflow_schema, obj, array, TEXT
+    schema['title'] = 'open-project packet 2.0'
+    schema['properties']['schema_version'] = {'const': '2.0'}
+    schema['properties']['workflow'] = workflow_schema()
+    schema['required'].append('workflow')
+    schema['properties']['sources']['items']['properties']['root_id'] = TEXT
+    schema['properties']['requirements'] = array(obj({'id': TEXT, 'text': TEXT,
+        'acceptance': array(TEXT, 1), 'source_ids': array(TEXT, 1)}), 1)
+    schema['$comment'] += ' Version 2 also enforces five independent required document roles, section IDs, roots, phase obligations, feature/requirement mapping, single current decision states and host-specific GitNexus applicability. Runtime evidence and completion checks are in workflow_contract.'
+    return schema

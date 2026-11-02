@@ -1,6 +1,6 @@
 # <PROJECT> — 管理 PLAN
 
-> Canonical：`md-drafts/plan-data.json`，schema_version `1.0`
+> Canonical：`md-drafts/plan-data.json`，schema_version `2.0`
 > plan_id：<PLAN_ID>　revision：<POSITIVE_INTEGER_STRING>
 > host：<HOST>　route：<new|reorg>　scale：<S|M|L>
 > capture time：<ISO8601_WITH_OFFSET>　packet SHA-256：<PACKET_DIGEST>
@@ -23,6 +23,28 @@
 | source ID | 類型／ref | resolved path／locator | revision/hash | 首讀 size／capture time | 覆蓋／verified |
 |---|---|---|---|---|---|
 | SRC1 | <file/session/tool/url> | <locator> | <raw SHA-256 or source revision> | <bytes; ISO time> | <scope; verified> |
+
+### 本輪 typed workflow 與目的地
+
+| 欄位 | 本輪決定／證據 |
+|---|---|
+| route／destination_mode | <new or reorg；獨立選 new_folder or existing_project> |
+| docs_root／PROJECT_ROOT | <canonical absolute root；與 code/source root 分開> |
+| source_roots | <逐 root ID、absolute path、用途及可讀／可寫 scope> |
+| creation_receipt | <plan_id/path/before/status/observed_at/request_ref；新根無此證據不 PLAN_READY> |
+| scope change | <parent digest、changed IDs、受影響 drafts／refs／approval／review／package；無則如實記> |
+
+### 五個核心文件角色（獨立於 manifest）
+
+| role | draft ID／target | 必需 section IDs→實際 heading | 當前狀態／evidence |
+|---|---|---|---|
+| project_manual | <agent.md> | <purpose/roots/reading_order/authority/tools/sop/verification/handover> | <ref> |
+| specification | <product_specification.md> | <goals/features/settings/scope/acceptance/sources> | <ref> |
+| project_status | <project_status.md or mapped existing alias> | <snapshot/results/unknowns/next_steps> | <ref> |
+| memory | <memory.md> | <events/decisions/sources> | <ref> |
+| independent_review | <REVIEW_REPORT.md> | <scope/reviewer/checks/outcome> | <NOT_RUN before actual review> |
+
+agent.md 用 project-manual.template.md，唔係 native agent；無 native agent 不取消手冊。所有 role 必須映射完整真實草稿，不能 required:false 降級。別名／合併須明確 scope 決定及內容對賬。
 
 ## §2 未知表（UNVERIFIED）
 
@@ -72,6 +94,10 @@
 | 可重跑方法 | <actual command/query/params; SQL only if actually used> |
 
 reorg S/M/L 都先全域 discovery；S 只縮深讀。WAL-aware read-only 短 transaction，discovery／必要匯出完即釋放；唔等 LLM／用戶。新 connection 深讀另記 snapshot。RSC 摘要只可 summary-only。不要用舊 directory/title WHERE 篩走全文候選。
+
+### 工具 receipt 與實際深讀分家
+
+workflow.discovery：inventory 列 sources 及 required／availability；receipts 用 root_id/path/sha256 指工具報告。reads 另記 source_id、full/partial/summary-only/unread、reference、ranges(start/end)；命中預設 unread。已知必要來源未掃／未讀保留 PARTIAL／BLOCKED，不把兩份 rollout／舊摘要當全系統。
 
 ## §6 工具化評估及開源候選
 
@@ -130,6 +156,18 @@ reorg S/M/L 都先全域 discovery；S 只縮深讀。WAL-aware read-only 短 tr
 |---|---|---|---|---|
 | 1 | <phase> | <action> | <evidence> | <existing/pending/N/A> |
 
+### 階段義務、package 及當前決定
+
+workflow.phases 列齊 0–9：id/status/required/evidence/reason。PLAN_READY 只計劃齊、PROMOTED 只選定寫入齊；後續 NOT_RUN 唔冒充 COMPLETE。
+
+package mode：<none/local_adapter/knowledge_bundle>；逐項 inventory 列 role/source_root/path/package_path/disposition/required/sha256/reason，查相對鏈閉包。只包本機 ops SKILL 不稱完整知識 bundle。MOVE／ARCHIVE 動作記原 bytes、destination、superseded_by、時間及 receipt；搬根前先完成變更 revision／草稿／gate／適用批准。
+
+| action ID | current state | event ID | source／時間 | 具體範圍 |
+|---|---|---|---|---|
+| <ID> | <唯一狀態> | <append-only decision event> | <ref; ISO time> | <effect/target> |
+
+歷史未批說法保留並標歷史；活文檔不能同時未批及完成。changed_ids→affected_areas，review 綁目前 snapshot，作者補記不代替獨立覆核。
+
 ## §10 風險與限制
 
 | ID | 風險／未知 | 觸發／來源 | 影響 | 緩解／owner | 殘留限制 |
@@ -155,3 +193,9 @@ observed status／修復過程另放 status、memory、review，唔混入 desire
 ## 報告尾部建議
 
 <advisory suggestions、scope limits、N/A 理由、剩餘驗證、下一步；唔用建議覆蓋 missing required／UNVERIFIED 狀態。>
+
+ZCode 無 GitNexus；workflow.gitnexus applicability=N/A，無 G6 不阻擋完成。
+
+workflow.issues：<逐issue id、severity(P0/P1/P2)、required、phase(0–9)、status(OPEN/RESOLVED)、reference、reason；無問題為[]>。plan擋到期未解P0／requiredP1，completion擋全部此類項。
+
+機械folder_changes只列id及選用description，ID集合精確對應workflow.effects.actions；before/after、原bytes、source_after、superseded_by及receipt在typed action。Git觀察用固定git status --porcelain=v1 --untracked-files=all --ignored及captured stdout，tracked/untracked/ignored分開，不靠口頭clean。

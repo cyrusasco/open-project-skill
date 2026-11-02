@@ -1,35 +1,31 @@
-# Release 3.0.0 — ZCode edition
+# 3.1.0 — plugin 0.2.0, packet 2.0
 
-Shared integrity upgrade; ZCode host configuration preserved.
+This release repairs workflow omissions across the separate ZCode and Codex editions. ZCode has **no GitNexus dependency**; Codex alone retains G6 onboarding.
 
-## Changes
+## Behavior
 
-- Explicitly requested workflow; Phase 0–9 and complete review packet retained.
-- Structured packet1.0, required full specification/drafts, content-bound exact Markdown/HTML views, precise approvals and read-time baselines.
-- Safe typed frontmatter parsing with existing ZCode model/provider policy preserved.
-- Whole-system visible-session discovery with read-only WAL snapshot, lineage, coverage and opaque IDs.
-- Dry-run promotion, exact hashes, private byte backups, Windows-safe locking, idempotent/no-op behavior and verified crash recovery.
-- Offline full-text renderer with exact decimal/unknown values, phase guide, charts, scalable graph and safe links.
-- Native ZCode package manifests and reproducible allowlisted build.
+- Independent output-root decisions and real creation receipts; old source/code stays separate when requested.
+- Five required document roles: project manual (`agent.md`), specification, status, append-only memory and independent review. Native subagents cannot replace the manual. Manifest count alone cannot cancel roles.
+- Global native SQLite/JSONL discovery, normalized tool receipts, captured read ranges and feature/setting acceptance traceability.
+- Plan readiness, promotion and workflow completion are separate stages. Current review, typed issues, adopted tools, package inventory and actual output bytes must reconcile.
+- Folder/archive provenance, cross-root references, unique decision states, truthful Git porcelain claims, bundle/adapter inventory and local link coverage.
+- Exact approvals, original baselines, deterministic transforms, drift refusal and recovery retained. Journal v2 captures approved packet bytes/material identity; completion bridges committed approvals to bounded observation updates. Legacy1 is diagnostic/recovery-only.
+- UTF-8/offline full-draft rendering, explicit invocation and each native host's settings are preserved. No global hook or new backend was introduced.
 
-## Validation
+## Evidence
 
-89 synthetic tests ran: 88 passed, 0 failures, 0 errors, 1 real-symlink test skipped because the Windows environment denies symlink creation. See TEST-RESULTS.json.
+Frozen zcode suite: **232 tests; 231 passed; 1 skipped; zero failures/errors**. The real-Windows-symlink skip is a privilege limit; mocked reparse/path checks still run. See TEST-RESULTS.json, TESTED-SOURCE.json and REQUIREMENTS-TRACEABILITY.json (T01–T22).
 
-An independent review verified malformed URL handling, ambiguous database identity rejection, package completeness, Windows case-insensitive repeated promotion, optional TOML import, and malformed-journal rejection before mutation.
+Independent review: 126 tests per edition plus five custom negative checks, all passed; protected native files match canonical upstream bytes. See INDEPENDENT-REVIEW.md and HOST-PROTECTION.json.
 
-No live session database, installed ZCode skill, backend model/provider setting or global host configuration was modified.
+Fresh separate agent: actual Codex-profile Phase0–4 plan from synthetic code plus two cross-directory history sources, five full drafts, eleven sections, PLAN_READY with G6 BLOCKED warning and complete=false. All five original source/history files remained unchanged. This is a local skill-file workflow trial, not native plugin load/invocation proof.
 
-## Update and migration
+Allowlisted package: 30 resources, PACKAGED. Source tree SHA-256 `0fe65c4b360124b82717c8eb20f1232ea9dec9b0246745ed8bb579e95b31f55f`. No database, raw private history, credentials, binaries or automatic installation is included.
 
-Use main for ZCode. Update source/package as one revision, then use ZCode's supported reload/new-session flow; do not assume a session already holding v2 instructions hot-loads v3.
+## Update and limits
 
-Packet1.0 is a breaking review-packet contract. Preserve historical packets/approvals, rebuild from verified first-read evidence, regenerate both views and obtain a new exact approval. Do not infer legacy approval or silently recapture a baseline after drafting.
+Use `main` for ZCode and `codex-port` for Codex; do not merge entire branches. See UPDATE-GUIDE.md for the ZCode update prompt and Codex native installer. Preserve local changes and old packet/journal/baseline evidence. Schema2 is breaking; rebuild and review a new candidate, never relabel old approvals.
 
-## Limits
+The new0.2.0 source/package has not been installed into the real host profile by this release task. PACKAGED is not INSTALLED/LOAD_VERIFIED/INVOCATION_VERIFIED. Native behavior remains unverified. ZCode G6 is N/A. Codex's inspected onboarding Skill remains fixture-only; real graph/catalog admission requires its existing owners and a reviewed adapter, otherwise BLOCKED. No ThreadDock/WhatsApp live repair was performed.
 
-PACKAGED does not mean INSTALLED or LOAD_VERIFIED. ZCode native manual-only enforcement and fresh-session loading are not verified here. Python3.10 compatibility was tested by simulating absent tomllib, not by running an actual3.10 interpreter.
-
-Promotion recovery verifies target file bytes. Audit state/backups and empty created parent directories may remain. Cooperative locks do not stop arbitrary external writers.
-
-The separate codex-port branch has its own portable manifest, invocation policy, native agents and history adapter. Never copy that branch's settings into ZCode or merge the whole port branch into main.
+Checks validate supplied evidence and current bytes, not human approval authenticity, semantic quality or arbitrary model compliance. Locks are advisory. Recovery preserves target bytes and evidence; it does not promise filesystem-wide rollback.

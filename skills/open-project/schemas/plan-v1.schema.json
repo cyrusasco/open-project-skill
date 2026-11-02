@@ -1,0 +1,450 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-project.local/plan.schema.json",
+  "title": "open-project packet 1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "plan_id",
+    "revision",
+    "host",
+    "project",
+    "route",
+    "scale",
+    "requirements",
+    "sources",
+    "facts",
+    "unknowns",
+    "conflicts",
+    "pains",
+    "roles",
+    "tools",
+    "oss",
+    "risks",
+    "folder_changes",
+    "drafts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "plan_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "host": {
+      "enum": [
+        "zcode",
+        "codex"
+      ]
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "route": {
+      "enum": [
+        "new",
+        "reorg"
+      ]
+    },
+    "scale": {
+      "enum": [
+        "S",
+        "M",
+        "L"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "kind": {
+            "enum": [
+              "file",
+              "session",
+              "url",
+              "tool",
+              "unknown"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Safe relative POSIX path. plan_contract enforces no traversal, Windows devices/ADS, links or reparse components."
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "depth": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "notes": {},
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "locator": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "anyOf": [
+                {
+                  "required": [
+                    "path"
+                  ]
+                },
+                {
+                  "required": [
+                    "kind"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "const": "file"
+                    }
+                  }
+                }
+              ]
+            },
+            "then": {
+              "required": [
+                "path",
+                "sha256"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "pains": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "oss": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "folder_changes": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "drafts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "path",
+          "target",
+          "template",
+          "kind",
+          "required",
+          "sha256",
+          "baseline_sha256",
+          "expected_sha256",
+          "transforms"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Safe relative POSIX path. plan_contract enforces no traversal, Windows devices/ADS, links or reparse components."
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Safe relative POSIX path. plan_contract enforces no traversal, Windows devices/ADS, links or reparse components."
+          },
+          "template": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Safe relative POSIX path. plan_contract enforces no traversal, Windows devices/ADS, links or reparse components."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "kind": {
+            "enum": [
+              "document",
+              "specification",
+              "zcode-agent",
+              "codex-agent"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "baseline_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "const": "NOT_EXISTS"
+              }
+            ]
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "transforms": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "remove_draft_marker",
+                "normalize_utf8_lf"
+              ]
+            }
+          },
+          "depends_on": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "zcode-agent",
+                    "codex-agent"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "transforms": {
+                  "not": {
+                    "contains": {
+                      "const": "remove_draft_marker"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "contains": {
+        "type": "object",
+        "required": [
+          "kind",
+          "required",
+          "target"
+        ],
+        "properties": {
+          "kind": {
+            "const": "specification"
+          },
+          "required": {
+            "const": true
+          },
+          "target": {
+            "type": "string",
+            "pattern": "(^|/)product_specification\\.md$"
+          }
+        }
+      }
+    },
+    "graph": {},
+    "code_map": {},
+    "timeline": {},
+    "execution": {},
+    "approval_requests": {},
+    "coverage": {},
+    "suggestions": {}
+  },
+  "additionalProperties": false,
+  "$comment": "Semantic validation in plan_contract additionally enforces finite JSON/valid Unicode, safe and reserved paths, unique IDs/paths/targets, no ancestor target collisions, known acyclic draft dependencies, host/kind agreement and normalization-only native agent transforms."
+}

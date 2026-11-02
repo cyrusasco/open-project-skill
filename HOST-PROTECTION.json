@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "edition": "zcode",
+  "baseline_commit": "1c29c6d8b2a3d99e4e7801b0f794da23c499897b",
+  "scope": "Exact native entry/template/policy bytes; global model/provider/config not modified or copied. Plugin version intentionally updated separately.",
+  "files": [
+    {
+      "path": "commands/open-project.md",
+      "sha256": "435193a73418f06dc635629906e63468d8aea895e24d3b49d49c7847a76950af",
+      "bytes": 2285
+    },
+    {
+      "path": "skills/open-project/templates/agent.template.md",
+      "sha256": "05c467cd2acd7c4b1b4541e32ace88a042a04665201be1f43269a6f3055c711b",
+      "bytes": 4675
+    },
+    {
+      "path": ".zcode-plugin/marketplace.json",
+      "sha256": "5c1bc1412df8f5ca9cb72dec096782ae9216778a8f8b3c713c36caa73ac637f5",
+      "bytes": 232
+    }
+  ]
+}

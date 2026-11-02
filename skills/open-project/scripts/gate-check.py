@@ -1,6 +1,7 @@
 """Read-only packet checks. Advisory reports never imply promotion approval."""
 from __future__ import annotations
 import argparse
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -142,17 +143,165 @@ def _reference_warnings(project, draft, raw, targets):
     return warnings
 
 
-def inspect_packet(project, plan=None):
-    result = {'ready':False,'errors':[],'warnings':[],'packet_sha256':None,'host':None}
+def _onboarding_capture_errors(plan, project, reference, label):
+    """Bind a declared receipt/adapter reference to captured bytes, not prose."""
+    if not isinstance(reference,str) or not reference.startswith('source:') or not reference[7:]:
+        return ['G6: ' + label + ' must reference captured evidence as source:<id>']
+    rows = [row for row in plan['sources'] if row.get('id') == reference[7:]]
+    if len(rows) != 1:
+        return ['G6: ' + label + ' identifies an unknown captured source']
+    source = rows[0]
+    if source.get('required') is not True or source.get('depth') != 'full' or 'path' not in source:
+        return ['G6: ' + label + ' requires a required, fully read file capture']
+    try:
+        from workflow_contract import source_location
+        raw = source_location(plan, project, source).read_bytes()
+        if sha256(raw) != source.get('sha256'):
+            raise PacketError('captured source hash differs')
+    except (PacketError,OSError,TypeError,ValueError,KeyError,ImportError) as exc:
+        return ['G6: cannot verify ' + label + ' capture: ' + str(exc)]
+    return []
+
+
+def _gitnexus_plan_checks(plan, project=None):
+    """Check Codex plan inclusion, not graph accuracy or lifecycle authorization."""
+    if plan['host'] != 'codex':
+        return [], []
+    rows = [item for item in plan['tools'] if isinstance(item, dict)
+            and item.get('id') == 'gitnexus-project-onboarding']
+    if len(rows) != 1:
+        return ['G6: Codex plan requires exactly one gitnexus-project-onboarding tools row'], []
+    row = rows[0]
+    errors = []
+    statuses = ('PLANNED', 'BLOCKED', 'VERIFIED', 'NOT_APPLICABLE')
+    text = lambda value: isinstance(value, str) and bool(value.strip())
+    if row.get('status') not in statuses:
+        errors.append('G6: invalid GitNexus onboarding status')
+    for field in ('skill_ref', 'reason'):
+        if not text(row.get(field)):
+            errors.append('G6: GitNexus onboarding requires nonblank ' + field)
+    for field in ('steps', 'acceptance', 'blockers', 'evidence'):
+        values = row.get(field)
+        if not isinstance(values, list) or not all(text(value) for value in values):
+            errors.append('G6: GitNexus onboarding requires a text list: ' + field)
+    artifacts = row.get('artifacts')
+    if not isinstance(artifacts, list):
+        errors.append('G6: GitNexus onboarding requires an artifacts list')
+        artifacts = []
+    artifact_ids = set()
+    for artifact in artifacts:
+        if not isinstance(artifact, dict):
+            errors.append('G6: GitNexus onboarding artifact must be an object')
+            continue
+        for field in ('id', 'source_root', 'project_id'):
+            if not text(artifact.get(field)):
+                errors.append('G6: GitNexus artifact requires nonblank ' + field)
+        identity = artifact.get('id')
+        if text(identity):
+            if identity in artifact_ids:
+                errors.append('G6: duplicate GitNexus artifact id: ' + identity)
+            artifact_ids.add(identity)
+        if artifact.get('kind') not in ('skill', 'plugin', 'project'):
+            errors.append('G6: invalid GitNexus artifact kind')
+        for field in ('graph_status', 'catalog_status'):
+            if artifact.get(field) not in statuses:
+                errors.append('G6: invalid GitNexus artifact ' + field)
+        if artifact.get('kind') in ('skill', 'plugin') and artifact.get('catalog_status') == 'NOT_APPLICABLE':
+            errors.append('G6: Skill and Plugin artifacts require catalog onboarding; unavailable support is BLOCKED')
+    status = row.get('status')
+    if plan['schema_version'] == '2.0':
+        adopted_kinds = {item['kind'].casefold() for item in plan['tools'] if isinstance(item,dict)
+                         and item.get('kind') in ('SKILL','Plugin') and item.get('decision') == 'adopt'}
+        artifact_kinds = {item['kind'] for item in artifacts if isinstance(item,dict) and isinstance(item.get('kind'),str)}
+        missing_kinds = adopted_kinds - artifact_kinds
+        if missing_kinds:
+            errors.append('G6: adopted Skill/Plugin requires matching onboarding artifacts: ' + ', '.join(sorted(missing_kinds)))
+        if status == 'NOT_APPLICABLE' and adopted_kinds:
+            errors.append('G6: adopted Skill/Plugin cannot use NOT_APPLICABLE onboarding')
+    if status == 'NOT_APPLICABLE':
+        if artifacts:
+            errors.append('G6: NOT_APPLICABLE onboarding must have no admitted artifacts')
+    elif status in statuses:
+        for field, values in (('artifacts', artifacts), ('steps', row.get('steps')), ('acceptance', row.get('acceptance'))):
+            if not isinstance(values, list) or not values:
+                errors.append('G6: applicable GitNexus onboarding requires nonempty ' + field)
+    if status == 'BLOCKED' and not row.get('blockers'):
+        errors.append('G6: BLOCKED GitNexus onboarding requires blockers')
+    if status == 'VERIFIED':
+        if not row.get('evidence'):
+            errors.append('G6: VERIFIED GitNexus onboarding requires evidence')
+        if row.get('blockers'):
+            errors.append('G6: VERIFIED GitNexus onboarding cannot retain unresolved blockers')
+        if any(isinstance(artifact, dict) and any(artifact.get(field) not in ('VERIFIED', 'NOT_APPLICABLE')
+               for field in ('graph_status', 'catalog_status')) for artifact in artifacts):
+            errors.append('G6: VERIFIED onboarding has an unfinished graph or catalog status')
+        if plan['schema_version'] == '2.0':
+            for reference in row.get('evidence',[]) if isinstance(row.get('evidence'),list) else []:
+                errors.extend(_onboarding_capture_errors(plan,project,reference,'onboarding receipt'))
+            if any(isinstance(artifact,dict) and artifact.get('kind') in ('skill','plugin') for artifact in artifacts):
+                if row.get('adapter_scope') != 'real-project':
+                    errors.append('G6: real Skill/Plugin verification requires reviewed real-project adapter scope; fixture-only is not real registration')
+                errors.extend(_onboarding_capture_errors(plan,project,row.get('adapter_ref'),'reviewed real-project adapter'))
+    warnings = []
+    if not errors and status in ('PLANNED', 'BLOCKED'):
+        warnings.append('G6: GitNexus onboarding is ' + status + '; plan inclusion is complete, onboarding is not verified and no lifecycle effect is authorized')
+    return errors, warnings
+
+
+def _observed_snapshot_digest(plan, project):
+    """Hash actual stable outputs and reviewed prefixes separately from review identity."""
+    from workflow_contract import workflow_snapshot
+    observed = workflow_snapshot(plan, project)
+    # workflow_snapshot returns fresh structures; do not mutate the packet's
+    # evidence prefix rows while replacing expected hashes with observations.
+    observed = json.loads(json.dumps(observed, ensure_ascii=False))
+    for row in observed['outputs']:
+        target = resolve_inside(project, row['target'])
+        row['sha256'] = sha256(target.read_bytes()) if target.is_file() else 'NOT_EXISTS'
+    for row in observed['prefixes']:
+        target = resolve_inside(project, row['path'])
+        row['sha256'] = sha256(target.read_bytes()[:row['length']]) if target.is_file() else 'NOT_EXISTS'
+    return packet_digest(observed)
+
+
+def inspect_packet(project, plan=None, *, stage='plan', legacy_diagnostic=False):
+    """Inspect without writes; READY is scoped to a stage, never authorization.
+
+    Legacy packets remain readable for diagnostics and exact journal recovery;
+    they cannot obtain current PLAN_READY or COMPLETE merely by omitting roles.
+    """
+    result = {'ready':False,'complete':False,'stage':stage,'status':'NOT_READY',
+              'errors':[],'warnings':[],'packet_sha256':None,'host':None}
+    if stage not in ('plan','completion'):
+        result['errors'].append('G0: stage must be plan or completion')
+        return result
     errors,warnings = result['errors'],result['warnings']
     try:
         plan = load_plan(project) if plan is None else plan
         validate_plan(plan)
         result['packet_sha256'] = packet_digest(plan)
         result['host'] = plan['host']
-    except (PacketError,OSError,ValueError,TypeError,KeyError) as exc:
+    except (PacketError,OSError,ValueError,TypeError,KeyError,ImportError) as exc:
         errors.append('G1: invalid packet: ' + str(exc))
         return result
+    legacy = plan['schema_version'] != '2.0'
+    result['schema_version'] = plan['schema_version']
+    if not legacy:
+        try:
+            from workflow_contract import workflow_findings
+            for finding in workflow_findings(plan, project, stage=stage):
+                destination = warnings if finding.get('severity') == 'warning' else errors
+                destination.append(str(finding.get('code','G7')) + ': ' + str(finding.get('message','invalid workflow')))
+        except (PacketError,OSError,ValueError,TypeError,KeyError,ImportError) as exc:
+            errors.append('G7: cannot validate workflow: ' + str(exc))
+    onboarding_errors, onboarding_warnings = _gitnexus_plan_checks(plan, project)
+    errors.extend(onboarding_errors)
+    warnings.extend(onboarding_warnings)
+    if stage == 'completion' and plan['host'] == 'codex':
+        rows = [row for row in plan['tools'] if isinstance(row,dict)
+                and row.get('id') == 'gitnexus-project-onboarding']
+        if len(rows) == 1 and rows[0].get('status') not in ('VERIFIED','NOT_APPLICABLE'):
+            errors.append('G6: Codex completion requires verified or justified non-applicable onboarding; current status is ' + str(rows[0].get('status')))
     targets = {d['target']:d for d in plan['drafts']}
     target_locations = {}
     for draft in plan['drafts']:
@@ -167,7 +316,11 @@ def inspect_packet(project, plan=None):
         required = source.get('required',True)
         if source.get('kind') == 'file' or 'path' in source:
             try:
-                location = resolve_inside(project,source['path'])
+                if legacy:
+                    location = resolve_inside(project,source['path'])
+                else:
+                    from workflow_contract import source_location
+                    location = source_location(plan, project, source)
                 digest = sha256(location.read_bytes())
                 if digest != source['sha256']:
                     draft = target_locations.get(os.path.normcase(os.fspath(location)))
@@ -217,22 +370,76 @@ def inspect_packet(project, plan=None):
                 errors.append('G2: generated view differs from canonical packet: ' + path)
     except (PacketError,OSError,ValueError,TypeError,KeyError) as exc:
         errors.append('G2: cannot verify canonical views: ' + str(exc))
+    result['diagnostic_checks_passed'] = not errors
+    if legacy:
+        result['status'] = 'MIGRATION_REQUIRED'
+        result['diagnostic_only'] = True
+        errors.append('G0: MIGRATION_REQUIRED: schema 1.0 is diagnostic-only; create and review a schema 2.0 revision before new promotion')
+        # An explicit recovery caller can examine diagnostic_checks_passed but
+        # never turns an old manifest into current readiness or completion.
+        result['legacy_recovery_requested'] = legacy_diagnostic is True
+        return result
     result['ready'] = not errors
+    result['complete'] = stage == 'completion' and result['ready']
+    result['status'] = ('COMPLETE' if result['complete'] else 'PLAN_READY') if result['ready'] else ('PARTIAL' if stage == 'completion' else 'PLAN_INCOMPLETE')
+    if stage == 'completion':
+        snapshot = None
+        observed_snapshot = None
+        approved = {'approved_packet_sha256':None,'approved_packet_sha256s':[],
+                    'promotion_refs':[],'approved_packets':[]}
+        try:
+            from workflow_contract import workflow_snapshot_digest
+            snapshot = workflow_snapshot_digest(plan, project)
+            observed_snapshot = _observed_snapshot_digest(plan, project)
+            if result['complete'] and observed_snapshot != snapshot:
+                errors.append('G7: current output snapshot differs from reviewed snapshot')
+                result['ready'] = result['complete'] = False
+                result['status'] = 'PARTIAL'
+        except (PacketError,OSError,ValueError,TypeError,KeyError,ImportError) as exc:
+            errors.append('G7: cannot identify completion snapshot: ' + str(exc))
+            result['ready'] = result['complete'] = False
+            result['status'] = 'PARTIAL'
+        try:
+            from promote import promotion_evidence
+            approved = promotion_evidence(project,plan)
+        except (PacketError,OSError,ValueError,TypeError,KeyError,ImportError) as exc:
+            errors.append('G8: approval/promotion bridge is incomplete: ' + str(exc))
+            result['ready'] = result['complete'] = False
+            result['status'] = 'PARTIAL'
+        result['completion_receipt'] = {
+            'schema_version':'completion-receipt-1.0',
+            'plan_id':plan['plan_id'], 'revision':plan['revision'],
+            'host':plan['host'], 'packet_sha256':result['packet_sha256'],
+            'snapshot_sha256':snapshot, 'status':result['status'],
+            'observed_snapshot_sha256':observed_snapshot,
+            'observation_packet_sha256':result['packet_sha256'],
+            'approved_packet_sha256':approved['approved_packet_sha256'],
+            'approved_packet_sha256s':approved['approved_packet_sha256s'],
+            'promotion_refs':approved['promotion_refs'],
+            'approved_packets':approved['approved_packets'],
+            'complete':result['complete'],
+            'checked_at':datetime.now(timezone.utc).isoformat(timespec='seconds'),
+            'errors':list(errors), 'warnings':list(warnings),
+            'limits':'Checks supplied artifacts and current bytes; not human authentication or host enforcement.'
+        }
+        result['diagnostic_checks_passed'] = not errors
     return result
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='Read-only plan packet gate (advisory by default)')
     parser.add_argument('project',type=Path)
+    parser.add_argument('--stage',choices=('plan','completion'),default='plan',help='Readiness stage; plan readiness never claims completion')
+    parser.add_argument('--legacy-diagnostic',action='store_true',help='Read legacy packet details without granting current readiness')
     parser.add_argument('--strict',action='store_true')
     parser.add_argument('--json',action='store_true',dest='as_json')
     parser.add_argument('--out',type=Path,help='Optional report path explicitly selected by the caller')
     args = parser.parse_args(argv)
-    result = inspect_packet(args.project)
+    result = inspect_packet(args.project,stage=args.stage,legacy_diagnostic=args.legacy_diagnostic)
     if args.as_json:
         output = json.dumps(result,ensure_ascii=False,sort_keys=True) + '\n'
     else:
-        lines = ['READY' if result['ready'] else 'NOT_READY']
+        lines = [result['status']]
         lines += ['[FAIL] ' + error for error in result['errors']]
         lines += ['[WARN] ' + warning for warning in result['warnings']]
         lines += ['Advisory mode reports readiness; it does not authorize promotion.']

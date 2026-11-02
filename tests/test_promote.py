@@ -105,8 +105,8 @@ class PromotionTests(unittest.TestCase):
 
     def test_reorg_source_equal_target_can_be_applied_and_repeated_as_noop(self):
         draft, target = self.baseline(b"historical specification\n")
-        self.plan["sources"] = [{"id": "original-spec", "kind": "file", "path": draft["target"],
-                                 "sha256": draft["baseline_sha256"], "required": True}]
+        self.plan["sources"].append({"id": "original-spec", "kind": "file", "path": draft["target"],
+                                    "sha256": draft["baseline_sha256"], "required": True, "depth": "full"})
         self.prepare()
         first = self.result(apply=True)
         self.assertEqual(first["status"], "COMMITTED", first)

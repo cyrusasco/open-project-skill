@@ -21,6 +21,8 @@ description: "只喺用戶明確調用 open-project、/open-project 或要求按
 
 ## 全程規則
 
+ZCode 無 GitNexus：workflow.gitnexus 記 applicability=N/A、tool_id 空字串及理由；不安裝／探測／索引，缺 G6 receipt／adapter 不阻擋 ZCode 完成。
+
 1. 每個動作按實際副作用與現有授權判斷，唔憑命令名推斷；可安全繼續嘅工作照做。未授權／不能安全執行標 `NOT_RUN`＋原因，對應結論 `UNVERIFIED`。
 2. read-only 查詢及隔離、可逆、已在任務範圍內嘅工作按授權執行；不為 routine 工作另設批准。涉及 live／發訊息／出網／安裝／部署／push 等按 §11 具體記錄。
 3. 數字連可重跑命令／query、來源與快照；未讀唔當否定證據。PASS／FAIL／UNVERIFIED 有證據；N/A 要有理由。
@@ -42,6 +44,26 @@ description: "只喺用戶明確調用 open-project、/open-project 或要求按
 | 7 ZCode 打包 | package、installed、loaded 分開 | PACKAGED 可交貨；啟用另按授權 |
 | 8 獨立審核 | 12 項 required coverage＋severity | 無 P0 唔會自動 ACCEPTED |
 | 9 交接 | status、memory、follow-up、repo 狀態 | LOCAL COMPLETE／NOT_PUSHED 清楚 |
+
+## 必交角色、目的地同完成狀態
+
+開案先分清 route 同 destination：new／reorg 決定歷史處理；new_folder／existing_project 獨立決定新內容寫邊。治理整理建議新 folder，沿用舊根要有用戶明確範圍決定；先核實要求來源、canonical docs root／source roots／code root、建立前狀態及 creation receipt。已授權空 staging 可先建立；遇無關已有目錄停止，唔覆蓋或回退 cwd。
+
+每次都交五個核心 role，manifest 自己漏列／required:false 唔能取消：
+
+| role | 新 folder 預設文件 | 用途 |
+|---|---|---|
+| project_manual | agent.md | 項目操作手冊：roots、讀取次序、權威、工具、SOP、驗收、handover |
+| specification | product_specification.md | 目標、功能／設定、來源、desired behavior、固定 acceptance |
+| project_status | project_status.md | 真實快照、結果、未知及下一步 |
+| memory | memory.md | append-only 事件、決定及來源 |
+| independent_review | REVIEW_REPORT.md | reviewer、範圍、逐項檢查、真實結果；未做就 NOT_RUN |
+
+用 project-manual.template.md 建 agent.md；手冊唔係 native agent，無 native agent 都唔可豁免。既有文件別名要明確 role mapping／完整內容核對；本版五角色分檔；明確合併／豁免範圍需匹配經審閱 profile，未支援就 BLOCKED。README／HANDOFF 視用途另交或由明確入口承擔，唔自動取代核心角色。
+
+schema 2.0 嘅 workflow.documents 將 role→draft_id→必需 section IDs／實際 heading 連起。workflow.phases 列齊 0–9；spec／review 草稿可完整寫未來程序及 NOT_RUN，不預填將來 PASS。PLAN_READY 只代表計劃齊，PROMOTED 只代表選定寫入成功；未做必要工作／review／交接不得 COMPLETE。
+
+改 scope、root、draft 或新增 plugin 時，先形成新 revision、完整受影響草稿、render／gate及適用真實批准，再做實質寫入。搬完正式 MD 後唔可以留舊 packet／草稿／連結／審批狀態；新發現需改 bytes 返回新 revision，不事後補批。
 
 ## Phase 0 — 意圖／訪談＋規模
 
@@ -98,7 +120,7 @@ description: "只喺用戶明確調用 open-project、/open-project 或要求按
 
 目的：俾用戶過目具體完整結果；本階段只寫 `<PROJECT_ROOT>/md-drafts/`，正式檔仍保留。
 
-1. 以 `schemas/plan.schema.json` 建 `md-drafts/plan-data.json`（schema_version `1.0`）作唯一 packet 資料源。詳見共同契約；必有 project、host、來源、requirements、folder_changes、drafts；工作流程另記 coverage，唔靠 mtime 判一致。
+1. 以 `schemas/plan.schema.json` 建 `md-drafts/plan-data.json`（schema_version `2.0`）作唯一 packet 資料源。詳見共同契約；必有 project、host、來源、requirements、folder_changes、drafts；工作流程另記 coverage，唔靠 mtime 判一致。
 2. 11 節 PLAN 全保留：§1 六類事實；§2 未知；§3 矛盾；§4 痛點；§5 角色／方法／coverage；§6 工具化及開源候選；§7 code map；§8 逐檔 manifest；§9 before/after folder／執行時序；§10 風險；§11 需求追溯＋批准請求。
 3. §6 每觸發器評估四項：沿用現有工具、維護成本／owner、錯誤影響、唔做會點。結論＝沿用現有／CLI／subagent／SKILL／MCP／Plugin／N/A。重複 ≥3 只觸發評估，唔強迫自建；首輪 agents ≤3，new 預估 0–1。
 4. new 工具鏈：本地已裝工具清單→已授權 gh／GitHub connector／官方來源搜尋→按需求估 agents。候選列 repo、license、last commit、部署方式、適用原因、風險；採用前查 license、secret、依賴。冇搜尋能力標 UNVERIFIED，唔阻塞離線規劃。
@@ -108,14 +130,18 @@ description: "只喺用戶明確調用 open-project、/open-project 或要求按
 8. 生成同源 PLAN／HTML，再 gate：
    ```text
    python <SKILL_ROOT>/scripts/render-plan.py <PROJECT_ROOT>
-   python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT>
-   python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT> --strict
+   python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT> --stage plan
+   python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT> --stage plan --strict
    ```
    renderer 讀 JSON，寫 `md-drafts/PLAN.DRAFT.md`、`md-drafts/PLAN-REPORT.DRAFT.html`；兩者顯示同一 packet digest。唔手改 rendered views，改 JSON 後再 render。
 9. HTML 預設零 CDN、完全離線；所有來源字串安全 escape／serialize，顯示完整 MD 草稿及有效相對連結；0、浮點、null、UNVERIFIED 保真，動畫非驗收證據。圖之外保留完整表格，支援 mobile／reduced motion。
 10. 呈交 PLAN＋全部 planned MD（含 spec）＋JSON＋HTML＋gate 報告。checker 預設 advisory＋報告尾部 suggestions；strict 係 opt-in。missing required artifact＝INCOMPLETE，唔因 advisory exit 0 宣稱 ready。零風險／零痛點合法，N/A 寫理由。
 
 輸出／閘門：所有 required 草稿、來源、hash、需求及 folder 決策齊；抽查安全數字、三方 digest 一致。先完成具體可審批包，再需要時請用戶批核。
+
+五核心模板待填欄位全部用雙大括號標記；含中文、lowercase、inline code／命令都要實填，未替換不當完整草稿。
+
+schema 2.0 嘅 workflow 包含 roots、documents、phases、issues、discovery、features、decisions、review、package、effects、evidence_policy、gitnexus；具體型別及 heading IDs 見 workflow-contract。requirements 每項 id/text/acceptance/source_ids；工具 SKILL／MCP／CLI／native_agent／Plugin 各有決策。
 
 ## Phase 5 — 明確批准＋漂移核對＋promote
 
@@ -150,15 +176,25 @@ description: "只喺用戶明確調用 open-project、/open-project 或要求按
 
 ## Phase 7 — ZCode Plugin 打包
 
+打包前選 none／local_adapter／knowledge_bundle。只包 ops SKILL＋外部本機路徑係 local adapter，唔能稱全部文件已包。要求知識 bundle 就將已批 manual／spec／handover／必要 references 逐項 included，或清楚 external／excluded＋理由。workflow.package.inventory 記來源 root、path、package_path、required、hash、reason；驗相對 link 閉包及漏／多檔。封存需 source→archive→superseded_by＋bytes hash／時間／receipt，不只睇備份存在。
+
 評估採用先打包。保留 `.zcode-plugin/plugin.json`、commands／skills／agents／tools 等 ZCode 結構；package 內使用實體副本及正確相對路徑，唔附 runtime binary、state、secret、大歷史。source／PACKAGED／INSTALLED／LOAD VERIFIED 分開；JSON 合法及內容乾淨可 PACKAGED 交貨。安裝、同步 installed cache、改 config、重啟、新 session loaded 驗證按明確授權另做，唔自行啟用。license 來源必須核實，唔預設改 MIT。
 
 ## Phase 8 — 獨立 review
+
+review 綁當前 revision／output-evidence snapshot，12 個共同 area 使用 frozen、parity、structure、paths、secrets、verification、git、native_agents、logic、claims、plan_views、promotion IDs。changed_ids→affected_areas，實質變更後補受影響獨立覆核；未受影響結果可有依據沿用。作者 addendum 只係自查，唔冒充新版獨立 review；舊 ACCEPTED 不自動覆蓋後加 spec／plugin／搬 folder。
 
 未參與改動嘅 reviewer 唯讀審核；只跑已授權且安全嘅相關驗證，唔改檔／commit。12 項逐項 PASS/FAIL/UNVERIFIED/N/A＋證據：FROZEN、三方數字/digest、required 結構、路徑、secret coverage、適用驗證、git、agent frontmatter／AP-17、SOP/skill/CLI 邏輯、過時宣稱、PLAN/HTML 對賬、已批草稿/實際檔 hash＋transform 對賬。coordinator 抽樣核實 subagent 報告，唔照抄結論。
 
 P0 及 required P1 必修；P2 roadmap。具體書面豁免只記限制或明確改變驗收範圍，唔將未解 required P1 當已通過。**零 P0 只係必要條件**：required coverage 有 UNVERIFIED、未解 required P1、未交草稿／未驗證 assertion，結論唔可 ACCEPTED。用 ACCEPTED／CHANGES REQUIRED／PARTIAL，清楚分 N/A、已批准限制及未知。修復後對受影響範圍覆核。
 
 ## Phase 9 — Handover／Repo＋follow-up
+
+完成前跑 `python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT> --stage completion --strict --json --out <REPORT_JSON>`；報告嘅 completion_receipt 要對應當前 snapshot，無 receipt 就未驗收。git porcelain 有任何改動就唔稱 clean；預期 untracked 指路牌可接受，但如實列數量／路徑。
+
+有限收尾按共同契約：保留已批rev1，先開尚未批准candidate2並凍定material／status-memoryprefix；獨立review其snapshot（排除report自身hash）→candidate2內完成實際report草稿→render／gate及匹配最終bytes嘅實際批准→promote／completion。其他material改動另開candidate及重審，唔原地改已批packet。terminal JSONL只按既有明確evidence_policy授權，不改舊body／prefix；無授權不寫。
+
+schema 1.0 只可 `--legacy-diagnostic` 讀取，結果 MIGRATION_REQUIRED／ready=false；不自動升級批准。保留舊 packet／baseline／journal；只對已有相同舊 journal 嘅恢復先用 `--legacy-recovery --resume`，不開始新 v1 promotion。
 
 更新 status 快照、append memory、新舊 evidence refs、逐項結果與 P0–Pn 下一步（各有 acceptance）。交接寫明 PROJECT_ROOT、canonical packet、批准、promotion journal、可重跑命令及新 session 入口。PLAN JSON 改動後重新 render HTML（AP-15），最終報告指同一 snapshot。
 
@@ -169,3 +205,5 @@ LOCAL COMPLETE／NOT_PUSHED 合法，唔強迫 push 先交貨。已有明確 pus
 AP-01 frontmatter 唔喺 line1；AP-02 假綠／無 assert；AP-03 crash 未查錯誤報告就歸因；AP-04 可用 API 卻用 UI；AP-05 hardcode secret；AP-06 placeholder 未替換；AP-07 banner 令引用漂移；AP-08 push 無遠端驗證；AP-09 副本不同步；AP-10 tasklist 截斷（用 /FO CSV）；AP-11 argparse dest 撞名；AP-12 無 baseline 宣稱穩定；AP-13 照抄 subagent；AP-14 數字無命令；AP-15 PLAN/HTML 脫鉤；AP-16 草稿缺份／一句交差；**AP-17 專屬 agent model 留空／inherit**；AP-18 規格混入病歷。
 
 唔要求舊 SELFTEST.md／SKILL-REPORT.html 存在先通過；以當前 source revision＋真實可重跑測試命令、exit、輸出及 coverage 作證。執行 repo 當前 unittest suite（按 README 指定入口），涵蓋 global discovery／WAL／opaque IDs、packet 缺件與 quoted YAML、offline renderer／script escaping、approval tamper／drift／no-op／resume／rollback、New-S／Reorg-M／不同 cwd／無 CLI／無 plugin／無 push。fresh-session／browser／host loaded 未驗證分開列，唔由 synthetic tests 推論。
+
+workflow.issues 列實際P0/P1/P2、required、due phase及OPEN/RESOLVED；零問題用[]。plan時擋到期P0／requiredP1，completion擋全部此類未解項，唔靠零P0口頭自證。

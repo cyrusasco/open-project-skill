@@ -12,6 +12,7 @@
 | agent 呼叫 | ZCode `Agent` tool，使用 `subagent_type`；只填實際可用 bare／namespaced role |
 | session 輔助 | `ReadSessionContext`（RSC）；按實際可用工具與參數使用，摘要標 summary-only |
 | DB 候選 | `Path.home() / ".zcode" / "cli" / "db" / "db.sqlite"`；存在唔代表授權或 schema 固定 |
+| GitNexus | ZCode 無此整合：workflow.gitnexus applicability=N/A；不安裝／探測／索引，無 G6 receipt／adapter不阻擋完成 |
 | Plugin | 保留 `.zcode-plugin/plugin.json`、commands、skills、agents 等 ZCode 結構 |
 | 已安裝位置 | 由 host／環境核實；可能涉及 `~/.zcode/skills`、`~/.agents/skills`、plugin cache；存在不等於 loaded |
 
@@ -53,3 +54,9 @@ coverage 至少記：metadata total、eligible/scanned/skipped/error parts、mat
 ZCode package 保留原 `.zcode-plugin` metadata，license 從實際來源核實。package 內容與 source 對帳；PACKAGED、INSTALLED、LOAD VERIFIED 分開。fresh session 載入未實測＝UNKNOWN；不將 package JSON 合法當載入證明。
 
 PowerShell REST 用 `curl.exe`，process 列表用 `tasklist /FO CSV`；長腳本用檔案避免 quoting。CLI 命令逐行呈現，唔用 `status | doctor | verify` 假裝可選項。doctor／verify／deploy／push 按用途與授權決定 N/A／NOT_RUN，唔無條件執行。
+
+## 項目手冊與 schema 2.0
+
+用 templates/project-manual.template.md 建必交 agent.md；原 native agent.template.md 保持ZCode YAML／AP-17，唔將兩者混為一份。無native agent只豁免該原生元件，唔取消手冊。
+
+route與destination分開；docs/source roots明確。搬文件前形成完整revision／drafts／適用批准；搬後驗packet、links、decisions、package及受影響獨立review。source refs加root_id，避免CODE_ROOT evidence被解析成DOCS_ROOT。completion用當前receipt；host/tool清單載入與實際執行證據仍分開，唔改既有模型設定。

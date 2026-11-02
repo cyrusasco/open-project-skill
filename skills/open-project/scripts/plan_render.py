@@ -178,6 +178,74 @@ def _workflow() -> tuple[str, str]:
     parts.append('</ol></details></section>')
     return md, "".join(parts)
 
+WORKFLOW_LABELS = (
+    ("roots", "Roots and destination / 根目錄與輸出位置"),
+    ("documents", "Document roles / 必交文件角色"),
+    ("phases", "Recorded phase obligations / 階段義務紀錄"),
+    ("discovery", "Discovery and reading coverage / 發現與深讀覆蓋"),
+    ("features", "Features and acceptance / 功能與驗收"),
+    ("decisions", "Decision events and current state / 決定事件與現況"),
+    ("review", "Independent review snapshot / 獨立覆核範圍"),
+    ("package", "Package scope and inventory / 打包範圍與清單"),
+    ("evidence_policy", "Evidence recording authority / 證據記錄授權"),
+    ("gitnexus", "Host-specific GitNexus applicability / GitNexus 適用範圍"),
+)
+
+
+def _contract_data(value: object, caption: str, depth: int = 0) -> tuple[str, str]:
+    """Preserve every field; never infer acceptance from recorded metadata."""
+    if not isinstance(value, dict) or depth >= 3:
+        return _table(value, caption)
+    fields = [{"field": key, "value": value[key]} for key in sorted(value)
+              if not isinstance(value[key], (dict, list))]
+    md, markup = _table(fields, caption) if fields else ("", "")
+    children = [key for key in sorted(value) if isinstance(value[key], (dict, list))]
+    for key in children:
+        child_caption = caption + " — " + key
+        child_md, child_html = _contract_data(value[key], child_caption, depth + 1)
+        md += "\n" + "#" * min(6, depth + 4) + " " + _md(key) + "\n\n" + child_md
+        tag = "h" + str(min(6, depth + 4))
+        markup += "<" + tag + ">" + html.escape(key) + "</" + tag + ">" + child_html
+    if not fields and not children:
+        return _table(value, caption)
+    return md, markup
+
+
+def _workflow_contract(plan: dict) -> tuple[str, str]:
+    workflow = plan.get("workflow")
+    if not isinstance(workflow, dict):
+        message = "LEGACY_DIAGNOSTIC — no schema 2.0 workflow contract supplied. Rendering does not establish PLAN_READY or COMPLETE."
+        return ("## Workflow contract / 流程契約\n\n" + message + "\n\n",
+                '<section id="workflow-contract"><h2>Workflow contract / 流程契約</h2><p class="authority">' + html.escape(message) + '</p></section>')
+    notice = ("Recorded contract only. PLAN_READY, PROMOTED and COMPLETE are separate states. "
+              "No gate result, approval, independent review or completion is inferred from rendering.")
+    document_count = len(workflow.get("documents", [])) if isinstance(workflow.get("documents"), list) else None
+    phase_count = len(workflow.get("phases", [])) if isinstance(workflow.get("phases"), list) else None
+    summary = [{"item": "Recorded document mappings", "value": document_count},
+               {"item": "Recorded phase records", "value": phase_count},
+               {"item": "Completion decision by renderer", "value": "NOT_EVALUATED"}]
+    summary_md, summary_html = _table(summary, "Recorded counts — not acceptance results")
+    md = "## Workflow contract / 流程契約\n\n" + notice + "\n\n" + summary_md
+    parts = ['<section id="workflow-contract"><h2>Workflow contract / 流程契約</h2><p class="authority">' + html.escape(notice) + '</p>' + summary_html]
+    host_note = ("ZCode: GitNexus is NOT_APPLICABLE. No installation, probe, index, adapter or receipt is required; its absence does not block ZCode completion."
+                 if plan["host"] == "zcode" else
+                 "Codex: apply the recorded GitNexus onboarding contract and authoritative G6 tool row. Fixture results do not establish real-project onboarding.")
+    md += "\n" + host_note + "\n"
+    parts.append('<p class="host-scope">' + html.escape(host_note) + '</p>')
+    labels = list(WORKFLOW_LABELS)
+    known = {key for key, _ in labels}
+    labels.extend((key, "Additional workflow field: " + key) for key in sorted(set(workflow) - known))
+    for key, heading in labels:
+        if key not in workflow:
+            child_md, child_html = _table([{"status": "MISSING", "field": key}], heading)
+        else:
+            child_md, child_html = _contract_data(workflow[key], heading)
+        md += "\n### " + heading + "\n\n" + child_md
+        parts.append("<h3>" + html.escape(heading) + "</h3>" + child_html)
+    parts.append("</section>")
+    return md + "\n", "".join(parts)
+
+
 def _graph(graph: object) -> tuple[str, str]:
     if graph is None or graph == {}:
         return "", ""
@@ -240,6 +308,9 @@ def render_views(project: Path, plan: dict) -> tuple[str, str]:
     workflow_md, workflow_html = _workflow()
     md += workflow_md
     content = [workflow_html]
+    contract_md, contract_html = _workflow_contract(plan)
+    md += contract_md
+    content.append(contract_html)
     for key, heading in SECTIONS:
         if key == "code-map":
             items = plan.get("code_map", [{"status": "UNVERIFIED", "note": "No code map supplied in this packet."}])
@@ -275,13 +346,13 @@ def render_views(project: Path, plan: dict) -> tuple[str, str]:
     md += graph_md
     content.append(graph_html)
     # Include all extension metadata rather than silently dropping approved fields.
-    handled = set(metadata) | {key for key, _ in SECTIONS} | {"folder_changes", "sources", "oss", "graph", "code_map", "timeline", "approval_requests"}
+    handled = set(metadata) | {key for key, _ in SECTIONS} | {"folder_changes", "sources", "oss", "graph", "code_map", "timeline", "approval_requests", "workflow"}
     extensions = {key: plan[key] for key in sorted(set(plan) - handled)}
     if extensions:
         extra_md, extra_html = _table(extensions, "Additional packet metadata")
         md += "\n## Additional packet metadata\n\n" + extra_md
         content.append('<section id="metadata"><h2>Additional packet metadata</h2>' + extra_html + '</section>')
-    toc = '<nav aria-label="Report sections"><ol>' + "".join('<li><a href="#' + key + '">' + html.escape(heading) + '</a></li>' for key, heading in SECTIONS) + '</ol></nav>'
+    toc = '<nav aria-label="Report sections"><ol><li><a href="#workflow-contract">Workflow contract / 流程契約</a></li>' + "".join('<li><a href="#' + key + '">' + html.escape(heading) + '</a></li>' for key, heading in SECTIONS) + '</ol></nav>'
     markup = _safe_template({"TITLE": html.escape(title, quote=True), "HEADER": html.escape(title, quote=True), "DIGEST": digest, "META": html_meta, "TOC": toc, "CONTENT": "\n".join(content)})
     return md.rstrip() + "\n", markup.rstrip() + "\n"
 

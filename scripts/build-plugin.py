@@ -115,6 +115,8 @@ def source_files(root):
     mandatory = {"SKILL.md",
         "scripts/plan_contract.py", "scripts/plan_render.py", "scripts/render-plan.py",
         "scripts/gate-check.py", "scripts/promote.py", "scripts/discover-sessions.py",
+        "scripts/workflow_contract.py", "scripts/workflow_effects.py", "scripts/workflow_package.py",
+        "templates/project-manual.template.md",
         "schemas/plan.schema.json", "references/workflow-contract.md",
         "references/host-" + edition + ".md",
         "templates/PLAN.template.md", "templates/plan-report.template.html",
@@ -124,6 +126,7 @@ def source_files(root):
         "templates/plugin.template.json", "templates/marketplace.template.json"}
     if edition == "codex":
         mandatory.add("templates/agent.template.toml")
+        mandatory.add("references/gitnexus-onboarding.md")
     missing = sorted(str(SKILL / relative).replace("\\", "/") for relative in mandatory
                      if (SKILL / relative).as_posix() not in data)
     if missing:
@@ -134,6 +137,11 @@ def source_files(root):
         raise ValueError("Skill version and SOURCE.json disagree")
     if manifest["version"] != info["plugin_version"]:
         raise ValueError("Plugin version and SOURCE.json disagree")
+    if info.get("contract_version") != "2.0":
+        raise ValueError("This release requires packet contract 2.0")
+    schema = json.loads(data[(SKILL / "schemas/plan.schema.json").as_posix()])
+    if schema.get("properties", {}).get("schema_version", {}).get("const") != "2.0":
+        raise ValueError("Packaged packet schema and SOURCE.json disagree")
     if edition == "codex":
         if manifest.get("$schema") != "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json":
             raise ValueError("Portable manifest schema missing")

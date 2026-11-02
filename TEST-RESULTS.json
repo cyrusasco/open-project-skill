@@ -1,23 +1,55 @@
 {
+  "schema_version": "release-tests/1.0",
   "edition": "zcode",
-  "skill_version": "3.0.0",
-  "run_at": "2026-10-27T23:13:51+08:00",
+  "run_at": "2026-11-02T16:14:20+00:00",
   "python": "3.14.4",
-  "tests_run": 89,
-  "passed": 88,
-  "failures": 0,
-  "errors": 0,
+  "seconds": 72.581,
+  "tests_run": 232,
+  "passed": 231,
+  "failures": [],
+  "errors": [],
   "skipped": [
     {
       "test": "test_output_symlink_is_rejected_even_when_target_is_inside (test_renderer.RendererTests.test_output_symlink_is_rejected_even_when_target_is_inside)",
-      "reason": "Real symlink creation is not permitted by this Windows test environment."
+      "reason": "Windows error 1314: real symlink creation requires a privilege unavailable in this test environment."
     }
   ],
-  "status": "PASSED_WITH_SKIPS",
-  "scope": "Synthetic fixtures; no live session history, databases or host configuration modified.",
+  "source_changed_during_test": false,
+  "tested_source_sha256": "cc7fcbb196a2c9476b1b0f4f8fb4090984d7c369b410d3e188bf7620ff6973d3",
+  "scope": "Synthetic tests only; no live history, project, installed plugin or host config changes.",
   "limits": [
-    "Actual ZCode host loading is not covered.",
-    "LLM implicit/explicit invocation behavior is not proved by unit tests.",
-    "Python 3.10 was not installed here; optional tomllib absence is simulated."
-  ]
+    "Native host loading and actual model invocation are not proved by these tests.",
+    "Real GitNexus onboarding is not performed; ZCode has no GitNexus obligation."
+  ],
+  "status": "PASSED_WITH_SKIPS",
+  "skill_version": "3.1.0",
+  "plugin_version": "0.2.0",
+  "contract_version": "2.0",
+  "canonical_base_commit": "1c29c6d8b2a3d99e4e7801b0f794da23c499897b",
+  "package": {
+    "status": "PACKAGED",
+    "resources": 30,
+    "source_tree_sha256": "0fe65c4b360124b82717c8eb20f1232ea9dec9b0246745ed8bb579e95b31f55f",
+    "installation_verified": false,
+    "invocation_verified": false
+  },
+  "independent_review": {
+    "verdict": "ACCEPTED",
+    "tests_per_edition": 126,
+    "custom_negatives_per_edition": 5,
+    "limits": "Source/synthetic scope only; no native loading or real onboarding."
+  },
+  "fresh_agent_plan_trial": {
+    "profile": "codex",
+    "status": "PLAN_READY",
+    "ready": true,
+    "complete": false,
+    "core_drafts": 5,
+    "sections": 11,
+    "errors": 0,
+    "gitnexus": "BLOCKED",
+    "packet_sha256": "89c93b507bd38b00c69c84404b8f6bd2261ad9ba64cfc4789d0bcbe1e6fcd412",
+    "source_files_unchanged": 5,
+    "native_plugin_invocation_verified": false
+  }
 }

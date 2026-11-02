@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 
-def make_packet(project, host="zcode"):
+def make_legacy_packet(project, host="zcode"):
     from plan_contract import DRAFT_MARKER, expected_content
     project = Path(project)
     staging = project / "md-drafts"
@@ -24,6 +24,12 @@ def make_packet(project, host="zcode"):
                 "folder_changes", "risks", "requirements", "code_map", "timeline", "approval_requests"):
         packet[key] = []
     return packet
+
+
+def make_packet(project, host="zcode"):
+    """New fixtures exercise current obligations; legacy cases opt in explicitly."""
+    from workflow_support import make_workflow_packet
+    return make_workflow_packet(project, host=host)
 
 
 def save_packet(project, packet):
