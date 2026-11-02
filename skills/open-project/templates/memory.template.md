@@ -1,4 +1,4 @@
-# <PROJECT> — Memory event log
+# {{PROJECT}} — Memory event log
 
 > **append-only**：舊 entries／rows／狀態／原文都不修改或刪除。更正、取代、撤回只 append 新 event。
 > 當前狀態係事件鏈計算結果：current／superseded／revoked；唔回頭改舊 row 成 superseded，唔用刪線覆寫舊內容。
@@ -12,7 +12,7 @@
 
 | entry ID | time | 事實 | evidence ID／version／scope |
 |---|---|---|---|
-| A1 | <ISO time+offset> | <verified fact> | <ref/hash/command output> |
+| A1 | {{ISO time+offset}} | {{verified fact}} | {{ref/hash/command output}} |
 
 不要在原 row 寫可變「current」狀態。狀態由 §K events 推導，未被有效 supersedes／revokes 嘅最新鏈端先 current。
 
@@ -20,7 +20,7 @@
 
 | entry ID | time | 症狀 | 有證據根因 | 解法／observed result | source refs |
 |---|---|---|---|---|---|
-| B1 | <time> | <symptom> | <evidence-backed cause> | <solution/result> | <refs> |
+| B1 | {{time}} | {{symptom}} | {{evidence-backed cause}} | {{solution/result}} | {{refs}} |
 
 無證據歸因去 §D；唔將臨時 workaround 自動升格需求。
 
@@ -28,7 +28,7 @@
 
 | entry ID | time | 當時判斷 | 核實後事實 | 教訓／來源 |
 |---|---|---|---|---|
-| C1 | <time> | <old claim> | <verified correction> | <ref> |
+| C1 | {{time}} | {{old claim}} | {{verified correction}} | {{ref}} |
 
 寫新 entry，再 append correction event 指向舊 claim，唔回頭改舊字句。
 
@@ -36,7 +36,7 @@
 
 | entry ID | time | 說法／缺失 | 原因 | 驗證方法／所需授權 | source ref |
 |---|---|---|---|---|---|
-| D1 | <time> | <unknown> | <reason> | <next check> | <ref> |
+| D1 | {{time}} | {{unknown}} | {{reason}} | {{next check}} | {{ref}} |
 
 驗證後新增 §A／§B entry，再以 supersedes event 指向舊未知；原未知保留。
 
@@ -44,7 +44,7 @@
 
 | entry ID | time | 原文／具體範圍 | decision/source ref |
 |---|---|---|---|
-| E1 | <time> | <explicit request/authorization> | <session ref + source version> |
+| E1 | {{time}} | {{explicit request/authorization}} | {{session ref + source version}} |
 
 撤回以新 revokes event 指向 E1，唔刪 E1。已有相同範圍明確授權持續有效；不由模糊舊偏好推導破壞性操作授權。
 
@@ -52,7 +52,7 @@
 
 | entry ID | time | 事件／里程碑 | evidence refs |
 |---|---|---|---|
-| F1 | <time> | <milestone> | <refs> |
+| F1 | {{time}} | {{milestone}} | {{refs}} |
 
 capture time、source 修改時間分開；mtime 不證明作者。
 
@@ -60,7 +60,7 @@ capture time、source 修改時間分開；mtime 不證明作者。
 
 | entry ID | time | 問題 | 根因／解法或繞道 | 當時 observed 狀態 | source refs |
 |---|---|---|---|---|---|
-| G1 | <time> | <issue> | <evidence-backed explanation> | <resolved/open/unknown> | <refs> |
+| G1 | {{time}} | {{issue}} | {{evidence-backed explanation}} | {{resolved/open/unknown}} | {{refs}} |
 
 後續結果寫新 entry＋event，不編輯當時狀態。序號持續追加，宣稱總數由實際 entry counts 計。
 
@@ -68,7 +68,7 @@ capture time、source 修改時間分開；mtime 不證明作者。
 
 | entry ID | time | 模式／次數／範圍 | 證據 | 工具化評估連結 |
 |---|---|---|---|---|
-| H1 | <time> | <pattern/count/scope> | <command/query + refs> | <PLAN §6 ID or N/A> |
+| H1 | {{time}} | {{pattern/count/scope}} | {{command/query + refs}} | {{PLAN §6 ID or N/A}} |
 
 重複不代表必須自建工具，N/A 可合法。
 
@@ -76,7 +76,7 @@ capture time、source 修改時間分開；mtime 不證明作者。
 
 | entry ID | time | 問題／當時缺口 | 下一步 acceptance | ref |
 |---|---|---|---|---|
-| I1 | <time> | <open item> | <criterion> | <ref> |
+| I1 | {{time}} | {{open item}} | {{criterion}} | {{ref}} |
 
 即時目前清單放 project_status，呢度保留事件歷史。
 
@@ -93,6 +93,20 @@ capture time、source 修改時間分開；mtime 不證明作者。
 
 | event ID | time | type | target entry/event ID | replacement entry ID | reason／decision evidence |
 |---|---|---|---|---|---|
-| EVT1 | <time> | <supersedes/revokes/correction> | <old ID> | <new ID or N/A> | <source ref> |
+| EVT1 | {{time}} | {{supersedes/revokes/correction}} | {{old ID}} | {{new ID or N/A}} | {{source ref}} |
 
 supersedes＝新 entry 取代舊 entry；revokes＝撤回該 entry 效力；correction＝明確指出舊說法錯誤並連新 evidence。原文原行原狀保留；若更正事件本身有誤，再 append event 指向該 event。不要 rewrite 舊狀態為 current／superseded／revoked。
+
+## §L 來源版本表
+
+| source ID | root ID／locator | source revision／raw hash | capture time／visible range | 引用 entries／events |
+|---|---|---|---|---|
+| {{ID}} | {{source root/path or session reference}} | {{hash/version}} | {{time/scope}} | {{IDs}} |
+
+初始無歷史事件可如實記「無已知歷史事件」及 inventory 方法，不杜撰；新事件追加，不回寫舊來源版本。
+
+## §M 已審 prefix 與 terminal receipts
+
+{{evidence_policy 實際授權 ref、path、prefix length/hash、允許 record_types 及本輪新增 terminal refs；無授權只在 staging。}}
+
+記 review receipt／command exit／digest／timestamp／terminal_state 等已明確允許事件；不能藉 terminal append 改需求、舊 evidence、SOP、權限或未定 record type。memory 舊 entries不改；current view 由有效事件鏈推導，與 status／packet一致。

@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "edition": "codex",
+  "baseline_commit": "33fa47a06c894b6bc384f5d6080199b7ad051744",
+  "scope": "Exact native entry/template/policy bytes; global model/provider/config not modified or copied. Plugin version intentionally updated separately.",
+  "files": [
+    {
+      "path": "skills/open-project/agents/openai.yaml",
+      "sha256": "96f4aa1338357d441655653637ea589ef54a4a09711829bd29e530981f6b0973",
+      "bytes": 284
+    },
+    {
+      "path": "skills/open-project/templates/agent.template.toml",
+      "sha256": "77393d8d3be39ece2a8359d292ffb8b93e071c50de5d397a1d3e9ccbb5fd6412",
+      "bytes": 488
+    },
+    {
+      "path": ".agents/plugins/marketplace.json",
+      "sha256": "699d2a0b83e8f57adbc5a655c06df475b5abf911eb9072af507f9795ac8ea30c",
+      "bytes": 379
+    },
+    {
+      "path": "scripts/install-plugin.ps1",
+      "sha256": "2ea4621d21b9eed511e190b3ec9ce58441d07c6b81d541ad894fb9b75f6c9152",
+      "bytes": 5636
+    }
+  ]
+}

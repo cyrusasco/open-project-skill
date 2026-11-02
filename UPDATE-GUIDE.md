@@ -1,67 +1,65 @@
-# open-project 兩版更新與安裝交接
+# open-project 0.2.0 — 兩個 host 更新指引
 
-同一 repo 保留兩個獨立 host 版本。按所用 host 更新來源，唔合併整條 branch，亦唔用另一版覆蓋已運作嘅 harness 設定。
-
-| Host | Branch | Skill revision | Plugin version | 原生整合 |
+| Host | Branch | Skill | Plugin | GitNexus |
 |---|---|---|---|---|
-| ZCode | `main` | `3.0.0` | `0.1.0` | 保留 `.zcode-plugin`、commands、Agent／subagent_type、ReadSessionContext 及既有 model／provider 規則 |
-| Codex | `codex-port` | `3.0.0-codex.2` | `0.1.1` | portable plugin、native TOML agents、JSONL adapter、手動叫用 policy |
+| ZCode | `main` | `3.1.0` | `0.2.0` | **N/A**；不安裝、不探測、不索引，缺少 receipt 不阻擋完成 |
+| Codex | `codex-port` | `3.1.0-codex.1` | `0.2.0` | Codex-only onboarding；現有 fixture MVP 唔代表真項目 adapter |
 
-版本以各 branch 嘅 `VERSION`、`SOURCE.json`、manifest 為準。更新前先比較本地修改，保留原檔／設定及來源記錄；唔自行覆蓋已安裝 cache、全域指令或其他插件。
+兩版共同使用 packet **2.0**。唔 merge 整條 branch；保留各 host 原生設定。普通安裝唔建立 project folder，亦唔自動啟動開案。
 
-## 已有共用改進
+## 本次共同修正
 
-`main` 已包含 v3 共用修正：packet 1.0 契約、必交 specification／完整草稿、行級 agent 解析、內容 hash／canonical views 核對、全系統 session discovery、數值保真離線 HTML，以及 dry-run／漂移停止／備份／journal／重跑 no-op 嘅 promote。
+- `route=new/reorg` 同輸出目的地分開。有舊 code／session 唔代表新文件要寫返舊 folder；先定 docs/code/source roots，再按授權建立 staging。
+- 五個核心文件角色必交：`agent.md` 項目操作手冊、`product_specification.md`、`project_status.md`、`memory.md`、`REVIEW_REPORT.md`。既有別名要明確映射；project manual 唔係 native subagent。
+- 全系統歷史 discovery、實際取回及模型深讀分開；必要來源未掃完唔叫全史完成。新專案無歷史可寫明有證據嘅 N/A。
+- `PLAN_READY`、`PROMOTED` 同 `COMPLETE` 分開。搬 folder／加 plugin／改 spec，要先完成受影響 packet／草稿／render／gate 及適用批准；舊 review 不能直接當最後版本驗收。
+- 決定事件推導唯一當前批准狀態。封存有 source→destination→supersedes 證據；git 有預期 untracked 可以接受，但唔稱 clean。
+- Plugin 清楚選知識 bundle 或本機 adapter；每項 included／external／excluded、hash 同連結要對賬。唔將私人全庫、secret、runtime state 包入。
+- advisory 預設及 explicit strict 保留；checker 係驗收，唔係 host 強制。命令及實際 JSON 欄位以 skill 內 `references/workflow-contract.md` 同 `--help` 為準。
 
-模型跟用戶／後台設定問題已 RESOLVED。更新唔重新設計模型選擇，亦唔搬另一 harness 嘅 model、agent、工具或 manifest 規則。之後共用修正按檔／功能選擇移植，再分別測試兩版。
+## 舊 packet 遷移
 
-## Codex 安裝及手動叫用
+1. 保留 schema1.0 packet、首次已知 baseline、批准、journal 及備份，唔先覆寫舊資料。
+2. 診斷舊包缺項；補 roots、五個角色、Phase 義務、來源／功能／review／package 證據，形成新2.0 revision。
+3. 重新 render／gate，再使用真正覆蓋該 revision／bytes／effects 嘅批准；同 scope 唔代表新內容自動已批。
+4. 舊在途操作只可用原 packet／批准／既有 journal 嘅明確 legacy recovery；不能借此啟動新寫入或移植授權。
+5. 未有收尾證據只報 PARTIAL／REVIEW_PENDING，唔用舊版 READY 當全流程完成。
 
-只喺 `codex-port` 來源根目錄、你正常有寫入權限嘅 PowerShell 7 使用本機安裝入口（Python 3.11+）：
+## ZCode 更新 prompt
+
+```text
+請更新 open-project，只用 https://github.com/cyrusasco/open-project-skill 的 main。
+目標：Skill3.1.0／Plugin0.2.0／packet2.0；先核對實際遠端HEAD與來源。
+先盤點已安裝 standalone skill、command、plugin 的來源／版本及本地修改；保留 dirty files、原始bytes、設定與回復入口，唔直接覆蓋。
+保護現有 Agent/subagent_type、ReadSessionContext、.zcode-plugin、commands、native agent frontmatter、已確認 model/provider、hooks/global instructions/host config。模型問題已解決，不重設。
+ZCode 無 GitNexus：G6=N/A，唔安裝／探測／索引，唔搬 Codex TOML、openai.yaml policy 或原生安裝指令。
+先喺獨立來源副本跑 unittest、build、核心角色缺件／新folder／搬移後packet漂移／review版本／批准矛盾等驗收；只用 synthetic DB，唔對 live session DB 寫入。
+按已授權範圍，用 ZCode 原生方法更新選定副本；冇必要唔加全域hook／其他設定。使用新session核對實際載入來源、版本、namespace及明確叫用行為；未實測就UNKNOWN。
+唔直接修 ThreadDock／WhatsApp 的 live 文件。先重新讀各自最新狀態，再各出 repair packet，避免覆蓋並行工作。
+交付來源HEAD、保護檔案對賬、測試命令/exit/coverage、package hashes、安裝/loaded/invocation狀態及rollback方法。PACKAGED唔等於INSTALLED。
+```
+
+## Codex 更新
+
+只使用 `codex-port`，先確認 `SOURCE.json`／`VERSION`／portable manifest 全部係本次版本，跑測試及 build。喺正常有 profile 寫入權限嘅 PowerShell7、Python3.11+ 執行：
 
 ```powershell
 .\scripts\install-plugin.ps1
 ```
 
-入口使用 Codex 原生 marketplace／plugin 安裝流程；唔直接改 cache 或全域模型。若當前來源未包含此入口，先更新 `codex-port`，或按該 branch README 嘅已核實 CLI 指令安裝。寫入 `config.toml` 被拒絕係安裝失敗，唔可以將打包／舊版載入結果當成功；保留錯誤及現有設定。
+原生 installer 不直接改 cache／global model；如同名 marketplace 指向另一來源，會停止並保留現有設定。唔用 sandbox／權限 workaround。已安裝0.1.1唔代表0.2.0已更新。
 
-Codex 版 `agents/openai.yaml` 已設定 YAML boolean `policy.allow_implicit_invocation: false`。用時喺 Codex 訊息／skill picker 明確選取，以下係 prompt，唔係 PowerShell 命令：
+手動叫用 prompt：
 
 ```text
 $open-project-codex:open-project new <goal or folder>
 $open-project-codex:open-project reorg <project folder>
 ```
 
-安裝狀態、實際載入名稱／版本、手動及一般任務觸發行為分開驗證。已經開住嘅 session 唔證明已重新載入新版；更新後以新 session／host 支援嘅載入流程核對。單純安裝唔會建立 project folder 或啟動開案流程。
+保留 YAML boolean `policy.allow_implicit_invocation: false`。Codex GitNexus 按現有 graph／catalog／casebook owner 分工；真 onboarding 缺 reviewed adapter 就 BLOCKED，不自造 receipt，不把 PLAN 當 BUILD 批准。呢項唔適用 ZCode。
 
-## ZCode 更新及手動叫用
+## 驗收及回復
 
-ZCode 只更新 `main`。用 ZCode 自己支援嘅安裝／載入流程，唔照搬 Codex marketplace 指令或 invocation policy 欄位。實際 namespace 以 host 顯示為準，例如：
-
-```text
-/open-project new <goal or folder>
-/open-project reorg <project folder>
-```
-
-ZCode 原生「啟用後仍只手動觸發」尚未實測保證。文件要求明確叫用，唔等於 host 強制；未核實前可於不用時停用此 plugin。先盤點舊 standalone skill／command，避免另一份仍自動觸發或遮住新版本；只處理已選定副本，保留其他設定。
-
-## 新內容、GitNexus 與驗收
-
-- `new` 先列清 project folder 嘅位置／用途；`reorg` 沿用現有 root，再按 PLAN 新增所需目錄。Phase 4 只寫 project 內 `md-drafts/`：JSON、PLAN、全文草稿、spec、離線 HTML；正式目錄／內容按具體批准及漂移檢查落地。
-- Codex profile 每份 PLAN 必列 `gitnexus-project-onboarding`，逐個新建／更新 Skill、Plugin 交付物記 graph／catalog 範圍、步驟、驗收、blockers、evidence；G6 擋缺 onboarding 決策／結構不完整，reviewer 另核對產物無漏項及證據內容。呢個 profile 唔搬入 ZCode。
-- 現有 onboarding Skill 核實版本仍係 copied-JavaScript fixture MVP，唔係真實專案／Markdown Skill 嘅通用 adapter。缺 reviewed adapter 或 catalog 入口就列 `BLOCKED`；Skill／Plugin 嘅 catalog obligation 唔可以用 N/A 略過，亦唔自動 index 全聊天／shared Skills。
-- 計劃齊件唔代表已 onboarding。沿用現有 graph、capability catalog、immutable casebook owner；真實寫入／backend verification 按實際 scope／effects 及既有有效授權執行，唔因 file promote 已批而順帶授權。
-- `PACKAGED`、`INSTALLED`、`LOAD_VERIFIED`、`INVOCATION_VERIFIED` 各自有證據；synthetic PASS／CLI exit 0 唔代表全部完成。舊 packet 補新內容後升 revision，重新 render／gate，唔沿用不匹配嘅 approval。
-
-## 可直接交俾 ZCode 嘅更新 prompt
-
-```text
-請更新 open-project：來源只用 cyrusasco/open-project-skill 嘅 main。
-先記 repo/branch/HEAD、本地差異、已安裝版本／來源同相關檔案 raw hashes；保留本地修改及原有備份，唔直接覆蓋 dirty files。
-採用 main 已有共用 v3 修正；唔 merge codex-port，唔搬 Codex agent TOML、JSONL adapter、G6 profile 或 policy 設定。
-逐項保護而家有效嘅 ZCode model/provider、agent frontmatter、tools/commands、hooks、global instructions、host config；模型問題已 RESOLVED，唔重新修改。
-先建獨立 package，再跑該版本 synthetic tests、gate 負例、renderer 數值／全文視圖及 promote dry-run／no-op／drift 驗證；唔對 live session DB 寫入。
-按我已授權範圍，用 ZCode 支援方法更新選定 plugin；任何額外 host config/hook/權限/其他副本變更先列具體內容及需要，唔順帶做。
-喺新 session 核對實際 skill/command/agent 載入來源、版本、namespace；測明確叫用同普通無關任務嘅觸發行為。未驗證就標 UNKNOWN，唔寫手動保證。
-交付版本／路徑／hash／命令／exit／測試覆蓋、保留設定對照、載入／觸發證據、未完成項及 rollback 方法。唔以打包或舊測試當實機成功。
-```
+`python -m unittest discover -s tests -v` 只證明列明 synthetic 範圍；看當前 `TEST-RESULTS.json`，唔沿用舊測試數。
+`python scripts/build-plugin.py` 建 allowlisted 獨立 package，不安裝。SOURCE／PACKAGED／INSTALLED／LOAD_VERIFIED／INVOCATION_VERIFIED 分開記錄。
+新版本 host load、真模型叫用或真 GitNexus 未實測就 UNKNOWN／BLOCKED。回復使用保留嘅上版來源及原生 host 操作；唔 reset 用戶其他改動或混合兩版設定。

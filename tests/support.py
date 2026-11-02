@@ -4,15 +4,7 @@ import json
 from pathlib import Path
 
 
-def gitnexus_plan_row():
-    """Explicit non-applicability for tests that produce no Skill/Plugin/code."""
-    return {"id": "gitnexus-project-onboarding", "status": "NOT_APPLICABLE",
-            "skill_ref": "synthetic-fixture:no-installed-skill-read",
-            "reason": "Synthetic document-only packet; no Skill, Plugin or code is adopted.",
-            "artifacts": [], "steps": [], "acceptance": [], "blockers": [], "evidence": []}
-
-
-def make_packet(project, host="zcode"):
+def make_legacy_packet(project, host="zcode"):
     from plan_contract import DRAFT_MARKER, expected_content
     project = Path(project)
     staging = project / "md-drafts"
@@ -31,9 +23,13 @@ def make_packet(project, host="zcode"):
     for key in ("facts", "unknowns", "conflicts", "pains", "roles", "tools", "oss", "sources",
                 "folder_changes", "risks", "requirements", "code_map", "timeline", "approval_requests"):
         packet[key] = []
-    if host == "codex":
-        packet["tools"].append(gitnexus_plan_row())
     return packet
+
+
+def make_packet(project, host="zcode"):
+    """New fixtures exercise current obligations; legacy cases opt in explicitly."""
+    from workflow_support import make_workflow_packet
+    return make_workflow_packet(project, host=host)
 
 
 def save_packet(project, packet):

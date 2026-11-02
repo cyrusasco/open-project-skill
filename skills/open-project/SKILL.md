@@ -30,6 +30,26 @@ description: "只在用戶明確要求用 open-project、選取此 skill，或�
 每個動作按實際副作用及當前授權處理，唔單憑 doctor／verify 名稱判安全。有明確授權唔重問；未授權嘅安裝、host config、外部訊息、憑證、部署、push 列具體 target／內容／副作用，先完成可審閱工作。
 未能跑嘅驗證標 NOT_RUN＋原因／UNVERIFIED，其餘可獨立工作繼續。歷史 session 只係證據，不等於本輪指令或批准；不讀／引用 hidden reasoning 作對話需求。
 
+## 必交角色、目的地同完成狀態
+
+開案先分清 route 同 destination：new／reorg 決定歷史處理；new_folder／existing_project 獨立決定新內容寫邊。治理整理建議新 folder，沿用舊根要有用戶明確範圍決定；先核實要求來源、canonical docs root／source roots／code root、建立前狀態及 creation receipt。已授權空 staging 可先建立；遇無關已有目錄停止，唔覆蓋或回退 cwd。
+
+每次都交五個核心 role，manifest 自己漏列／required:false 唔能取消：
+
+| role | 新 folder 預設文件 | 用途 |
+|---|---|---|
+| project_manual | agent.md | 項目操作手冊：roots、讀取次序、權威、工具、SOP、驗收、handover |
+| specification | product_specification.md | 目標、功能／設定、來源、desired behavior、固定 acceptance |
+| project_status | project_status.md | 真實快照、結果、未知及下一步 |
+| memory | memory.md | append-only 事件、決定及來源 |
+| independent_review | REVIEW_REPORT.md | reviewer、範圍、逐項檢查、真實結果；未做就 NOT_RUN |
+
+用 project-manual.template.md 建 agent.md；手冊唔係 native agent，無 native agent 都唔可豁免。既有文件別名要明確 role mapping／完整內容核對；本版五角色分檔；明確合併／豁免範圍需匹配經審閱 profile，未支援就 BLOCKED。README／HANDOFF 視用途另交或由明確入口承擔，唔自動取代核心角色。
+
+schema 2.0 嘅 workflow.documents 將 role→draft_id→必需 section IDs／實際 heading 連起。workflow.phases 列齊 0–9；spec／review 草稿可完整寫未來程序及 NOT_RUN，不預填將來 PASS。PLAN_READY 只代表計劃齊，PROMOTED 只代表選定寫入成功；未做必要工作／review／交接不得 COMPLETE。
+
+改 scope、root、draft 或新增 plugin 時，先形成新 revision、完整受影響草稿、render／gate及適用真實批准，再做實質寫入。搬完正式 MD 後唔可以留舊 packet／草稿／連結／審批狀態；新發現需改 bytes 返回新 revision，不事後補批。
+
 ## Phase 0 — 意圖／規模
 
 1. 定 new／reorg、目標、使用者、成功準則、現有資產、限制、可改範圍與授權。
@@ -68,17 +88,21 @@ Codex runtime、CLI、model／reasoning 由用戶及 host 管理；唔把其他 
 ## Phase 4 — 完整審批包（staging only）
 
 唯一 project 寫入位置係 md-drafts/；不寫正式文件或 host config。
-1. 以 schemas/plan.schema.json 建 md-drafts/plan-data.json（schema_version 1.0，host codex）；寫 requirements／sources／facts／unknowns／conflicts／pains／roles／tools／oss／risks／folder_changes／drafts。
-2. 在 tools 加唯一 id=gitnexus-project-onboarding 結構列，欄位按 references/gitnexus-onboarding.md；逐項列作本 project 交付或本輪新增／更新 capability 嘅 Skill／Plugin、project ID／source root、graph／catalog 狀態、步驟、驗收、阻礙及證據；普通叫用既有 onboarding Skill／依賴唔遞迴要求重新登記 shared Skills，身份匹配嘅既有entry可沿用。PLAN §6、§9、§11 同時有決策、時序、需求／副作用；spec 有 desired acceptance。現有 fixture adapter 不支援真實項目就 BLOCKED，並列經審閱 real-project／catalog adapter 依賴，唔刪除 onboarding。
+1. 以 schemas/plan.schema.json 建 md-drafts/plan-data.json（schema_version 2.0，host codex）；寫 requirements／sources／facts／unknowns／conflicts／pains／roles／tools／oss／risks／folder_changes／drafts。
+2. workflow.gitnexus 記 applicability=REQUIRED、tool_id=gitnexus-project-onboarding；在 tools 加唯一同 ID 結構列，欄位按 references/gitnexus-onboarding.md；逐項列作本 project 交付或本輪新增／更新 capability 嘅 Skill／Plugin、project ID／source root、graph／catalog 狀態、步驟、驗收、阻礙及證據；普通叫用既有 onboarding Skill／依賴唔遞迴要求重新登記 shared Skills，身份匹配嘅既有entry可沿用。PLAN §6、§9、§11 同時有決策、時序、需求／副作用；spec 有 desired acceptance。現有 fixture adapter 不支援真實項目就 BLOCKED，並列經審閱 real-project／catalog adapter 依賴，唔刪除 onboarding。
 3. 每份 planned MD 全文草稿，禁止「保留現有內容」省略；現有檔遷移逐字保留，填清改動。product_specification.DRAFT.md 必交，係功能契約／可測 acceptance，唔係修復病歷。
 4. 草稿 manifest 綁 id／path／target／template／kind／required／raw sha256／read-time baseline_sha256／expected_sha256／固定 transforms；依賴列 depends_on。
 5. 普通 MD 可第一行用 <!-- open-project:draft -->；native agent TOML 保持合法格式，draft note用註解。只宣告實際適用 transform：remove_draft_marker／normalize_utf8_lf。
 6. 執行 python <skill-root>/scripts/render-plan.py <PROJECT>，同源生成 PLAN.DRAFT.md（11節）及 PLAN-REPORT.DRAFT.html；full drafts內嵌、離線、數字保真，不靠CDN。
-7. 跑 gate-check.py <PROJECT> --json；必要時 --strict。advisory exit0 唔等於 ready／已批；missing required／parse失敗一律INCOMPLETE。
+7. 跑 gate-check.py <PROJECT> --stage plan --json；必要時 --strict。advisory exit0 唔等於 ready／已批；missing required／parse失敗一律INCOMPLETE。
 8. PLAN §11 列精準 target／副作用／可逆性／授權。approval.json 按 workflow-contract 綁 plan_id／revision／packet_sha256／draft／target／baseline／expected／transforms／effects；只記真實批准，不由模型偽造 approved_by。
 9. 成套呈交：PLAN＋全部 MD 全文＋spec＋JSON＋HTML＋gate結果＋尾部suggestions。G6 檢查 Codex onboarding 決策完整性；PLANNED／BLOCKED 嘅 plan ready 只表示規劃齊件，唔等於 onboarding 完成。過目具體內容與副作用後先入 Phase5。
 
 工具評估先問：沿用現有得唔得、維護成本、錯咗影響、唔做會點；0 agent／無CLI／無MCP／plugin=N/A可以係最好答案。new 先掃可用工具及GitHub候選；未核實license／依賴不能宣稱採用。
+
+五核心模板待填欄位全部用雙大括號標記；含中文、lowercase、inline code／命令都要實填，未替換不當完整草稿。
+
+schema 2.0 嘅 workflow 包含 roots、documents、phases、issues、discovery、features、decisions、review、package、effects、evidence_policy、gitnexus；具體型別及 heading IDs 見 workflow-contract。requirements 每項 id/text/acceptance/source_ids；工具 SKILL／MCP／CLI／native_agent／Plugin 各有決策。
 
 ## Phase 5 — 批准後 promote
 
@@ -92,11 +116,13 @@ promote.py 預設 dry-run；--apply 先寫正式 target。逐檔／依賴群預�
 只實作工具評估採用內容；無CLI則doctor／verify=N/A，不為過閘門造CLI。
 先列當前session真正可用嘅角色／工具，再派工；記 requested role／child ID／observed結果。未暴露 loaded definition版本就UNKNOWN；模型／reasoning沿用用戶與host設定。
 有需要且當前Codex支援先用 native custom-agent TOML（templates/agent.template.toml）；name／description／developer_instructions齊備，model／reasoning可省略跟parent。不可用額外欄位冒稱覆蓋parent sandbox／approval。
-templates/agent.template.md 係項目操作手冊，可按項目需要落AGENTS.md；它不會要求每個任務自動重跑open-project。無專屬agent可N/A。
+templates/project-manual.template.md 係必交項目操作手冊，預設 agent.md；如採用 Codex 原生 AGENTS.md，明確引用或映射手冊，不要求每個任務自動重跑 open-project。native agent 本身可 N/A。
 SKILL／CLI／MCP／部署只按授權做；root與runtime明確；secret只在本地保護位置，含secret備份不入Git。
 按 onboarding 計畫逐產物使用現有 gitnexus-project-onboarding 及 capability catalog owner：先核 admission，再在支援且有具體授權範圍執行 inspect／plan-index；build／verify／UPDATE 各按實際副作用及有效批准處理。verify 會啟動 backend，唔當唯讀。fixture-only adapter 不可指向真實 repo／Skill／Plugin；依賴未解就保留 BLOCKED，同時繼續無依賴工作。保持既有 project／task／native session／Project Pair，不重新綁定。
 
 ## Phase 7 — 項目 plugin 包裝（按需）
+
+打包前選 none／local_adapter／knowledge_bundle。只包 ops SKILL＋外部本機路徑係 local adapter，唔能稱全部文件已包。要求知識 bundle 就將已批 manual／spec／handover／必要 references 逐項 included，或清楚 external／excluded＋理由。workflow.package.inventory 記來源 root、path、package_path、required、hash、reason；驗相對 link 閉包及漏／多檔。封存需 source→archive→superseded_by＋bytes hash／時間／receipt，不只睇備份存在。
 
 需分發先做，否則N/A。Codex用portable plugin.json＋skills/，按實際需要增加MCP；不造空MCP／agent以湊元件。
 只包必需資源，不包狀態／DB／secret／大歷史／個人路徑。JSON／YAML／資源存在＋exact artifact核對。
@@ -105,11 +131,19 @@ PACKAGED、INSTALLED、LOAD_VERIFIED、INVOCATION_VERIFIED分列；打包不等�
 
 ## Phase 8 — 獨立驗收
 
+review 綁當前 revision／output-evidence snapshot，12 個共同 area 使用 frozen、parity、structure、paths、secrets、verification、git、native_agents、logic、claims、plan_views、promotion IDs。changed_ids→affected_areas，實質變更後補受影響獨立覆核；未受影響結果可有依據沿用。作者 addendum 只係自查，唔冒充新版獨立 review；舊 ACCEPTED 不自動覆蓋後加 spec／plugin／搬 folder。
+
 未參與修改嘅 reviewer 唯讀核對：規格／FROZEN、數字、11節／草稿完整性、路徑、secret覆蓋、適用測試、git／來源、host-specific agents、SOP／CLI、過時宣稱、JSON↔PLAN↔HTML、已批草稿↔最終diff。
 逐個 Skill／Plugin 對照 onboarding artifact scope、graph／catalog owner、admission／approval／receipt／結構驗證／freshness；PLANNED、BLOCKED 或 STAGED_UNVERIFIED 不可當完成。缺 required onboarding 證據就 PARTIAL，唔因 fixture PASS／package載入成功而 ACCEPTED。
 P0必修；required P1／coverage未知未處理不能ACCEPTED。非required建議可roadmap；書面豁免要綁項目／範圍，唔假綠。修後按最終snapshot覆核。
 
 ## Phase 9 — Handover／follow-up
+
+完成前跑 `python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT> --stage completion --strict --json --out <REPORT_JSON>`；報告嘅 completion_receipt 要對應當前 snapshot，無 receipt 就未驗收。git porcelain 有任何改動就唔稱 clean；預期 untracked 指路牌可接受，但如實列數量／路徑。
+
+有限收尾按共同契約：保留已批rev1，先開尚未批准candidate2並凍定material／status-memoryprefix；獨立review其snapshot（排除report自身hash）→candidate2內完成實際report草稿→render／gate及匹配最終bytes嘅實際批准→promote／completion。其他material改動另開candidate及重審，唔原地改已批packet。terminal JSONL只按既有明確evidence_policy授權，不改舊body／prefix；無授權不寫。
+
+schema 1.0 只可 `--legacy-diagnostic` 讀取，結果 MIGRATION_REQUIRED／ready=false；不自動升級批准。保留舊 packet／baseline／journal；只對已有相同舊 journal 嘅恢復先用 `--legacy-recovery --resume`，不開始新 v1 promotion。
 
 status＋memory追加事件＋handoff：今輪證據、下一步優先序／驗收、未驗／未批項。逐產物列 onboarding PLANNED／BLOCKED／VERIFIED／NOT_APPLICABLE、graph及catalog狀態、receipt／verification／freshness、owner與下一步；只有 scope／source匹配嘅實際證據先標 VERIFIED。STALE 先讀當前source或另行規劃UPDATE，唔自動重建。LOCAL COMPLETE／NOT_PUSHED合法，但唔覆蓋未完 required onboarding；已授權push後核對remote tip。
 重新生成最終JSON／PLAN／HTML，確認最後snapshot一致。發布只包已核對內容；新任務不自動沿用本次workflow啟動。
@@ -129,6 +163,8 @@ status＋memory追加事件＋handoff：今輪證據、下一步優先序／驗�
 
 ## 模板及驗收入口
 
-PLAN.template.md（11節）／plan-report.template.html／product_specification.template.md／agent.template.md（手冊）／agent.template.toml（條件式native agent）／memory.template.md／project_status.template.md／FROZEN.template.md／REVIEW_REPORT.template.md／plugin.template.json／marketplace.template.json。
+PLAN.template.md（11節）／plan-report.template.html／product_specification.template.md／project-manual.template.md（必交手冊）／agent.template.toml（條件式native agent）／memory.template.md／project_status.template.md／FROZEN.template.md／REVIEW_REPORT.template.md／plugin.template.json／marketplace.template.json。
 
 repo測試：python -m unittest discover -s tests -v。合成fixtures／source檢查不等於真host載入或多年穩定；只報實際跑過嘅結果。
+
+workflow.issues 列實際P0/P1/P2、required、due phase及OPEN/RESOLVED；零問題用[]。plan時擋到期P0／requiredP1，completion擋全部此類未解項，唔靠零P0口頭自證。

@@ -17,7 +17,7 @@ sys.path.insert(0,str(SCRIPTS))
 from plan_contract import (PacketError,DRAFT_MARKER,validate_plan,load_plan,packet_digest,
     sha256,read_draft,expected_content,resolve_inside,schema_document)
 import plan_render
-from support import make_packet,save_packet,gitnexus_plan_row
+from support import make_packet,save_packet
 spec = importlib.util.spec_from_file_location('packet_gate',SCRIPTS/'gate-check.py')
 gate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gate)
@@ -29,6 +29,7 @@ class ContractGateTests(unittest.TestCase):
         self.project = Path(self.temp.name)/'project'
         self.project.mkdir()
         self.plan = make_packet(self.project)
+        self.goal_source = copy.deepcopy(self.plan['sources'][0])
 
     def ready(self):
         save_packet(self.project,self.plan)
@@ -46,16 +47,37 @@ class ContractGateTests(unittest.TestCase):
 
     def add_agent(self,raw,host='zcode'):
         self.plan['host'] = host
+        self.plan['workflow']['gitnexus'].update(
+            applicability='N/A' if host == 'zcode' else 'REQUIRED',
+            tool_id='' if host == 'zcode' else 'gitnexus-project-onboarding')
+        self.plan['tools'] = [row for row in self.plan['tools'] if row.get('id') != 'gitnexus-project-onboarding']
         if host == 'codex':
-            self.plan['tools'].append(gitnexus_plan_row())
+            self.plan['tools'].append({'id':'gitnexus-project-onboarding','status':'NOT_APPLICABLE',
+                'skill_ref':'synthetic-fixture:native-agent-test','reason':'No Skill, Plugin or code adopted.',
+                'artifacts':[],'steps':[],'acceptance':[],'blockers':[],'evidence':[]})
+        next(row for row in self.plan['tools'] if row.get('kind') == 'native_agent').update(
+            decision='adopt',artifacts=[{'draft_id':'agent'}])
+        next(phase for phase in self.plan['workflow']['phases'] if phase['id']==6)['required'] = True
         draft = {'id':'agent','path':'md-drafts/agents/worker.DRAFT.md',
             'target':'.zcode/agents/worker.md' if host=='zcode' else '.codex/agents/worker.toml',
             'template':'agent.template.md','kind':host+'-agent','required':True,
             'sha256':'0'*64,'baseline_sha256':'NOT_EXISTS','expected_sha256':'0'*64,
             'transforms':['normalize_utf8_lf']}
         self.plan['drafts'].append(draft)
-        self.replace_draft(raw,1)
+        self.replace_draft(raw,len(self.plan['drafts'])-1)
         return draft
+
+    def set_sources(self, rows):
+        # Physical-source regressions retain the v2 requirement's explicit user
+        # source; they do not silently erase its traceability to test a hash.
+        for row in rows:
+            row.setdefault('depth','full')
+        self.plan['sources'] = [copy.deepcopy(self.goal_source)] + rows
+
+    def append_to_spec(self, extra):
+        draft = self.plan['drafts'][0]
+        current = expected_content(draft,(self.project/draft['path']).read_bytes()).decode('utf-8')
+        return self.replace_draft((DRAFT_MARKER+'\n'+current+extra).encode('utf-8'))
 
     def test_valid_minimal_packet_and_schema_are_consistent(self):
         result = self.ready()
@@ -113,7 +135,11 @@ class ContractGateTests(unittest.TestCase):
             validate_plan(self.plan)
 
     def test_no_arbitrary_array_or_graph_quotas(self):
-        self.plan['requirements'] = [{'id':str(n),'description':'requirement'} for n in range(1500)]
+        self.plan['requirements'] = [{'id':'REQ-'+str(n),'text':'requirement',
+            'acceptance':['Inspectable fixture output.'],'source_ids':['user-goal']} for n in range(1500)]
+        ids = [row['id'] for row in self.plan['requirements']]
+        self.plan['workflow']['features'][0]['requirement_ids'] = ids
+        self.append_to_spec('\n'+' '.join(ids)+'\n')
         self.plan['graph'] = {'nodes':[{'id':str(n)} for n in range(35)],'links':[]}
         validate_plan(self.plan)
         self.assertTrue(self.ready()['ready'])
@@ -218,7 +244,7 @@ class ContractGateTests(unittest.TestCase):
     def test_required_file_source_hash_and_missing_source_fail(self):
         path = self.project/'evidence.txt'
         path.write_bytes(b'captured evidence')
-        self.plan['sources'] = [{'id':'file','kind':'file','path':'evidence.txt','sha256':sha256(path.read_bytes()),'required':True}]
+        self.set_sources([{'id':'file','kind':'file','path':'evidence.txt','sha256':sha256(path.read_bytes()),'required':True}])
         self.assertTrue(self.ready()['ready'])
         path.write_bytes(b'changed')
         result = gate.inspect_packet(self.project)
@@ -229,15 +255,25 @@ class ContractGateTests(unittest.TestCase):
 
     def test_external_sources_are_explicit_and_not_pretend_files(self):
         for kind in ('session','url','tool'):
-            self.plan['sources'] = [{'id':'external','kind':kind,'reference':'captured record','verified':True,'required':True}]
+            self.set_sources([{'id':'external','kind':kind,'reference':'captured record','verified':True,'required':True}])
+            self.plan['workflow']['discovery']['reads'] = []
+            if kind == 'session':
+                capture = self.project/'session-capture.txt'
+                capture.write_bytes(b'Synthetic visible session text.\n')
+                digest = sha256(capture.read_bytes())
+                self.plan['sources'][-1]['content_sha256'] = digest
+                self.plan['workflow']['discovery']['reads'] = [{'source_id':'external','depth':'full',
+                    'reference':'synthetic-fixture:captured-session','unit':'lines','total':1,
+                    'content_sha256':digest,'capture':{'root_id':'docs','path':'session-capture.txt','sha256':digest},
+                    'ranges':[{'start':1,'end':1}]}]
             self.assertTrue(self.ready()['ready'])
-        self.plan['sources'][0]['verified'] = False
+        self.plan['sources'][-1]['verified'] = False
         self.assertFalse(self.ready()['ready'])
-        self.plan['sources'][0]['required'] = False
+        self.plan['sources'][-1]['required'] = False
         result = self.ready()
         self.assertTrue(result['ready'])
         self.assertTrue(result['warnings'])
-        self.plan['sources'] = [{'id':'unknown','kind':'unknown','verified':True,'reference':'unresolved'}]
+        self.set_sources([{'id':'unknown','kind':'unknown','verified':True,'reference':'unresolved'}])
         self.assertFalse(self.ready()['ready'])
 
     def test_source_equal_promoted_target_allows_only_exact_expected_evidence(self):
@@ -246,13 +282,13 @@ class ContractGateTests(unittest.TestCase):
         path.write_bytes(b'baseline\n')
         baseline = sha256(path.read_bytes())
         draft['baseline_sha256'] = baseline
-        self.plan['sources'] = [{'id':'baseline','kind':'file','path':draft['target'],'sha256':baseline}]
+        self.set_sources([{'id':'baseline','kind':'file','path':draft['target'],'sha256':baseline}])
         self.assertTrue(self.ready()['ready'])
         path.write_bytes(expected_content(draft,(self.project/draft['path']).read_bytes()))
         result = gate.inspect_packet(self.project)
         self.assertTrue(result['ready'])
         self.assertTrue(any('pre-promotion' in w for w in result['warnings']))
-        self.plan['sources'][0]['sha256'] = 'e'*64
+        self.plan['sources'][-1]['sha256'] = 'e'*64
         self.assertFalse(gate.inspect_packet(self.project,self.plan)['ready'])
 
     @unittest.skipUnless(os.name == 'nt','Windows case-insensitive path composition')
@@ -262,13 +298,13 @@ class ContractGateTests(unittest.TestCase):
         target.write_bytes(b'baseline\n')
         baseline = sha256(target.read_bytes())
         draft['baseline_sha256'] = baseline
-        self.plan['sources'] = [{'id':'baseline','kind':'file','path':draft['target'].upper(),'sha256':baseline}]
+        self.set_sources([{'id':'baseline','kind':'file','path':draft['target'].upper(),'sha256':baseline}])
         self.assertTrue(self.ready()['ready'])
         target.write_bytes(expected_content(draft,(self.project/draft['path']).read_bytes()))
         result = gate.inspect_packet(self.project)
         self.assertTrue(result['ready'],result)
         self.assertTrue(any('pre-promotion' in warning for warning in result['warnings']))
-        self.plan['sources'][0]['sha256'] = 'e'*64
+        self.plan['sources'][-1]['sha256'] = 'e'*64
         self.assertFalse(gate.inspect_packet(self.project,self.plan)['ready'])
 
     def test_zcode_agent_positive_control_without_tools_heuristic(self):
@@ -282,7 +318,7 @@ class ContractGateTests(unittest.TestCase):
             'model: true\n','model: 0\n','model: 0x10\n','model: a: b\n')
         for field in samples:
             with self.subTest(model=field):
-                self.plan['drafts'] = self.plan['drafts'][:1]
+                self.plan['drafts'] = [d for d in self.plan['drafts'] if d['kind'] not in ('zcode-agent','codex-agent')]
                 raw = ('---\nname: worker\n'+field+'description: instructions\n---\nBody\n').encode('utf-8')
                 self.add_agent(raw)
                 result = self.ready()
@@ -292,12 +328,14 @@ class ContractGateTests(unittest.TestCase):
     def test_zcode_native_frontmatter_must_start_line_one(self):
         self.add_agent(b'<!-- open-project:draft -->\n---\nmodel: provider/model\n---\nBody\n')
         self.assertFalse(self.ready()['ready'])
-        self.plan['drafts'][1]['transforms'].append('remove_draft_marker')
+        self.plan['drafts'][-1]['transforms'].append('remove_draft_marker')
         with self.assertRaises(PacketError):
             validate_plan(self.plan)
 
     def test_document_with_tools_is_not_misclassified_as_agent(self):
-        raw = b'---\ntools: [Read]\n---\nOrdinary specification\n'
+        draft = self.plan['drafts'][0]
+        body = expected_content(draft,(self.project/draft['path']).read_bytes())
+        raw = b'---\ntools: [Read]\n---\n' + body
         self.plan['drafts'][0]['transforms'] = ['normalize_utf8_lf']
         self.replace_draft(raw)
         self.assertTrue(self.ready()['ready'])
@@ -311,7 +349,7 @@ class ContractGateTests(unittest.TestCase):
             isolated_spec.loader.exec_module(isolated_gate)
             result = isolated_gate.inspect_packet(self.project)
             self.assertTrue(result['ready'],result)
-        self.plan['drafts'] = self.plan['drafts'][:1]
+        self.plan['drafts'] = [d for d in self.plan['drafts'] if d['kind'] not in ('zcode-agent','codex-agent')]
         self.add_agent(b'name = "worker"\ndescription = "work"\ndeveloper_instructions = "Instructions"\n',host='codex')
         self.ready()
         with mock.patch.dict(sys.modules,{'tomllib':None}):
@@ -323,7 +361,7 @@ class ContractGateTests(unittest.TestCase):
         self.add_agent(b'name = "worker"\ndescription = "work"\ndeveloper_instructions = "Instructions"\n',host='codex')
         self.assertTrue(self.ready()['ready'])
         for raw in (b'name = "worker"\ndescription = "work"\n',b'---\nmodel: provider/model\n---\nBody\n',b'name = 1\ndescription = "work"\ndeveloper_instructions = "body"\n'):
-            self.replace_draft(raw,1)
+            self.replace_draft(raw,len(self.plan['drafts'])-1)
             self.assertFalse(self.ready()['ready'])
 
     def test_host_kind_mismatch_is_schema_error(self):
@@ -339,8 +377,7 @@ class ContractGateTests(unittest.TestCase):
         (nested/'需求.md').write_text('evidence',encoding='utf-8')
         (self.project/'archive').mkdir()
         (self.project/'archive/FROZEN.md').write_text('archive',encoding='utf-8')
-        raw = (DRAFT_MARKER+'\n[需求](資料/需求.md)\n[planned](product_specification.md)\n[Frozen](FROZEN.md)\n[web](https://example.invalid/missing.md)\n').encode('utf-8')
-        self.replace_draft(raw)
+        self.append_to_spec('\n[需求](資料/需求.md)\n[planned](product_specification.md)\n[Frozen](FROZEN.md)\n[web](https://example.invalid/missing.md)\n')
         result = self.ready()
         self.assertTrue(result['ready'])
         self.assertEqual(len(result['warnings']),1,result)
@@ -348,7 +385,7 @@ class ContractGateTests(unittest.TestCase):
         self.assertNotIn('需求.md',result['warnings'][0])
 
     def test_malformed_markdown_url_warns_without_crash_or_url_disclosure(self):
-        self.replace_draft((DRAFT_MARKER+'\n[broken](http://[)\n').encode('utf-8'))
+        self.append_to_spec('\n[broken](http://[)\n')
         result = self.ready()
         self.assertTrue(result['ready'],result)
         self.assertTrue(any('malformed Markdown reference' in warning for warning in result['warnings']))

@@ -1,0 +1,230 @@
+{
+  "plan": "correction-20261102-v2.1",
+  "packet_contract": "2.0",
+  "cases": [
+    {
+      "id": "T01",
+      "requirement": "Five mandatory roles cannot be omitted or downgraded",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_every_omitted_core_role_is_rejected_even_when_manifest_claims_complete",
+        "test_workflow_contract.WorkflowContractTests.test_governance_roles_cannot_map_native_agent_drafts",
+        "test_workflow_contract.WorkflowContractTests.test_required_false_cannot_cancel_manual"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T02",
+      "requirement": "Six-file incident manifest cannot erase roles",
+      "tests": [
+        "test_incident_replays.IncidentReplayTests.test_six_file_manifest_cannot_erase_four_core_obligations"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T03",
+      "requirement": "Reorg with a new governance folder preserves old source",
+      "tests": [
+        "test_reorg_workflow.ReorgWorkflowTests.test_global_sqlite_history_to_new_docs_and_finite_completion_preserves_old_code",
+        "test_workflow_contract.WorkflowContractTests.test_wrong_root_cannot_fall_back_to_cwd"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T04",
+      "requirement": "Destination conflict and same-plan resume",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_new_folder_cannot_relabel_existing_unrelated_directory",
+        "test_workflow_contract.WorkflowContractTests.test_resume_requires_same_plan_identity"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T05",
+      "requirement": "No shell specification, empty sections or unfilled templates",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_actual_core_template_fill_tokens_fail_after_section_mapping",
+        "test_workflow_contract.WorkflowContractTests.test_empty_declared_sections_are_not_complete_content",
+        "test_workflow_contract.WorkflowContractTests.test_empty_requirement_is_not_accepted_as_generic_object",
+        "test_workflow_contract.WorkflowContractTests.test_x_spec_with_fresh_hashes_still_fails_content_obligations"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T06",
+      "requirement": "Global inventory and pagination coverage",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_partial_search_or_missing_pagination_cannot_claim_complete",
+        "test_workflow_contract.WorkflowContractTests.test_reorg_cannot_hide_existing_history_by_na",
+        "test_workflow_contract.WorkflowContractTests.test_required_inventory_source_needs_its_own_receipt"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T07",
+      "requirement": "Search and retrieval do not prove full reading",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_capture_declared_total_and_hash_are_verified",
+        "test_workflow_contract.WorkflowContractTests.test_omitted_required_defaults_true_for_session_capture_checks",
+        "test_workflow_contract.WorkflowContractTests.test_one_read_line_cannot_claim_full_three_line_capture",
+        "test_workflow_contract.WorkflowContractTests.test_tool_retrieval_counts_never_prove_model_deep_reading"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T08",
+      "requirement": "Plan ready and promotion do not mean workflow complete",
+      "tests": [
+        "test_workflow_gate.WorkflowGateTests.test_plan_readiness_does_not_claim_workflow_completion",
+        "test_workflow_promote.WorkflowPromotionTests.test_v2_promotion_is_not_workflow_completion"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T09",
+      "requirement": "Current independent review required",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_author_cannot_self_certify_independent_review",
+        "test_workflow_contract.WorkflowContractTests.test_metadata_accepted_cannot_hide_an_unexecuted_report",
+        "test_workflow_contract.WorkflowContractTests.test_old_review_revision_is_not_final_review",
+        "test_workflow_contract.WorkflowContractTests.test_review_cannot_omit_required_area"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T10",
+      "requirement": "Scope and exact approval drift",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_stable_byte_changes_and_material_scope_changes_invalidate_review",
+        "test_workflow_gate_promote.ReviewPromotionSequenceTests.test_unapproved_candidate_is_reviewed_then_exactly_approved_and_completed",
+        "test_workflow_promote.WorkflowPromotionTests.test_changed_legacy_approval_cannot_rebind_recovery"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T11",
+      "requirement": "Real timestamps and claims",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_fake_timestamp_is_rejected",
+        "test_workflow_renderer.WorkflowRendererTests.test_promotion_and_recorded_counts_never_become_completion"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T12",
+      "requirement": "Bounded evidence and finite final-review lifecycle",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_only_bounded_typed_terminal_records_are_allowed",
+        "test_workflow_contract.WorkflowContractTests.test_prefix_cannot_be_shrunk_to_hide_rewritten_status",
+        "test_workflow_contract.WorkflowContractTests.test_record_evidence_cannot_grant_project_config_writes",
+        "test_workflow_gate_promote.ReviewPromotionSequenceTests.test_unapproved_candidate_is_reviewed_then_exactly_approved_and_completed"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T13",
+      "requirement": "Explicit N/A tools without omitting core manual",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_missing_tool_evaluation_is_not_na",
+        "test_workflow_contract.WorkflowContractTests.test_zcode_has_no_gitnexus_dependency"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T14",
+      "requirement": "Native host protection and Codex-only G6",
+      "tests": [
+        "test_release_contract.ReleaseContractTests.test_native_host_bytes_are_preserved",
+        "test_workflow_contract.WorkflowContractTests.test_codex_requires_its_own_authoritative_g6_row",
+        "test_workflow_contract.WorkflowContractTests.test_invalid_host_cannot_gain_zcode_na",
+        "test_workflow_gate.WorkflowGateTests.test_zcode_has_no_gitnexus_requirement"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T15",
+      "requirement": "Legacy diagnostic and exact recovery",
+      "tests": [
+        "test_workflow_gate.WorkflowGateTests.test_legacy_diagnostics_cannot_mint_current_readiness",
+        "test_workflow_promote.WorkflowPromotionTests.test_default_dry_run_does_not_mutate",
+        "test_workflow_promote.WorkflowPromotionTests.test_legacy_new_promotion_is_refused_before_state_creation",
+        "test_workflow_promote.WorkflowPromotionTests.test_only_exact_original_legacy_journal_can_recover"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T16",
+      "requirement": "Package source, offline rendering and manual policy",
+      "tests": [
+        "test_packaging.CodexMetadataTests.test_correct_manual_only_mapping_is_required",
+        "test_packaging.EditionBoundaryTests.test_native_manifest_matches_edition",
+        "test_release_contract.ReleaseContractTests.test_release_contract_and_resources_match",
+        "test_workflow_renderer.WorkflowRendererTests.test_real_v2_packet_has_exact_offline_views_for_both_hosts"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T17",
+      "requirement": "Folder move invalidates stale canonical packet",
+      "tests": [
+        "test_incident_replays.IncidentReplayTests.test_folder_exists_after_move_but_stale_packet_is_not_ready",
+        "test_workflow_contract.WorkflowContractTests.test_old_review_revision_is_not_final_review",
+        "test_workflow_effects.WorkflowEffectsTests.test_rebinding_root_invalidates_old_action_receipt"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T18",
+      "requirement": "One current approval/tool decision state",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_decision_current_cannot_contradict_latest_real_event"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T19",
+      "requirement": "Review is bound to material snapshot and actual report",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_metadata_accepted_cannot_hide_an_unexecuted_report",
+        "test_workflow_contract.WorkflowContractTests.test_old_review_revision_is_not_final_review",
+        "test_workflow_contract.WorkflowContractTests.test_stable_byte_changes_and_material_scope_changes_invalidate_review"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T20",
+      "requirement": "Bundle/adapter inventory and Codex onboarding scope",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_knowledge_bundle_cannot_declare_only_ops_files_complete",
+        "test_workflow_gate.WorkflowGateTests.test_codex_adopted_skill_cannot_hide_in_not_applicable",
+        "test_workflow_gate.WorkflowGateTests.test_codex_verified_prose_without_captured_receipt_is_rejected",
+        "test_workflow_package.PackageFindingsTests.test_required_external_adapter_dependency_is_explicit_and_hash_checked"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T21",
+      "requirement": "Cross-root evidence and archive provenance",
+      "tests": [
+        "test_workflow_contract.WorkflowContractTests.test_cross_root_sources_are_not_resolved_against_docs",
+        "test_workflow_effects.WorkflowEffectsTests.test_physical_archive_without_supersedes_mapping_or_receipt_is_incomplete",
+        "test_workflow_effects.WorkflowEffectsTests.test_preserved_source_fallback_is_exact_and_keeps_original_identity",
+        "test_workflow_effects.WorkflowEffectsTests.test_valid_archive_checks_receipt_mapping_bytes_and_replacement"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    },
+    {
+      "id": "T22",
+      "requirement": "Git claims match captured porcelain",
+      "tests": [
+        "test_workflow_effects.WorkflowEffectsTests.test_git_metadata_timestamp_and_root_cannot_be_stale_or_fake_na",
+        "test_workflow_effects.WorkflowEffectsTests.test_tracked_untracked_ignored_counts_and_empty_clean_are_exact",
+        "test_workflow_effects.WorkflowEffectsTests.test_untracked_documentation_cannot_be_called_clean"
+      ],
+      "scope": "Synthetic executable evidence; not native host or human-authentication proof."
+    }
+  ],
+  "limits": [
+    "Host load/invocation require actual native observation.",
+    "ZCode GitNexus is N/A. Codex real onboarding is not performed by test fixtures."
+  ]
+}

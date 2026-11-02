@@ -22,8 +22,10 @@ header{border-top:4px solid var(--accent)}
 h1{font-size:clamp(1.55rem,4vw,2.3rem);line-height:1.25;margin:0 0 16px}
 h2{font-size:1.25rem;line-height:1.4;margin:0 0 16px}
 h3{font-size:1.05rem;margin:24px 0 10px}
+h4,h5,h6{font-size:.95rem;margin:18px 0 8px;color:var(--muted)}
 p{margin:12px 0}
 .authority{color:var(--warning);font-weight:650}
+.host-scope{border-left:3px solid var(--accent);padding:10px 14px;background:var(--bg)}
 .digest{font-family:ui-monospace,Consolas,monospace;font-size:.88rem;word-break:break-all}
 nav ol{columns:2;padding-left:24px;margin:0}
 nav li{break-inside:avoid;margin:4px 0}
@@ -69,6 +71,7 @@ pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:
 <p class="digest">Packet SHA-256: <code>@@DIGEST@@</code></p>
 <p>The Markdown plan and this report are deterministic views of the same packet. Recorded verification states, notes, units, null values and complete draft content are shown below.</p>
 <p>Recorded evidence snapshot. Rendering does not revalidate current source bytes; run the gate before approval or promotion.</p>
+<p>Workflow obligations, roots, source coverage, review scope and package inventory are recorded data. A promoted file or rendered report is not proof that the workflow is complete.</p>
 @@META@@
 </header>
 @@TOC@@

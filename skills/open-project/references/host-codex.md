@@ -40,7 +40,7 @@ Use currently available native roles/tools. If custom agents are justified and s
 
 Custom agent fields do not grant permissions or override parent sandbox/approval. Capture requested role, child identity and observed behavior; a requested label alone does not prove which definition was loaded.
 
-Plugin resources are read relative to the selected installed skill. Project commands run from the approved project root, not the plugin cache. Use templates/agent.template.md for a project operation manual; use agent.template.toml only for actual native agent registration, with a separately scoped write target.
+Plugin resources are read relative to the selected installed skill. Project commands run from the approved project root, not the plugin cache. Use templates/project-manual.template.md for the mandatory agent.md project operation manual; use agent.template.toml only for actual native agent registration, with a separately scoped write target.
 
 ## GitNexus onboarding
 
@@ -62,3 +62,9 @@ Sources checked 2026-10-27:
 - https://developers.openai.com/plugins/build/plugins
 
 These are host contracts, not evidence that this particular package was installed or used.
+
+## Schema 2.0 profile boundary
+
+Codex uses workflow.gitnexus applicability REQUIRED pointing to the unique tools row gitnexus-project-onboarding. That row owns status/artifacts; do not duplicate current states. ZCode has no GitNexus and uses N/A without probes or onboarding blockers. Invalid/missing host never silently selects N/A.
+
+Five required document roles exist independently of the draft manifest. The manual is separate from optional native TOML; an explicit AGENTS.md mapping may refer to it without invoking open-project automatically. route and output destination are independent; docs roots and code/evidence source roots remain distinct. Current completion requires the final output/evidence snapshot, affected independent review, and gate completion_receipt. Promotion alone is not completion.

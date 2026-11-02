@@ -7,6 +7,7 @@ permission. Dry runs only read files; target writes require --apply.
 from __future__ import annotations
 
 import argparse
+import base64
 from contextlib import contextmanager
 from datetime import datetime
 import hashlib
@@ -30,10 +31,16 @@ RESOLVED = {"COMMITTED", "FAILED_RECOVERED"}
 JOURNAL_STATES = {"PREPARED", "APPLYING", "COMMITTED", "FAILED_RECOVERED", "FAILED_UNRECOVERED"}
 APPROVAL_FIELDS = {"plan_id", "revision", "packet_sha256", "approved_by", "approved_at", "actions"}
 ACTION_FIELDS = {"draft_id", "target", "draft_sha256", "baseline_sha256", "expected_sha256", "transforms", "effects"}
-JOURNAL_FIELDS = {"version", "plan_id", "revision", "packet_sha256", "approval_sha256", "approval",
-                  "status", "backup_id", "actions", "errors"}
+JOURNAL_FIELDS_V1 = {"version", "plan_id", "revision", "packet_sha256", "approval_sha256", "approval",
+                     "status", "backup_id", "actions", "errors"}
+JOURNAL_FIELDS = JOURNAL_FIELDS_V1 | {"approved_packet", "approved_packet_raw_base64",
+    "approved_packet_raw_sha256", "material_snapshot_sha256"}
 JOURNAL_ACTION_FIELDS = {"draft_id", "target", "baseline_sha256", "expected_sha256", "status", "backup"}
 ACTION_STATES = {"NO_OP", "PENDING", "BACKUP_INTENT", "WRITE_INTENT", "WRITTEN", "ROLLED_BACK", "ROLLBACK_FAILED"}
+
+
+class LegacyMigration(PacketError):
+    status = "MIGRATION_REQUIRED"
 
 
 class TargetDrift(PacketError):
@@ -290,12 +297,13 @@ def _lock(root, approval_hash, resume):
                 _fsync_dir(lock.parent)
 
 
-def _gate(root, plan):
+def _gate(root, plan, *, legacy_recovery=False):
     spec = importlib.util.spec_from_file_location("open_project_promotion_gate", SCRIPTS / "gate-check.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    gate = module.inspect_packet(root, plan)
-    if not gate["ready"]:
+    gate = module.inspect_packet(root, plan, legacy_diagnostic=legacy_recovery)
+    allowed = gate.get('diagnostic_checks_passed') if legacy_recovery else gate['ready']
+    if not allowed:
         raise PacketError("packet gate is not ready: " + "; ".join(gate["errors"]))
     if gate["packet_sha256"] != packet_digest(plan):
         raise PacketError("gate packet digest does not match the plan")
@@ -307,6 +315,11 @@ def _approval(root, plan, approval_path):
     if not path.is_file():
         raise PacketError("approval must be a regular JSON file")
     value = _plain_json(path)
+    return _approval_value(root, plan, value)
+
+
+def _approval_value(root, plan, value):
+    """Validate either the selected decision file or its immutable journal copy."""
     if not isinstance(value, dict) or set(value) != APPROVAL_FIELDS:
         raise PacketError("approval fields do not match the approval contract")
     for key in ("plan_id", "revision", "packet_sha256"):
@@ -388,10 +401,13 @@ def _journal_path(plan, approval_hash):
 
 def _validate_journal_shape(journal):
     _canonical(journal)
-    if not isinstance(journal, dict) or set(journal) != JOURNAL_FIELDS:
+    if not isinstance(journal, dict):
         raise PacketError("promotion journal fields do not match the contract")
-    if type(journal["version"]) is not int or journal["version"] != 1:
+    if type(journal.get("version")) is not int or journal["version"] not in (1,2):
         raise PacketError("unsupported promotion journal version")
+    fields = JOURNAL_FIELDS_V1 if journal['version'] == 1 else JOURNAL_FIELDS
+    if set(journal) != fields:
+        raise PacketError("promotion journal fields do not match the contract")
     if not isinstance(journal["status"], str) or journal["status"] not in JOURNAL_STATES:
         raise PacketError("invalid promotion journal state")
     for field in ("plan_id", "revision", "packet_sha256", "approval_sha256", "backup_id"):
@@ -413,7 +429,114 @@ def _validate_journal_shape(journal):
             raise PacketError("invalid promotion journal action state")
         if action["backup"] is not None and not isinstance(action["backup"], str):
             raise PacketError("promotion journal backup must be a path or null")
+    if journal['version'] == 2:
+        _validate_packet_capture(journal)
     return journal
+
+
+def _decode_captured_packet(encoded):
+    def unique(pairs):
+        value = {}
+        for key,item in pairs:
+            if key in value:
+                raise PacketError('duplicate key in approved packet capture')
+            value[key] = item
+        return value
+    def reject_constant(value):
+        raise PacketError('non-finite approved packet capture')
+    try:
+        raw = base64.b64decode(encoded,validate=True)
+        value = json.loads(raw.decode('utf-8-sig'),object_pairs_hook=unique,parse_constant=reject_constant)
+        _canonical(value)
+        return raw,value
+    except (ValueError,TypeError,UnicodeError) as exc:
+        raise PacketError('invalid raw approved packet capture') from exc
+
+
+def _validate_packet_capture(journal):
+    captured = journal['approved_packet']
+    validate_plan(captured)
+    if captured.get('schema_version') != '2.0':
+        raise PacketError('journal version 2 requires an approved schema 2.0 packet')
+    raw,parsed = _decode_captured_packet(journal['approved_packet_raw_base64'])
+    if digest(raw) != journal['approved_packet_raw_sha256'] or _canonical(parsed) != _canonical(captured):
+        raise PacketError('immutable approved packet raw bytes differ from captured packet')
+    for key in ('plan_id','revision'):
+        if captured[key] != journal[key]:
+            raise PacketError('captured approved packet identity differs from journal')
+    if packet_digest(captured) != journal['packet_sha256']:
+        raise PacketError('captured approved packet digest differs from journal')
+    _,approval_hash,selected = _approval_value(None,captured,journal['approval'])
+    if approval_hash != journal['approval_sha256']:
+        raise PacketError('captured approval digest differs from journal')
+    if len(selected) != len(journal['actions']):
+        raise PacketError('journal actions differ from captured approval')
+    for draft,action in zip(selected,journal['actions']):
+        if any(action[key] != draft[draft_key] for key,draft_key in (
+                ('draft_id','id'),('target','target'),('baseline_sha256','baseline_sha256'),
+                ('expected_sha256','expected_sha256'))):
+            raise PacketError('journal action does not identify the approved output')
+    from workflow_contract import workflow_snapshot_digest
+    if workflow_snapshot_digest(captured,None) != journal['material_snapshot_sha256']:
+        raise PacketError('captured material snapshot differs from journal')
+    return captured
+
+
+def promotion_evidence(project, plan):
+    """Read committed immutable decisions covering current required outputs.
+
+    The current observation packet may have new terminal states. It must retain
+    the approved material snapshot, required drafts and captured original decision.
+    Integrity checks do not authenticate the decision maker or reviewer.
+    """
+    root = _project(project)
+    from workflow_contract import workflow_snapshot_digest
+    material = workflow_snapshot_digest(plan,root)
+    directory = _inside(root,STATE+'/journals')
+    if not directory.is_dir():
+        raise PacketError('completion requires a committed immutable approved-packet journal')
+    required = {draft['id']:draft for draft in plan['drafts'] if draft['required']}
+    covered,packets,refs = set(),[],[]
+    for path in sorted(directory.iterdir()):
+        _check_plain(path)
+        if path.suffix != '.json':
+            continue
+        journal = _validate_journal_shape(_plain_json(path))
+        if journal['plan_id'] != plan['plan_id']:
+            continue
+        if journal['status'] not in RESOLVED:
+            raise PacketError('completion has an unresolved promotion journal: '+path.name)
+        if journal['version'] != 2 or journal['status'] != 'COMMITTED' or journal['material_snapshot_sha256'] != material:
+            continue
+        captured = journal['approved_packet']
+        if captured['revision'] != plan['revision']:
+            continue
+        approved_drafts = {draft['id']:draft for draft in captured['drafts']}
+        matched = set()
+        for action in journal['actions']:
+            if action['status'] not in ('NO_OP','WRITTEN'):
+                raise PacketError('committed completion journal has an incomplete action')
+            identifier = action['draft_id']
+            if identifier not in required:
+                continue
+            # The report self hash is excluded from the material snapshot but
+            # its exact approved draft remains mandatory through this bridge.
+            if approved_drafts[identifier] != required[identifier]:
+                raise PacketError('current required output differs from immutable approved draft: '+identifier)
+            matched.add(identifier)
+        if matched:
+            relative = path.relative_to(root).as_posix()
+            covered.update(matched)
+            refs.append(relative)
+            packets.append({'journal':relative,'packet_sha256':journal['packet_sha256'],
+                            'raw_sha256':journal['approved_packet_raw_sha256'],
+                            'material_snapshot_sha256':journal['material_snapshot_sha256']})
+    if set(required)-covered:
+        raise PacketError('committed approved-packet journals do not cover current required outputs: '+', '.join(sorted(set(required)-covered)))
+    digests = sorted({row['packet_sha256'] for row in packets})
+    return {'approved_packet_sha256':digests[0] if len(digests)==1 else None,
+            'approved_packet_sha256s':digests,'promotion_refs':refs,
+            'material_snapshot_sha256':material,'approved_packets':packets}
 
 
 def _existing(root, journal_rel):
@@ -437,7 +560,8 @@ def _existing(root, journal_rel):
 
 def _validate_resume(root, journal, plan, approval_hash, actions):
     _validate_journal_shape(journal)
-    if (journal.get("version") != 1 or journal.get("plan_id") != plan["plan_id"]
+    expected_version = 1 if plan['schema_version'] == '1.0' else 2
+    if (journal.get("version") != expected_version or journal.get("plan_id") != plan["plan_id"]
             or journal.get("revision") != plan["revision"]
             or journal.get("packet_sha256") != packet_digest(plan)
             or journal.get("approval_sha256") != approval_hash):
@@ -521,7 +645,7 @@ def _rollback(root, journal):
     return errors
 
 
-def promote(project, approval_path, *, apply=False, resume=False):
+def promote(project, approval_path, *, apply=False, resume=False, legacy_recovery=False):
     """Return a structured result; validation failures raise PacketError."""
     root = _project(project)
     for internal in (STATE, STATE + "/journals", STATE + "/backups", STATE + "/lock.json"):
@@ -529,12 +653,22 @@ def promote(project, approval_path, *, apply=False, resume=False):
     _private_metadata(root)
     plan = load_plan(root)
     validate_plan(plan)
-    gate = _gate(root, plan)
+    legacy = plan['schema_version'] != '2.0'
+    if legacy and not (legacy_recovery and resume):
+        raise LegacyMigration('schema 1.0 is diagnostic-only; new promotion requires a reviewed schema 2.0 revision; exact existing journal recovery requires --legacy-recovery --resume')
+    if legacy_recovery and not legacy:
+        raise PacketError('--legacy-recovery is only for an original legacy journal')
+    if not legacy:
+        gate = _gate(root, plan)
     approval, approval_hash, drafts = _approval(root, plan, approval_path)
     content = _content(root, drafts)
     actions = _preflight(root, drafts)
     journal_rel = _journal_path(plan, approval_hash)
     existing = _existing(root, journal_rel)
+    if legacy:
+        if existing is None:
+            raise LegacyMigration('legacy recovery requires the existing original journal; no new legacy journal is permitted')
+        gate = _gate(root, plan, legacy_recovery=True)
     if existing is not None:
         if existing.get("status") != "COMMITTED" and not resume:
             raise PacketError("existing promotion journal requires --resume")
@@ -543,7 +677,9 @@ def promote(project, approval_path, *, apply=False, resume=False):
         raise PacketError("--resume requires the journal and its original approval")
     result = {"status": "DRY_RUN", "ready": True, "packet_sha256": packet_digest(plan),
               "approval_sha256": approval_hash, "warnings": gate.get("warnings", []),
-              "actions": actions, "decision_evidence_only": True}
+              "actions": actions, "decision_evidence_only": True,
+              "workflow_complete": False,
+              "workflow_status": "RECOVERY_ONLY" if legacy else "PLAN_READY"}
     if not apply:
         return result
     with _lock(root, approval_hash, resume):
@@ -552,7 +688,7 @@ def promote(project, approval_path, *, apply=False, resume=False):
         latest_plan = load_plan(root)
         if packet_digest(latest_plan) != packet_digest(plan):
             raise PacketError("packet changed before application")
-        _gate(root, latest_plan)
+        _gate(root, latest_plan, legacy_recovery=legacy)
         latest_approval, latest_hash, _ = _approval(root, latest_plan, approval_path)
         if latest_hash != approval_hash:
             raise PacketError("approval changed before application")
@@ -564,7 +700,7 @@ def promote(project, approval_path, *, apply=False, resume=False):
                 raise PacketError("existing promotion journal requires --resume")
             journal = _validate_resume(root, existing, plan, approval_hash, actions)
             if journal["status"] == "COMMITTED":
-                return {**result, "status": "NO_OP", "actions": journal["actions"], "journal": journal_rel}
+                return {**result, "status": "NO_OP", "workflow_status": "RECOVERY_ONLY" if legacy else "PROMOTED", "actions": journal["actions"], "journal": journal_rel}
         else:
             if resume:
                 raise PacketError("resume journal disappeared")
@@ -572,10 +708,19 @@ def promote(project, approval_path, *, apply=False, resume=False):
             backup_root = _inside(root, STATE + "/backups/" + backup_id)
             if backup_root.exists():
                 raise PacketError("backup directory collision; no files were overwritten")
-            journal = {"version": 1, "plan_id": plan["plan_id"], "revision": plan["revision"],
+            raw_packet = _inside(root,'md-drafts/plan-data.json').read_bytes()
+            encoded_packet = base64.b64encode(raw_packet).decode('ascii')
+            _,captured_packet = _decode_captured_packet(encoded_packet)
+            if packet_digest(captured_packet) != packet_digest(plan):
+                raise PacketError('packet changed before immutable approval capture')
+            from workflow_contract import workflow_snapshot_digest
+            journal = {"version": 2, "plan_id": plan["plan_id"], "revision": plan["revision"],
                        "packet_sha256": packet_digest(plan), "approval_sha256": approval_hash,
                        "approval": approval, "status": "PREPARED", "backup_id": backup_id,
-                       "actions": actions, "errors": []}
+                       "actions": actions, "errors": [],
+                       "approved_packet":captured_packet,"approved_packet_raw_base64":encoded_packet,
+                       "approved_packet_raw_sha256":digest(raw_packet),
+                       "material_snapshot_sha256":workflow_snapshot_digest(plan,root)}
             _journal_write(root, journal_rel, journal)
         try:
             journal["status"] = "APPLYING"
@@ -622,7 +767,7 @@ def promote(project, approval_path, *, apply=False, resume=False):
                     raise TargetDrift("final target verification failed: " + action["target"])
             journal["status"] = "COMMITTED"
             _journal_write(root, journal_rel, journal)
-            return {**result, "status": "COMMITTED", "actions": journal["actions"], "journal": journal_rel}
+            return {**result, "status": "COMMITTED", "workflow_status": "RECOVERY_ONLY" if legacy else "PROMOTED", "actions": journal["actions"], "journal": journal_rel}
         except Exception as exc:
             rollback_errors = _rollback(root, journal)
             journal["status"] = "FAILED_UNRECOVERED" if rollback_errors else "FAILED_RECOVERED"
@@ -644,9 +789,10 @@ def main(argv=None):
     parser.add_argument("--approval", required=True, type=Path)
     parser.add_argument("--apply", action="store_true", help="write approved files (default: read-only dry run)")
     parser.add_argument("--resume", action="store_true", help="resume the same packet and recorded approval")
+    parser.add_argument("--legacy-recovery", action="store_true", help="recover only an existing exact legacy journal; requires --resume")
     args = parser.parse_args(argv)
     try:
-        result = promote(args.project, args.approval, apply=args.apply, resume=args.resume)
+        result = promote(args.project, args.approval, apply=args.apply, resume=args.resume, legacy_recovery=args.legacy_recovery)
     except (PacketError, OSError, ValueError) as exc:
         print(json.dumps({"status": getattr(exc, "status", "REJECTED"), "ready": False, "errors": [_error_message(exc)]}, ensure_ascii=False))
         return 2

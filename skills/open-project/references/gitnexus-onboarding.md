@@ -23,7 +23,7 @@ Plugin 同內含 Skill 各有 artifact row，唔以單一 generic task代替。�
 
 ## Canonical packet row
 
-沿用 packet1.0嘅 tools array；只放**一列** id=gitnexus-project-onboarding。renderer會將完整row放PLAN §6及離線HTML；唔手改views。
+packet2.0沿用 tools array，workflow.gitnexus applicability=REQUIRED、tool_id指該唯一row；status／artifacts以tools row為權威；只放**一列** id=gitnexus-project-onboarding。renderer會將完整row放PLAN §6及離線HTML；唔手改views。
 
 | 欄位 | 契約 |
 |---|---|
@@ -36,10 +36,13 @@ Plugin 同內含 Skill 各有 artifact row，唔以單一 generic task代替。�
 | acceptance | 非空字串array，列固定、可驗證結果；N/A可空array |
 | blockers | 字串array；BLOCKED必須非空；未知adapter／owner／權限缺口逐項列 |
 | evidence | 字串array；VERIFIED必須非空，引用本輪scope／source匹配嘅實際receipts等 |
+| adapter_ref／adapter_scope | schema2真實Skill／Plugin標VERIFIED時必需：adapter_ref 為 source:<ID>，指向已捕獲required／full來源；adapter_scope 必須 real-project。PLANNED／BLOCKED仍如實列缺口，不捏造adapter |
 
 artifacts每項graph_status及catalog_status使用同一status集合，但kind=skill／plugin嘅catalog_status**不可NOT_APPLICABLE**；缺metadata adapter入口就BLOCKED。project artifact嘅catalog N/A才按實際適用理由處理。非N/A總狀態必有artifacts、steps及acceptance；VERIFIED只准所有artifact兩個status都VERIFIED或有理由而且適用規則容許嘅N/A；Skill／Plugin catalog必須VERIFIED。整項NOT_APPLICABLE必須artifacts為空及有具體reason，唔可用嚟略過已採用Skill／Plugin。
 
 G6係plan完整性／狀態一致性檢查，唔認證receipt真偽或授權。PLANNED／BLOCKED可呈交完整plan及有warning，但不表示已onboard或整項驗收ACCEPTED。
+
+schema2 的 VERIFIED evidence 每項用 `source:<ID>`，指向 plan.sources 中實際可讀檔案來源，required:true、depth:full及相符hash；任意「verified」字串／網址唔足夠。Skill／Plugin 同時要有來源綁定嘅 real-project adapter；fixture-only、missing adapter或無provenance保持BLOCKED。被採用（tools kind=SKILL或Plugin、decision=adopt）嘅元件必有匹配artifact kind，不能用整項N/A隱藏。此係最小機械綁定；reviewer仍核實來源內容、adapter真實能力、owner及權限，唔由字串或hash證明真實註冊。
 
 以下係需填真實值嘅**規劃例子**，唔係執行結果／批准：
 
@@ -77,3 +80,5 @@ G6係plan完整性／狀態一致性檢查，唔認證receipt真偽或授權。P
 5. Phase8–9：按每artifact核對source root、project／owner、admitted fingerprint、結構query及catalog可查identity，保留receipts／verification／capture time。Freshness與結構正確分開；STALE先讀當前source或另行批准UPDATE，唔自動重建。
 
 required onboarding未完成，status／handover明列BLOCKED或PLANNED、owner、缺口及下一步；不得標整項ACCEPTED。若用戶明確改驗收範圍，保留理由、新packet／revision及對應批准，唔改舊PASS。rollback只按該owner／adapter已定scope執行，唔刪source／generations／歷史證據。
+
+本契約只適用 Codex；ZCode 無 GitNexus，workflow applicability=N/A，唔安裝／探測／索引，缺G6不阻擋ZCode。

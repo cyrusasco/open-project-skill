@@ -1,45 +1,46 @@
-# <PROJECT> — Project status／handover
+# {{PROJECT}} — Project status／handover
 
-> capture time：<ISO8601_WITH_OFFSET>　source snapshot／revision：<ID>
+> capture time：{{ISO8601_WITH_OFFSET}}　source snapshot／revision：{{ID}}
 > 本文件係當前 observed 狀態；desired behavior／固定 acceptance 見 product_specification。
-> completion：<LOCAL COMPLETE/PARTIAL/CHANGES REQUIRED>　repo：<NOT_PUSHED/PUSHED+REMOTE VERIFIED>
-> package：<N/A/PACKAGED/INSTALLED/LOAD VERIFIED>；四狀態不混用。
+> completion：{{LOCAL COMPLETE/PARTIAL/CHANGES REQUIRED}}　repo：{{NOT_PUSHED/PUSHED+REMOTE VERIFIED}}
+> package：{{N/A/PACKAGED/INSTALLED/LOAD VERIFIED}}；四狀態不混用。
 
 ## §0 事實、未知與證據
 
 | fact ID | observed fact／值 | evidence ID | capture time／source version／scope |
 |---|---|---|---|
-| F1 | <observed value> | <ref> | <time/hash/range> |
+| F1 | {{observed value}} | {{ref}} | {{time/hash/range}} |
 
 | unknown ID | UNVERIFIED／原因 | 影響 required coverage | 下一步驗證 |
 |---|---|---|---|
-| U1 | <missing or NOT_RUN reason> | <impact> | <safe check/needed authorization> |
+| U1 | {{missing or NOT_RUN reason}} | {{impact}} | {{safe check/needed authorization}} |
 
 ## §1 目前快照
 
 | 項目 | 狀態 | evidence／命令／exit |
 |---|---|---|
-| PROJECT_ROOT | <resolved path> | <ref> |
-| canonical packet | md-drafts/plan-data.json | <plan_id; revision; packet digest> |
-| rendered views | <PLAN/HTML paths> | <same digest; last render evidence> |
-| gate／ready | <advisory/strict; ready/status> | <report; missing; suggestions> |
-| approval | <separate JSON ref or pending> | <plan/revision/digest/selected IDs> |
-| promote | <per-file states/journal ref> | <draft/target/baseline/expected refs> |
-| CLI | <adopted path or NOT_APPLICABLE> | <§6 decision; actual checks> |
-| host enforcement／loaded | <UNKNOWN or observed proof> | <fresh-session/role evidence> |
-| git | <branch; HEAD; dirty> | <command/time> |
-| GitNexus onboarding | <overall PLANNED/BLOCKED/VERIFIED/NOT_APPLICABLE; each Skill／Plugin ID> | <tools row; source identity; graph／catalog owner; receipt／verification／freshness refs> |
+| DOCS_ROOT／PROJECT_ROOT | {{canonical output root}} | {{root decision／creation receipt}} |
+| source_roots／CODE_ROOT | {{root IDs and paths; evidence locations}} | {{scope and first-read refs}} |
+| canonical packet | md-drafts/plan-data.json | {{plan_id; revision; packet digest}} |
+| rendered views | {{PLAN/HTML paths}} | {{same digest; last render evidence}} |
+| gate／ready | {{advisory/strict; ready/status}} | {{report; missing; suggestions}} |
+| approval | {{separate JSON ref or pending}} | {{plan/revision/digest/selected IDs}} |
+| promote | {{per-file states/journal ref}} | {{draft/target/baseline/expected refs}} |
+| CLI | {{adopted path or NOT_APPLICABLE}} | {{§6 decision; actual checks}} |
+| host enforcement／loaded | {{UNKNOWN or observed proof}} | {{fresh-session/role evidence}} |
+| git | {{branch; HEAD; tracked/untracked/ignored counts}} | {{command/time}} |
+| GitNexus onboarding | {{overall PLANNED/BLOCKED/VERIFIED/NOT_APPLICABLE; each Skill／Plugin ID}} | {{tools row; source identity; graph／catalog owner; receipt／verification／freshness refs}} |
 
 ## §2 Repo／package review
 
 | 項目 | observed 結果／來源 |
 |---|---|
-| repo | <owner/repo or N/A> |
-| local checkout／worktrees | <path; branch; SHA; dirty> |
-| remote tip | <verified SHA/time or NOT_VERIFIED/NOT_PUSHED> |
-| issues／PR／releases | <evidence or NOT_RUN reason> |
-| source／package／installed／loaded | <separate paths/hashes/evidence> |
-| secret coverage | <SCANNED count; NOT_SCANNED paths/reasons; findings counts only> |
+| repo | {{owner/repo or N/A}} |
+| local checkout／worktrees | {{path; branch; SHA; dirty}} |
+| remote tip | {{verified SHA/time or NOT_VERIFIED/NOT_PUSHED}} |
+| issues／PR／releases | {{evidence or NOT_RUN reason}} |
+| source／package／installed／loaded | {{separate paths/hashes/evidence}} |
+| secret coverage | {{SCANNED count; NOT_SCANNED paths/reasons; findings counts only}} |
 
 push 未授權可 NOT_PUSHED 合法交貨；已 push 需驗遠端 tip，唔只信本地。
 
@@ -47,7 +48,7 @@ push 未授權可 NOT_PUSHED 合法交貨；已 push 需驗遠端 tip，唔只�
 
 | ID | 完成結果 | requirement／acceptance ID | evidence／command／exit／scope |
 |---|---|---|---|
-| DONE1 | <observed completion> | <REQ/test ID> | <ref> |
+| DONE1 | {{observed completion}} | {{REQ/test ID}} | {{ref}} |
 
 不要用舊 SELFTEST／SKILL-REPORT 當當前 PASS；寫當前 source revision、可重跑命令及實際 exit。
 
@@ -55,7 +56,7 @@ push 未授權可 NOT_PUSHED 合法交貨；已 push 需驗遠端 tip，唔只�
 
 | ID | 未完成／UNKNOWN／NOT_RUN | 具體原因／授權缺口 | acceptance／下一步 |
 |---|---|---|---|
-| OPEN1 | <item> | <reason> | <criterion> |
+| OPEN1 | {{item}} | {{reason}} | {{criterion}} |
 
 full／partial／summary-only／unread、global metadata/content coverage、missing sources、WAL／併發 delta、fresh session／browser／live integration 分開記。reorg 不因 S 規模省掉全域 discovery。無 CLI／Plugin／deploy 可 N/A＋理由。
 
@@ -63,7 +64,7 @@ full／partial／summary-only／unread、global metadata/content coverage、miss
 
 | artifact ID／kind | source root／project ID | graph_status／catalog_status | owner／receipt／verification／freshness | blocker及下一步acceptance |
 |---|---|---|---|---|
-| <每個採用／建立Skill及Plugin一列；無產物有理由N/A> | <canonical identity; source revision/hash> | <PLANNED/BLOCKED/VERIFIED/NOT_APPLICABLE; N/A理由> | <actual refs or NOT_RUN> | <real-project／catalog adapter等依賴; owner> |
+| {{每個採用／建立Skill及Plugin一列；無產物有理由N/A}} | {{canonical identity; source revision/hash}} | {{PLANNED/BLOCKED/VERIFIED/NOT_APPLICABLE; N/A理由}} | {{actual refs or NOT_RUN}} | {{real-project／catalog adapter等依賴; owner}} |
 
 plan ready／PACKAGED唔等於onboard。fixture-only能力唔借作真實project證據；required onboarding未完保留PARTIAL。STALE不自動UPDATE／build；既有project／task／native session／Project Pair不重綁，歷史搜尋報告不自動入graph。
 
@@ -71,27 +72,44 @@ plan ready／PACKAGED唔等於onboard。fixture-only能力唔借作真實project
 
 | priority | action／owner | 固定 acceptance | 依賴／現有授權／缺口 |
 |---|---|---|---|
-| P0 | <action> | <criterion> | <dependency> |
-| P1 | <action> | <criterion> | <dependency> |
-| P2 | <action or N/A> | <criterion> | <dependency> |
+| P0 | {{action}} | {{criterion}} | {{dependency}} |
+| P1 | {{action}} | {{criterion}} | {{dependency}} |
+| P2 | {{action or N/A}} | {{criterion}} | {{dependency}} |
 
 ## §6 風險／恢復
 
 | risk ID | observed 風險／來源 | 影響 | 緩解／剩餘限制 |
 |---|---|---|---|
-| R1 | <risk> | <impact> | <action> |
+| R1 | {{risk}} | {{impact}} | {{action}} |
 
 promote journal／backups：`.open-project-promotion/`，內部 .gitignore 保護記錄。FAILED_RECOVERED／FAILED_UNRECOVERED 只指 target_file_bytes；journal／backup／新空 parent directories 可保留。合作鎖不阻外部 writer。FROZEN 舊 bytes 以外部 manifest 指版本；memory correction events append。
 
 ## §7 Handoff／新 session 入口
 
-- 明確任務／範圍：<request ref>。
-- 根目錄與 canonical files：<PROJECT_ROOT; packet; spec; status; memory; frozen manifest>。
-- 本輪證據：<source/evidence IDs; revision; tests/report>。
-- 下一步先做：<P0 action＋acceptance＋可重跑命令>。
-- 授權邊界：<already authorized / concrete missing authorization>。
-- GitNexus交接：<逐artifact graph／catalog狀態、source／receipts／freshness、owner／blockers、下一步驗收；無產物N/A理由>。
-- 最終 review：<ACCEPTED/CHANGES REQUIRED/PARTIAL; required coverage; P0/P1 status>。
-- 收尾：<LOCAL COMPLETE/NOT_PUSHED/PACKAGED 等具體結果>。
+- 明確任務／範圍：{{request ref}}。
+- 根目錄與 canonical files：{{PROJECT_ROOT; packet; spec; status; memory; frozen manifest}}。
+- 本輪證據：{{source/evidence IDs; revision; tests/report}}。
+- 下一步先做：{{P0 action＋acceptance＋可重跑命令}}。
+- 授權邊界：{{already authorized / concrete missing authorization}}。
+- GitNexus交接：{{逐artifact graph／catalog狀態、source／receipts／freshness、owner／blockers、下一步驗收；無產物N/A理由}}。
+- 最終 review：{{ACCEPTED/CHANGES REQUIRED/PARTIAL; required coverage; P0/P1 status}}。
+- 收尾：{{LOCAL COMPLETE/NOT_PUSHED/PACKAGED 等具體結果}}。
 
 新 session 讀到入口不自動觸發 open-project；只有用戶明確要求先按本流程續行。
+
+### 當前 lifecycle／決定／review 身份
+
+| 項目 | 當前狀態／證據 |
+|---|---|
+| lifecycle | {{PLAN_INCOMPLETE/PLAN_READY/PROMOTED/REVIEW_PENDING/PARTIAL/CHANGES_REQUIRED/COMPLETE}} |
+| phases 0–9 | {{逐 id/status/required/evidence/reason}} |
+| decisions | {{action ID→唯一 current state→append-only event/ref}} |
+| review | {{reviewer/author identities、revision、snapshot digest、areas；NOT_RUN if pending}} |
+| changed IDs／affected areas | {{spec/root/package/evidence changes；哪些獨立覆核仍有效}} |
+| completion receipt | {{gate result ref/snapshot or missing reason}} |
+
+porcelain 有 ?? DOCUMENTATION.md 就如實記一個 untracked，唔稱 git clean。打包／安裝／loaded 分開；package inventory缺必需文檔不稱全包。搬 root 後 packet／草稿／links／review不同步就 PARTIAL。
+
+### 有限 terminal 證據區
+
+{{只喺既有明確 evidence_policy 授權下記 typed JSONL terminal records；唔改已審 body；記批准 ref、paths／record_types、已審 prefix length/hash。無授權留 staging。唔改舊 body／prefix，唔以「同 scope」自行重鑄批准；新實質內容需新 revision／覆核。}}

@@ -1,24 +1,55 @@
 {
+  "schema_version": "release-tests/1.0",
   "edition": "codex",
-  "skill_version": "3.0.0-codex.2",
-  "plugin_version": "0.1.1",
-  "run_at": "2026-11-02T00:31:49+08:00",
+  "run_at": "2026-11-02T16:14:20+00:00",
   "python": "3.14.4",
-  "tests_run": 113,
-  "passed": 112,
-  "failures": 0,
-  "errors": 0,
+  "seconds": 83.736,
+  "tests_run": 253,
+  "passed": 252,
+  "failures": [],
+  "errors": [],
   "skipped": [
     {
       "test": "test_output_symlink_is_rejected_even_when_target_is_inside (test_renderer.RendererTests.test_output_symlink_is_rejected_even_when_target_is_inside)",
-      "reason": "Real symlink creation is not permitted by this Windows test environment."
+      "reason": "Windows error 1314: real symlink creation requires a privilege unavailable in this test environment."
     }
   ],
-  "status": "PASSED_WITH_SKIPS",
-  "scope": "Synthetic runtime and native-installer CLI-double fixtures. Actual native CLI0.154.0 installer and skills loading were separately verified in an isolated home. No GitNexus index/catalog or live session writes.",
+  "source_changed_during_test": false,
+  "tested_source_sha256": "960f4c6c027857d39924082ae8733af03aa12677448ff1e8e248b4670f574a55",
+  "scope": "Synthetic tests only; no live history, project, installed plugin or host config changes.",
   "limits": [
-    "Actual user-profile installation failed AccessDenied during native marketplace registration; see HOST-INSTALL-RESULT.json.",
-    "Installed-source manual policy and isolated loading do not prove model invocation behavior.",
-    "G6 checks declared inclusion/state; reviewer verifies artifact completeness and receipt authenticity."
-  ]
+    "Native host loading and actual model invocation are not proved by these tests.",
+    "Real GitNexus onboarding is not performed; ZCode has no GitNexus obligation."
+  ],
+  "status": "PASSED_WITH_SKIPS",
+  "skill_version": "3.1.0-codex.1",
+  "plugin_version": "0.2.0",
+  "contract_version": "2.0",
+  "canonical_base_commit": "33fa47a06c894b6bc384f5d6080199b7ad051744",
+  "package": {
+    "status": "PACKAGED",
+    "resources": 32,
+    "source_tree_sha256": "9f7f29d8c60986597608d306f2ee082fc52588338c31889236c552cb580daa64",
+    "installation_verified": false,
+    "invocation_verified": false
+  },
+  "independent_review": {
+    "verdict": "ACCEPTED",
+    "tests_per_edition": 126,
+    "custom_negatives_per_edition": 5,
+    "limits": "Source/synthetic scope only; no native loading or real onboarding."
+  },
+  "fresh_agent_plan_trial": {
+    "profile": "codex",
+    "status": "PLAN_READY",
+    "ready": true,
+    "complete": false,
+    "core_drafts": 5,
+    "sections": 11,
+    "errors": 0,
+    "gitnexus": "BLOCKED",
+    "packet_sha256": "89c93b507bd38b00c69c84404b8f6bd2261ad9ba64cfc4789d0bcbe1e6fcd412",
+    "source_files_unchanged": 5,
+    "native_plugin_invocation_verified": false
+  }
 }
