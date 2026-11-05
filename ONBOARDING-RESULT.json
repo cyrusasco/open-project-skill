@@ -1,0 +1,295 @@
+{
+  "schema": "open-project-published-onboarding/1",
+  "edition": "codex",
+  "plugin_version": "0.2.1",
+  "skill_version": "3.1.0-codex.2",
+  "status": "VERIFIED",
+  "captured_at": "2026-11-05T17:45:26.221581+00:00",
+  "source_identity_sha256": "dd013dcdd17f7b560516a9858493aab806c62fadaf7c02f0f719c11d02c0de5d",
+  "admission_sha256": "42177a49b66dc81cac4645e0cffcd994d524cc5a9df404befa35235ee4ab21e8",
+  "generation": "g-42177a49b66d-43da685f",
+  "artifacts": [
+    {
+      "id": "open-project-codex",
+      "kind": "plugin",
+      "project_id": "open-project-codex",
+      "graph_status": "VERIFIED",
+      "catalog_status": "VERIFIED"
+    },
+    {
+      "id": "open-project",
+      "kind": "skill",
+      "project_id": "open-project-codex",
+      "graph_status": "VERIFIED",
+      "catalog_status": "VERIFIED",
+      "reason": "Python runtime included in project graph"
+    }
+  ],
+  "source_inventory": [
+    {
+      "path": ".agents/plugins/marketplace.json",
+      "bytes": 379,
+      "sha256": "699d2a0b83e8f57adbc5a655c06df475b5abf911eb9072af507f9795ac8ea30c"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1066,
+      "sha256": "da9c207ac178f429ac002df6617a18633a4629ec8d0db86f6e92f1a04cb8422c"
+    },
+    {
+      "path": "SOURCE.json",
+      "bytes": 831,
+      "sha256": "b6f9c38cba48d873d1c99175e4bc0420665ccc1c2ac68a9f124627b5dfb72efa"
+    },
+    {
+      "path": "VERSION",
+      "bytes": 15,
+      "sha256": "311e5b9fae59deb7982a522ea0e922d0dbc67bde46ab1fafa8e3f0de35fc70a2"
+    },
+    {
+      "path": "plugin.json",
+      "bytes": 975,
+      "sha256": "66e302847703193fe9a095094570c592c9f6c0ca0f7e7e42ac5c86852cf53b29"
+    },
+    {
+      "path": "skills/open-project/SKILL.md",
+      "bytes": 19780,
+      "sha256": "e2c88062054d7fb60bd288c98bf6e4f0ac640b52ab6d51bd29475b26393478e1"
+    },
+    {
+      "path": "skills/open-project/agents/openai.yaml",
+      "bytes": 284,
+      "sha256": "96f4aa1338357d441655653637ea589ef54a4a09711829bd29e530981f6b0973"
+    },
+    {
+      "path": "skills/open-project/references/gitnexus-onboarding.md",
+      "bytes": 9324,
+      "sha256": "bda7d9883b655fec4ce2021dbb94cff8df73c95c02ed30fce28086c17c5f7183"
+    },
+    {
+      "path": "skills/open-project/references/gitnexus-real-adapter.md",
+      "bytes": 7269,
+      "sha256": "51b1de6f78fda89099edcb1dcd318df6834bd2f01265e17b341a8e7adddedfa4"
+    },
+    {
+      "path": "skills/open-project/references/host-codex.md",
+      "bytes": 6785,
+      "sha256": "1b704f770172533080bafee2c18fa8ab9a820fd2eb61eb97685d389c73f528cc"
+    },
+    {
+      "path": "skills/open-project/references/workflow-contract.md",
+      "bytes": 22857,
+      "sha256": "8a564a149e7eed035b5b239f66208d058e40dd94235c73b6b24a1c0cc082bfec"
+    },
+    {
+      "path": "skills/open-project/schemas/plan-v1.schema.json",
+      "bytes": 9584,
+      "sha256": "6e4423cc81707b689bde32acf5b36323291b86a3453f84210df2069f9ab11add"
+    },
+    {
+      "path": "skills/open-project/schemas/plan.schema.json",
+      "bytes": 45743,
+      "sha256": "fa14c0cb7b0c52b1ba8fd6b2fc514573856a0bc42d8b90860acacbb61d7f3dd1"
+    },
+    {
+      "path": "skills/open-project/scripts/discover-sessions.py",
+      "bytes": 50464,
+      "sha256": "dc87e830923882b70d092a4f734d440be9ffba3c6c7507bd9bedbe5cb38b5916"
+    },
+    {
+      "path": "skills/open-project/scripts/gate-check.py",
+      "bytes": 24951,
+      "sha256": "27ae4923a7f027a8ffb7f31be0984d4ffa85997ab92144f2c2f410e0777b5c10"
+    },
+    {
+      "path": "skills/open-project/scripts/gitnexus_onboard.py",
+      "bytes": 38656,
+      "sha256": "af7904217147107610631889489f89a6028e56308a74dcdaafb55908376e9319"
+    },
+    {
+      "path": "skills/open-project/scripts/plan_contract.py",
+      "bytes": 17977,
+      "sha256": "0cdc2483105172bec0a2e2ffb8648ebcd07dda4685963d89593e8d5c5cfa43ff"
+    },
+    {
+      "path": "skills/open-project/scripts/plan_render.py",
+      "bytes": 25577,
+      "sha256": "b092c4c85557641ee8624508c72214369c2535bf6202fc377a159976999746ce"
+    },
+    {
+      "path": "skills/open-project/scripts/promote.py",
+      "bytes": 38492,
+      "sha256": "e66c9d792cbd5e2797388f5b48f62786c556f83efe212a3178ef82ab18a2f0f5"
+    },
+    {
+      "path": "skills/open-project/scripts/render-plan.py",
+      "bytes": 181,
+      "sha256": "2afbc69d9afeaf9afd1dd15c29c5139b8d116bd1adf1088efbf1ee562a1925cd"
+    },
+    {
+      "path": "skills/open-project/scripts/workflow_contract.py",
+      "bytes": 44630,
+      "sha256": "d9a48822301d51996fc13eca8f1c3c5440552af7f0a8b23c71cad389ca0ec9a8"
+    },
+    {
+      "path": "skills/open-project/scripts/workflow_effects.py",
+      "bytes": 17511,
+      "sha256": "0fdadc7668112962903438f1bac3887c58af4f18bb4634baff3515b5bc01e871"
+    },
+    {
+      "path": "skills/open-project/scripts/workflow_package.py",
+      "bytes": 9789,
+      "sha256": "734d0f6dbaa708231c8385a14753faf1bbf9a40b595552a4f288040b38028318"
+    },
+    {
+      "path": "skills/open-project/templates/FROZEN.template.md",
+      "bytes": 2785,
+      "sha256": "5ea0ec62cb60ebdb18099b60e7e6ed057a87693345ee0432167dfb177fa50597"
+    },
+    {
+      "path": "skills/open-project/templates/PLAN.template.md",
+      "bytes": 14627,
+      "sha256": "bc5dc827cf7782c06a58da280511af3f3f9767a061bfa2d187466705ab26ab37"
+    },
+    {
+      "path": "skills/open-project/templates/REVIEW_REPORT.template.md",
+      "bytes": 9243,
+      "sha256": "69ad0e188a0cfb46ee52c40be4f860a7ee765bc13426aa388396b29096937d35"
+    },
+    {
+      "path": "skills/open-project/templates/agent.template.md",
+      "bytes": 2716,
+      "sha256": "cef36026441106c6175f2a97e56e302b1760bc0b1b2de09d774954c120aec7de"
+    },
+    {
+      "path": "skills/open-project/templates/agent.template.toml",
+      "bytes": 488,
+      "sha256": "77393d8d3be39ece2a8359d292ffb8b93e071c50de5d397a1d3e9ccbb5fd6412"
+    },
+    {
+      "path": "skills/open-project/templates/marketplace.template.json",
+      "bytes": 312,
+      "sha256": "b644250356e1bd3767bb6fcf9ff84d56892514ce7cc9dc06714e350a166bac2c"
+    },
+    {
+      "path": "skills/open-project/templates/memory.template.md",
+      "bytes": 5386,
+      "sha256": "e86682ea0a2f0f387365bfdba3f3c9ae22a2c59427463384c07ee2402620dd3d"
+    },
+    {
+      "path": "skills/open-project/templates/plan-report.template.html",
+      "bytes": 6060,
+      "sha256": "0f51fab47f77c37b5bcca0cf22f80bf4e9a1ec2f01d5af581f2200fcb3571f35"
+    },
+    {
+      "path": "skills/open-project/templates/plugin.template.json",
+      "bytes": 250,
+      "sha256": "1b35abf9c02a1498e132d1fe9ddb8502df0a2ad770d9ac35bc68e2ea332f3b8f"
+    },
+    {
+      "path": "skills/open-project/templates/product_specification.template.md",
+      "bytes": 5074,
+      "sha256": "aecd481400142214d95d0dd9f70118a5c94dd7994829d6356b5bbc58638ad64b"
+    },
+    {
+      "path": "skills/open-project/templates/project-manual.template.md",
+      "bytes": 4238,
+      "sha256": "5de76c8e1e0ddf7224f1234e72d1d1df70980e58eae65cf3903f2978fcb19f1f"
+    },
+    {
+      "path": "skills/open-project/templates/project_status.template.md",
+      "bytes": 6820,
+      "sha256": "daf26342b53181a5b7d9b0f9bdb1d81fa0554af57a0d8e214669525f4bd2ac00"
+    }
+  ],
+  "graph": {
+    "python_files": 10,
+    "query_groups": 6,
+    "all_query_exits_zero": true,
+    "oracle_rows": [
+      {
+        "kind": "files",
+        "expected_rows": 10
+      },
+      {
+        "kind": "definitions",
+        "expected_rows": 8
+      },
+      {
+        "kind": "calls",
+        "expected_rows": 1
+      },
+      {
+        "kind": "calls",
+        "expected_rows": 1
+      },
+      {
+        "kind": "imports",
+        "expected_rows": 1
+      },
+      {
+        "kind": "negative",
+        "expected_rows": 0
+      }
+    ],
+    "stats": {
+      "files": 10,
+      "nodes": 310,
+      "edges": 1095,
+      "communities": 16,
+      "processes": 27,
+      "embeddings": 0
+    },
+    "freshness": "FRESH",
+    "coverage": "all admitted Python File rows; sampled exact definitions, cross-file calls/import and negative query; zero-based backend declaration lines; not semantic completeness"
+  },
+  "lifecycle": {
+    "build": "BUILT_UNVERIFIED",
+    "verify": "VERIFIED",
+    "same_admission_replay": "NO_OP, no backend launched",
+    "lookup": "sha256 -> skills/open-project/scripts/plan_contract.py:24",
+    "rollback": "RETIRED, source/generations preserved",
+    "reactivation": "VERIFIED"
+  },
+  "catalog": {
+    "owner": "existing Codex native marketplace",
+    "source_version": "0.2.1",
+    "installed_versions": [
+      "0.2.0"
+    ],
+    "installation_current": false,
+    "invocation_verified": false
+  },
+  "casebook": {
+    "status": "NOT_APPLICABLE",
+    "reason": "Existing collector accepts genuine Jev controller state only; this direct authorized workflow has none. Preserve owned generation receipts; no fabricated controller state."
+  },
+  "tests": {
+    "run": 278,
+    "passed": 277,
+    "skipped": 1,
+    "failures": 0,
+    "errors": 0,
+    "tested_source_sha256": "6461d0cb7c3b60d32d0352482271fb4e7a7676c7d1494ca04018332b6eadb031"
+  },
+  "raw_evidence_digests": {
+    "completion.json": "9e47ff6158d74f41d6cfb2f8aff0c4c5386a18208924d1bda310745cc8d00987",
+    "admission-final.json": "8b1529ed5a840241de95e579f96aaeb898c6391fd2fa6b02720e733c6dc60f70",
+    "approval-final.json": "3a219990735f8f97eb82e622771f0b61f29a203c3cec305653b8c9c8ea11f086",
+    "build-final.json": "7ef31541fd38cb4613e3d3085ae008469780e998e1c1d244af6ca3ea408d91bf",
+    "reactivated.json": "67fa4aa040a7230562318734f2cf17f88e60257fd3e56a5c76396713cafd4e88",
+    "lookup.json": "ed3e4744af8cee3f0d35cfce89de0268ab3a6e80e9bab46e804d95d41fb55af2",
+    "noop.json": "bd085fce6109fc49a1a484ad5c39fdc647ac81622ccadc5988ba915d814e37ad",
+    "rollback.json": "3822591ebadcb728b74ed1b30277b38dd55a75869ffc7f247d250024b06740c6",
+    "native-update.json": "0163aee73ccfe554b24b7c59eac9ec6718a62cf2e6ea695cb6dab2a054468261"
+  },
+  "limitations": [
+    "Snapshot graph via bounded CLI adapter, no new global MCP/server",
+    "FTS/BM25 and embeddings disabled; inferred process/flow graph is truncated by backend budgets",
+    "Structural queries match source; not semantic completeness",
+    "Native cache update denied by session filesystem permissions; installed plugin remains0.2.0",
+    "Actual model invocation not tested",
+    "OS network/process isolation and all transitive dependencies not fully attested",
+    "Raw state/index/receipts remain local; this published summary has their hashes"
+  ]
+}

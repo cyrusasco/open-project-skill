@@ -127,6 +127,8 @@ def source_files(root):
     if edition == "codex":
         mandatory.add("templates/agent.template.toml")
         mandatory.add("references/gitnexus-onboarding.md")
+        mandatory.add("references/gitnexus-real-adapter.md")
+        mandatory.add("scripts/gitnexus_onboard.py")
     missing = sorted(str(SKILL / relative).replace("\\", "/") for relative in mandatory
                      if (SKILL / relative).as_posix() not in data)
     if missing:

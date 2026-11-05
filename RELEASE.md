@@ -1,3 +1,19 @@
+# 3.1.0-codex.2 — plugin 0.2.1, packet 2.0
+
+Codex-only real Python plugin onboarding is implemented and executed for this source. The original fixture owner and ZCode main remain unchanged. Manual-only invocation is preserved.
+
+The adapter records explicit source admission and actual authorization, copies only admitted Python runtime files, uses the existing pinned GitNexus backend, verifies source-derived File/definition/CALLS/IMPORTS/negative queries, and activates only the accepted generation. Native Codex catalog lookup binds the plugin and contained skill separately. It also provides source/index freshness, exact-symbol lookup, no-op replay and retained rollback.
+
+Real acceptance: 10 Python files; six exact query groups passed; native catalog source and both artifact rows VERIFIED. Actual lookup returned plan_contract.sha256 at human line24. Replay started no backend; rollback and subsequent verified reactivation succeeded. See ONBOARDING-RESULT.json and ONBOARDING-REVIEW.md. This is bounded structural acceptance, not FTS/embedding or complete inferred-flow coverage.
+
+Final regression suite: 278 tests, 277 passed, one Windows symlink privilege skip, zero failures/errors; frozen tested source matched before/after. Package contains34 allowlisted resources. Existing native policy, templates, marketplace and installer bytes remain protected.
+
+Installation is separate: source/catalog and graph use0.2.1; installed native cache is still0.2.0. A standard native update was attempted but the current session could not write the personal plugin cache (AccessDenied). Run the existing scripts/install-plugin.ps1 from an ordinary user PowerShell to update it, then verify explicit invocation in a new session. No claim of model invocation or automatic loading.
+
+The existing casebook collector accepts genuine Jev controller states only. This direct task has none; its collector is N/A and real receipts remain with the owned generation. No fabricated casebook, second capability catalog, global hook, server, backend installation or history indexing was introduced.
+
+## Previous 0.2.0 release (historical evidence)
+
 # 3.1.0-codex.1 — plugin 0.2.0, packet 2.0
 
 This release repairs workflow omissions across the separate ZCode and Codex editions. ZCode has **no GitNexus dependency**; Codex alone retains G6 onboarding.

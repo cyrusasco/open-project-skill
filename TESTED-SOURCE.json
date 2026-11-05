@@ -1,5 +1,6 @@
 {
-  "fingerprint": "960f4c6c027857d39924082ae8733af03aa12677448ff1e8e248b4670f574a55",
+  "schema_version": "tested-source/1.0",
+  "source_sha256": "6461d0cb7c3b60d32d0352482271fb4e7a7676c7d1494ca04018332b6eadb031",
   "files": [
     {
       "path": "skills/open-project/agents/openai.yaml",
@@ -7,11 +8,15 @@
     },
     {
       "path": "skills/open-project/references/gitnexus-onboarding.md",
-      "sha256": "2f5089f733cd36233985e66c99ee554ac752efb84f850ed13fdd4c6b0b01c96e"
+      "sha256": "bda7d9883b655fec4ce2021dbb94cff8df73c95c02ed30fce28086c17c5f7183"
+    },
+    {
+      "path": "skills/open-project/references/gitnexus-real-adapter.md",
+      "sha256": "51b1de6f78fda89099edcb1dcd318df6834bd2f01265e17b341a8e7adddedfa4"
     },
     {
       "path": "skills/open-project/references/host-codex.md",
-      "sha256": "3bf75c6cb0c83b8fa82398dbfb3730eee18a3c7022a7e4ab515a69e7de9700bc"
+      "sha256": "1b704f770172533080bafee2c18fa8ab9a820fd2eb61eb97685d389c73f528cc"
     },
     {
       "path": "skills/open-project/references/workflow-contract.md",
@@ -32,6 +37,10 @@
     {
       "path": "skills/open-project/scripts/gate-check.py",
       "sha256": "27ae4923a7f027a8ffb7f31be0984d4ffa85997ab92144f2c2f410e0777b5c10"
+    },
+    {
+      "path": "skills/open-project/scripts/gitnexus_onboard.py",
+      "sha256": "af7904217147107610631889489f89a6028e56308a74dcdaafb55908376e9319"
     },
     {
       "path": "skills/open-project/scripts/plan_contract.py",
@@ -63,7 +72,7 @@
     },
     {
       "path": "skills/open-project/SKILL.md",
-      "sha256": "d1c6c44399c1cde5f890d53b59de1e1f099d70aac4a97bbe47d7f47f16042d1b"
+      "sha256": "e2c88062054d7fb60bd288c98bf6e4f0ac640b52ab6d51bd29475b26393478e1"
     },
     {
       "path": "skills/open-project/templates/agent.template.md",
@@ -115,7 +124,7 @@
     },
     {
       "path": "scripts/build-plugin.py",
-      "sha256": "dfee1521f36e1812e61ea36ff8a3107ef0de37809e8e834425d585208c28e1d7"
+      "sha256": "8d4e56004512c30bcde690b828bdafa7b8c1dc1aeb8c7cf98f63f66e98aff857"
     },
     {
       "path": "scripts/install-plugin.ps1",
@@ -166,8 +175,12 @@
       "sha256": "adbb0ded6602e4f1635490336322f12d0d5e4edea100f75121ddabdc62f7b4b0"
     },
     {
+      "path": "tests/test_real_onboarding.py",
+      "sha256": "8add4eef2625d020b21f42025692d962ebaf3797effc9b7f4124a4ea8ac28ef7"
+    },
+    {
       "path": "tests/test_release_contract.py",
-      "sha256": "437dc9fc1fda1b0f415a5724c2fbdf9f07ea8e52e219da092f53fce8b38c9ea9"
+      "sha256": "a838362e92cd9edd6104cad7544f345bc03ac6b97bd8249748efd36315af3bf6"
     },
     {
       "path": "tests/test_renderer.py",
@@ -211,15 +224,15 @@
     },
     {
       "path": "SOURCE.json",
-      "sha256": "050691900a4e5342aa10ba0cc5252c524103dc8bb81cd79321de43370e04939c"
+      "sha256": "b6f9c38cba48d873d1c99175e4bc0420665ccc1c2ac68a9f124627b5dfb72efa"
     },
     {
       "path": "VERSION",
-      "sha256": "b48c4f7143c4a3d78094ef2e36169c4ecaa0ccfca903505ef4fd92920a5fd7fe"
+      "sha256": "311e5b9fae59deb7982a522ea0e922d0dbc67bde46ab1fafa8e3f0de35fc70a2"
     },
     {
       "path": "plugin.json",
-      "sha256": "b291bdb467054a1da7b6623ec1d8973662b1bbd0666156daf962d0e3c15ac7fc"
+      "sha256": "66e302847703193fe9a095094570c592c9f6c0ca0f7e7e42ac5c86852cf53b29"
     },
     {
       "path": "HOST-PROTECTION.json",

@@ -62,7 +62,7 @@ schema 2.0 嘅 workflow.documents 將 role→draft_id→必需 section IDs／實
 盤點 host／工具能力、工作樹／repo／根目錄、文件、服務／介面、測試、未知。每個數字附命令／來源與時間。
 **第一次讀原檔就計 raw SHA-256**；不存在記 NOT_EXISTS，git dirty 另列。保留原 bytes，唔等草稿寫好先當新 baseline。新檔／刪除／目錄變更亦列 before/after／owner。
 Codex runtime、CLI、model／reasoning 由用戶及 host 管理；唔把其他 harness 的模型限制搬入。
-定位現有 gitnexus-project-onboarding（CODEX_HOME／已設定 skill root），實讀當前 SKILL 及 admission／verification-rollback／freshness references，記來源版本／hash及執行範圍。缺失記 BLOCKED；唔安裝替代品或複製佢嘅 backend。現已核實 fixture-only MVP，唔代表真實項目可執行。
+定位現有 gitnexus-project-onboarding（CODEX_HOME／已設定 skill root），實讀當前 SKILL 及 admission／verification-rollback／freshness references，記來源版本／hash及執行範圍。缺失記 BLOCKED；唔安裝替代品或複製佢嘅 backend。原 owner 入口仍係 fixture-only；真實 Python plugin 可使用本包 references/gitnexus-real-adapter.md 所列獨立 adapter，先核對支援範圍及 source-derived oracle。
 
 ## Phase 2 — 全系統 session 發現與深讀
 
@@ -89,7 +89,7 @@ Codex runtime、CLI、model／reasoning 由用戶及 host 管理；唔把其他 
 
 唯一 project 寫入位置係 md-drafts/；不寫正式文件或 host config。
 1. 以 schemas/plan.schema.json 建 md-drafts/plan-data.json（schema_version 2.0，host codex）；寫 requirements／sources／facts／unknowns／conflicts／pains／roles／tools／oss／risks／folder_changes／drafts。
-2. workflow.gitnexus 記 applicability=REQUIRED、tool_id=gitnexus-project-onboarding；在 tools 加唯一同 ID 結構列，欄位按 references/gitnexus-onboarding.md；逐項列作本 project 交付或本輪新增／更新 capability 嘅 Skill／Plugin、project ID／source root、graph／catalog 狀態、步驟、驗收、阻礙及證據；普通叫用既有 onboarding Skill／依賴唔遞迴要求重新登記 shared Skills，身份匹配嘅既有entry可沿用。PLAN §6、§9、§11 同時有決策、時序、需求／副作用；spec 有 desired acceptance。現有 fixture adapter 不支援真實項目就 BLOCKED，並列經審閱 real-project／catalog adapter 依賴，唔刪除 onboarding。
+2. workflow.gitnexus 記 applicability=REQUIRED、tool_id=gitnexus-project-onboarding；在 tools 加唯一同 ID 結構列，欄位按 references/gitnexus-onboarding.md；逐項列作本 project 交付或本輪新增／更新 capability 嘅 Skill／Plugin、project ID／source root、graph／catalog 狀態、步驟、驗收、阻礙及證據；普通叫用既有 onboarding Skill／依賴唔遞迴要求重新登記 shared Skills，身份匹配嘅既有entry可沿用。PLAN §6、§9、§11 同時有決策、時序、需求／副作用；spec 有 desired acceptance。按 references/gitnexus-real-adapter.md 核對本包真實 Python adapter；不符合 profile 或缺 runtime／catalog owner 就 BLOCKED，唔刪除 onboarding。
 3. 每份 planned MD 全文草稿，禁止「保留現有內容」省略；現有檔遷移逐字保留，填清改動。product_specification.DRAFT.md 必交，係功能契約／可測 acceptance，唔係修復病歷。
 4. 草稿 manifest 綁 id／path／target／template／kind／required／raw sha256／read-time baseline_sha256／expected_sha256／固定 transforms；依賴列 depends_on。
 5. 普通 MD 可第一行用 <!-- open-project:draft -->；native agent TOML 保持合法格式，draft note用註解。只宣告實際適用 transform：remove_draft_marker／normalize_utf8_lf。
@@ -118,7 +118,7 @@ promote.py 預設 dry-run；--apply 先寫正式 target。逐檔／依賴群預�
 有需要且當前Codex支援先用 native custom-agent TOML（templates/agent.template.toml）；name／description／developer_instructions齊備，model／reasoning可省略跟parent。不可用額外欄位冒稱覆蓋parent sandbox／approval。
 templates/project-manual.template.md 係必交項目操作手冊，預設 agent.md；如採用 Codex 原生 AGENTS.md，明確引用或映射手冊，不要求每個任務自動重跑 open-project。native agent 本身可 N/A。
 SKILL／CLI／MCP／部署只按授權做；root與runtime明確；secret只在本地保護位置，含secret備份不入Git。
-按 onboarding 計畫逐產物使用現有 gitnexus-project-onboarding 及 capability catalog owner：先核 admission，再在支援且有具體授權範圍執行 inspect／plan-index；build／verify／UPDATE 各按實際副作用及有效批准處理。verify 會啟動 backend，唔當唯讀。fixture-only adapter 不可指向真實 repo／Skill／Plugin；依賴未解就保留 BLOCKED，同時繼續無依賴工作。保持既有 project／task／native session／Project Pair，不重新綁定。
+按 onboarding 計畫逐產物使用現有 gitnexus-project-onboarding 及 capability catalog owner：先核 admission，再在支援且有具體授權範圍執行 inspect／plan-index；build／verify／UPDATE 各按實際副作用及有效批准處理。verify 會啟動 backend，唔當唯讀。fixture-only adapter 不可指向真實 repo／Skill／Plugin；本包 scripts/gitnexus_onboard.py 可按已審閱 real Python profile 執行 plan→build→verify→complete，receipt 綁實際 graph 同 native catalog；依賴未解就保留 BLOCKED，同時繼續無依賴工作。保持既有 project／task／native session／Project Pair，不重新綁定。
 
 ## Phase 7 — 項目 plugin 包裝（按需）
 

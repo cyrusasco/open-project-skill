@@ -82,3 +82,8 @@ schema2 的 VERIFIED evidence 每項用 `source:<ID>`，指向 plan.sources 中�
 required onboarding未完成，status／handover明列BLOCKED或PLANNED、owner、缺口及下一步；不得標整項ACCEPTED。若用戶明確改驗收範圍，保留理由、新packet／revision及對應批准，唔改舊PASS。rollback只按該owner／adapter已定scope執行，唔刪source／generations／歷史證據。
 
 本契約只適用 Codex；ZCode 無 GitNexus，workflow applicability=N/A，唔安裝／探測／索引，缺G6不阻擋ZCode。
+
+
+## Real adapter available in this Codex package
+
+Read [gitnexus-real-adapter.md](gitnexus-real-adapter.md) for the supported real Python plugin profile. The original owner remains fixture-only; scripts/gitnexus_onboard.py is a separate adapter with real source-derived oracle, native catalog lookup, status, exact-symbol lookup and rollback. Existing BLOCKED examples above remain examples for unsupported/missing adapters, not the current status of every real plugin. Capture the actual completion receipt before changing a G6 row to VERIFIED.

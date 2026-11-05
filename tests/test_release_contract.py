@@ -24,7 +24,7 @@ class ReleaseContractTests(unittest.TestCase):
     def test_release_contract_and_resources_match(self):
         info, files = builder.source_files(ROOT)
         self.assertEqual(info['contract_version'], '2.0')
-        self.assertEqual(info['plugin_version'], '0.2.0')
+        self.assertEqual(info['plugin_version'], '0.2.0' if info['edition'] == 'zcode' else '0.2.1')
         self.assertIn('skills/open-project/scripts/workflow_contract.py', files)
         self.assertIn('skills/open-project/scripts/workflow_effects.py', files)
         self.assertIn('skills/open-project/scripts/workflow_package.py', files)
@@ -35,6 +35,7 @@ class ReleaseContractTests(unittest.TestCase):
         else:
             self.assertEqual(info['gitnexus_applicability'], 'CODEX_ONLY')
             self.assertIn('skills/open-project/references/gitnexus-onboarding.md', files)
+            self.assertIn('skills/open-project/scripts/gitnexus_onboard.py', files)
 
     def test_missing_new_runtime_resources_cannot_package(self):
         for missing in ['scripts/workflow_contract.py', 'scripts/workflow_effects.py', 'scripts/workflow_package.py', 'templates/project-manual.template.md']:

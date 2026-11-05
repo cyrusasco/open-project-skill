@@ -63,3 +63,8 @@ $open-project-codex:open-project reorg <project folder>
 `python -m unittest discover -s tests -v` 只證明列明 synthetic 範圍；看當前 `TEST-RESULTS.json`，唔沿用舊測試數。
 `python scripts/build-plugin.py` 建 allowlisted 獨立 package，不安裝。SOURCE／PACKAGED／INSTALLED／LOAD_VERIFIED／INVOCATION_VERIFIED 分開記錄。
 新版本 host load、真模型叫用或真 GitNexus 未實測就 UNKNOWN／BLOCKED。回復使用保留嘅上版來源及原生 host 操作；唔 reset 用戶其他改動或混合兩版設定。
+
+
+## Codex-only 0.2.1 follow-up
+
+This branch adds the real Python plugin onboarding adapter. ZCode main stays on 0.2.0 and requires no GitNexus update. Preserve `allow_implicit_invocation: false`. Read `skills/open-project/references/gitnexus-real-adapter.md`, then use plan/build/verify/complete for an explicitly authorized source. A native plugin update and actual model invocation remain separate from graph/catalog onboarding; source updates do not silently rewrite the current session or global hooks.
