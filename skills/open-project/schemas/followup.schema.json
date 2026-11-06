@@ -1,0 +1,228 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "open-project/followup/1.0"
+      ]
+    },
+    "plan_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "packet_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "inventory_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      }
+    },
+    "inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "session_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "session_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "screening": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "relevance": {
+            "enum": [
+              "RELATED",
+              "UNRELATED",
+              "UNDETERMINED"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "scoped_search",
+              "bounded_context",
+              "verified_link",
+              "user_scope",
+              "metadata_only"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "read": {
+            "enum": [
+              "FULL",
+              "PARTIAL",
+              "UNREAD",
+              "NOT_REQUIRED"
+            ]
+          },
+          "read_scope": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "id",
+          "relevance",
+          "basis",
+          "reason",
+          "evidence",
+          "read",
+          "read_scope"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "kind": {
+            "enum": [
+              "relevance",
+              "reading",
+              "attachment",
+              "other"
+            ]
+          },
+          "session_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "BLOCKED",
+              "DEFERRED",
+              "DONE"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "authority_ref": {
+            "type": "string"
+          },
+          "blocker": {
+            "enum": [
+              "none",
+              "missing_source",
+              "permission",
+              "tool_limit",
+              "external_dependency"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "session_ids",
+          "action",
+          "state",
+          "reason",
+          "owner",
+          "evidence",
+          "authority_ref",
+          "blocker"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "plan_id",
+    "revision",
+    "packet_sha256",
+    "scope",
+    "inventory_evidence",
+    "inventory",
+    "screening",
+    "tasks"
+  ],
+  "additionalProperties": false
+}

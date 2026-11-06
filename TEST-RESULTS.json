@@ -1,14 +1,14 @@
 {
   "edition": "zcode",
   "command": "python -m unittest discover -s tests -v",
-  "tests": 242,
-  "passed": 241,
+  "tests": 260,
+  "passed": 259,
   "failures": 0,
   "errors": 0,
   "skipped": 1,
   "exit_code": 0,
-  "at": "2026-11-06T12:29:21.643012+00:00",
+  "at": "2026-11-06T17:29:28.460765+00:00",
   "skip_reasons": [
-    "Windows lacks real symlink creation privilege; synthetic path/reparse checks pass."
+    "Windows symlink creation privilege unavailable; synthetic reparse/path checks pass."
   ]
 }

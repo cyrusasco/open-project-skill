@@ -6,7 +6,7 @@
     {
       "path": ".zcode-plugin/plugin.json",
       "bytes": 290,
-      "sha256": "8dccbb07aef0318dc906c27a5dc1387597ae40b8078937a9875499444c5e50c2"
+      "sha256": "95facb178b5c5ab04525254910549d8f9fd77a777c0033a4cd61a141efae96c1"
     },
     {
       "path": "LICENSE",
@@ -15,13 +15,13 @@
     },
     {
       "path": "SOURCE.json",
-      "bytes": 542,
-      "sha256": "c1fa360fd34eafe715c3bd6a357e5a0f94f0bea9e4287ccf89fde4785126f7bc"
+      "bytes": 594,
+      "sha256": "684755dbec235aaa198f79b2b6caaed72fbc3f23ab3122eaa3008fbc27454412"
     },
     {
       "path": "VERSION",
-      "bytes": 6,
-      "sha256": "6dc3b2dc3139b7d421b6fc26a7f853389a9b035ea4f2e9047b9516050dd6ac73"
+      "bytes": 7,
+      "sha256": "d600fbbe4952ea385d4940ab224ad0ce5e570e06a93122a759af07f69e7a2227"
     },
     {
       "path": "commands/open-project.md",
@@ -30,8 +30,8 @@
     },
     {
       "path": "scripts/build-plugin.py",
-      "bytes": 11178,
-      "sha256": "dfee1521f36e1812e61ea36ff8a3107ef0de37809e8e834425d585208c28e1d7"
+      "bytes": 11304,
+      "sha256": "acf9cb85ef8c8bf3d09b488dbdccf32645867c6405c61622d975a5882e692225"
     },
     {
       "path": "scripts/configure-jev-bypass.py",
@@ -40,8 +40,8 @@
     },
     {
       "path": "skills/open-project/SKILL.md",
-      "bytes": 26545,
-      "sha256": "3a43e613f3fbddbff161cef27e347485e012561e8242189f7c5b44f5db341f49"
+      "bytes": 27391,
+      "sha256": "d2414dd153be7880e1949cc0bdc3c11559d3b11882fbc02ac3f4ecc8148b907f"
     },
     {
       "path": "skills/open-project/references/host-zcode.md",
@@ -54,9 +54,19 @@
       "sha256": "ee3caa2a73adf094e8c7520c761e4d54689bf65a94c1ff48782139e81cb600d3"
     },
     {
+      "path": "skills/open-project/references/relevance-and-continuation.md",
+      "bytes": 4988,
+      "sha256": "854aee4fe0ac856d7dbb450aca0f121ca617286763ef415ebba07d01ec64e428"
+    },
+    {
       "path": "skills/open-project/references/workflow-contract.md",
-      "bytes": 23160,
-      "sha256": "c53b3f19e3b8c80685e69f03b1eb98ffe116ed6926c0d4d39dedf20ab012e149"
+      "bytes": 23785,
+      "sha256": "b73f461af324485d882690fa047dc934449f001107c1450e80aaa737c366fa43"
+    },
+    {
+      "path": "skills/open-project/schemas/followup.schema.json",
+      "bytes": 4868,
+      "sha256": "d2a70efaaad04be0bf9169c2cca9651763b4240b62e3eb81bdb8ddd2f8497c4e"
     },
     {
       "path": "skills/open-project/schemas/plan-v1.schema.json",
@@ -74,9 +84,14 @@
       "sha256": "dc87e830923882b70d092a4f734d440be9ffba3c6c7507bd9bedbe5cb38b5916"
     },
     {
+      "path": "skills/open-project/scripts/followup_checkpoint.py",
+      "bytes": 6905,
+      "sha256": "4e4825633a078dd21c1bfcdd2313ed91d89bd8685e45d22e9ade58dd3f00966c"
+    },
+    {
       "path": "skills/open-project/scripts/gate-check.py",
-      "bytes": 24951,
-      "sha256": "27ae4923a7f027a8ffb7f31be0984d4ffa85997ab92144f2c2f410e0777b5c10"
+      "bytes": 25192,
+      "sha256": "f1afbd375f928bc08fb938b88712eb9515f9efd03f90924c325969a335eee4a5"
     },
     {
       "path": "skills/open-project/scripts/plan_contract.py",
@@ -105,8 +120,8 @@
     },
     {
       "path": "skills/open-project/scripts/workflow_effects.py",
-      "bytes": 17511,
-      "sha256": "0fdadc7668112962903438f1bac3887c58af4f18bb4634baff3515b5bc01e871"
+      "bytes": 20119,
+      "sha256": "38a22e1e31ea7cd69468a5350cdf8ca12023a4e55c2474ec9d04a7b106afc483"
     },
     {
       "path": "skills/open-project/scripts/workflow_package.py",
@@ -125,8 +140,8 @@
     },
     {
       "path": "skills/open-project/templates/REVIEW_REPORT.template.md",
-      "bytes": 8479,
-      "sha256": "63a5b9967697d180470ebde5c5b6596fbe07b6726857fcfe84a00ee85c7c023c"
+      "bytes": 8882,
+      "sha256": "0c26bb95860a827aa5ec73598034d579ea430b1a061f178ca1c38abd522bf39e"
     },
     {
       "path": "skills/open-project/templates/agent.template.md",
@@ -165,8 +180,8 @@
     },
     {
       "path": "skills/open-project/templates/project_status.template.md",
-      "bytes": 5735,
-      "sha256": "d12369f5be63af8468e3de99596ca91913fba93c758e1f92efec815f3d841f0e"
+      "bytes": 5986,
+      "sha256": "b50c442bfbb8d56d1d262c194da36c30c61f8ce45256a66489d0f86462032493"
     },
     {
       "path": "tests/support.py",
@@ -199,6 +214,11 @@
       "sha256": "2516214feadcf80aaab496f80fb1b3d365d2443037f2a8d766c88bbabc0e6dbd"
     },
     {
+      "path": "tests/test_followup_checkpoint.py",
+      "bytes": 7400,
+      "sha256": "e057ec814336a1ae9d41bea21b25355ae1ed2df93ce165df3468102b0fb68efe"
+    },
+    {
       "path": "tests/test_incident_replays.py",
       "bytes": 2800,
       "sha256": "8d8f5a65ba2c10e5e6bf22fc80a973f311d9eea2ff7d6801cc48b54d3c9112ed"
@@ -220,8 +240,8 @@
     },
     {
       "path": "tests/test_release_contract.py",
-      "bytes": 2946,
-      "sha256": "6a973063bfb117ad3797b7d1108d3c38f92745da72e03222f22b084eba3d1474"
+      "bytes": 3056,
+      "sha256": "a77f409ea6f278eea475b0a7aa45f29af08b5ce195f398ad22c9aecd7e11c107"
     },
     {
       "path": "tests/test_renderer.py",
@@ -240,8 +260,8 @@
     },
     {
       "path": "tests/test_workflow_effects.py",
-      "bytes": 13193,
-      "sha256": "e82d638c6ea957db49bdb6a7d40e7b9cacc88f555127ab570dc0b0406eba2248"
+      "bytes": 14965,
+      "sha256": "140ed53073af2192b477bb3dcfaaec1d4f796e7b94a050ec152957111df982db"
     },
     {
       "path": "tests/test_workflow_gate.py",

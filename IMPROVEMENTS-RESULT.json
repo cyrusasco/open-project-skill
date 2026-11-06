@@ -1,0 +1,45 @@
+{
+  "schema": "open-project-improvements/1",
+  "edition": "zcode",
+  "plugin_version": "0.2.2",
+  "skill_version": "3.1.2",
+  "contract_version": "2.0",
+  "followup_contract": "open-project/followup/1.0",
+  "status": "SOURCE_TESTED_AND_PACKAGED",
+  "tests": {
+    "edition": "zcode",
+    "command": "python -m unittest discover -s tests -v",
+    "tests": 260,
+    "passed": 259,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "exit_code": 0,
+    "at": "2026-11-06T17:29:28.460765+00:00",
+    "skip_reasons": [
+      "Windows symlink creation privilege unavailable; synthetic reparse/path checks pass."
+    ]
+  },
+  "package_tree_sha256": "61755a0c56967f13b82f5edcfe3f563f038d00a217e6b2609fe2ef58dba6adb4",
+  "independent_review": "NO_REMAINING_P0_P2_IN_REVIEWED_SCOPE",
+  "review_ref": "IMPROVEMENTS-REVIEW.md",
+  "protected_native_bytes": "UNCHANGED",
+  "explicit_invocation_only": true,
+  "history_policy": "Global relevance discovery; bounded screening; related project content only; unrelated histories need no full read.",
+  "real_git_capture": {
+    "bytes": 10730374,
+    "streaming_check": "PASS",
+    "original_project_unchanged": true,
+    "project_complete": false
+  },
+  "live_installation": "NOT_RUN",
+  "invocation_behavior_verified": false,
+  "gitnexus": {
+    "status": "NOT_APPLICABLE"
+  },
+  "limits": [
+    "Checkpoint is not completion or effect approval.",
+    "Screening semantics and inventory exhaustiveness require evidence review.",
+    "Real model invocation of this release was not tested."
+  ]
+}

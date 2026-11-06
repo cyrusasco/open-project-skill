@@ -114,6 +114,8 @@ schema 2.0 嘅 workflow.documents 將 role→draft_id→必需 section IDs／實
 輸出／閘門：痛點及角色統計有原文 ref＋深度 tag；實際 tool/query/scope 寫 PLAN §5，coverage 明確。只輸出任務相關證據，唔傾倒整個私人 DB；access denied 唔繞過，用戶排除範圍照做。
 
 
+**關聯先行**：全系統係搜尋範圍，只有本 project 相關內容先深讀。按 RELATED／UNRELATED／UNDETERMINED 記篩選證據；無關跳過，關聯未明先最少上下文核對。唔由清單數量差推論全部漏讀，唔因無關 session 未全文讀而擋完成。按 [relevance-and-continuation.md](references/relevance-and-continuation.md) 對照來源／ID、查相關延續及需要嘅附件。
+
 ## Phase 3 — 舊檔／代碼 review
 
 目的：由實際原檔分清現況、需求與歷史，建立權威順序。
@@ -199,6 +201,8 @@ review 綁當前 revision／output-evidence snapshot，12 個共同 area 使用 
 P0 及 required P1 必修；P2 roadmap。具體書面豁免只記限制或明確改變驗收範圍，唔將未解 required P1 當已通過。**零 P0 只係必要條件**：required coverage 有 UNVERIFIED、未解 required P1、未交草稿／未驗證 assertion，結論唔可 ACCEPTED。用 ACCEPTED／CHANGES REQUIRED／PARTIAL，清楚分 N/A、已批准限制及未知。修復後對受影響範圍覆核。
 
 ## Phase 9 — Handover／Repo＋follow-up
+
+任何 PARTIAL 交接前，按 references/relevance-and-continuation.md 建 followup-checkpoint.json，跑 `gate-check.py <PROJECT_ROOT> --stage checkpoint --strict --json`。有 READY 繼續；BLOCKED 附限制證據及owner；DEFERRED 綁用戶決定。CHECKPOINT_JUSTIFIED 唔係 COMPLETE；未篩選、相關未讀及真實不可讀分開報。獨立 reviewer 對照篩選來源及可繼續task，唔只抄總數。
 
 完成前跑 `python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT> --stage completion --strict --json --out <REPORT_JSON>`；報告嘅 completion_receipt 要對應當前 snapshot，無 receipt 就未驗收。git porcelain 有任何改動就唔稱 clean；預期 untracked 指路牌可接受，但如實列數量／路徑。
 

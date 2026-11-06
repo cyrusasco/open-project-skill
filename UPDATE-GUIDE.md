@@ -1,3 +1,7 @@
+> Current release (2026-11-07): Skill 3.1.2 / Plugin 0.2.2; packet 2.0 unchanged.
+> Related-project history only: global relevance search, bounded screening, then relevant deep reading.
+> New `--stage checkpoint` checks continuation; streaming Git capture accepts large valid output without loading it all.
+
 # open-project — Jev bypass update (2026-11-06)
 
 | Host | Branch | Skill | Plugin |
@@ -84,7 +88,7 @@ python scripts/configure-jev-bypass.py --instructions PATH --remove --apply --ex
 
 ```text
 請更新 open-project，只用 https://github.com/cyrusasco/open-project-skill 的 main。
-目標：Skill3.1.0／Plugin0.2.0／packet2.0；先核對實際遠端HEAD與來源。
+目標：Skill3.1.2／Plugin0.2.2／packet2.0；先核對實際遠端HEAD與來源。
 先盤點已安裝 standalone skill、command、plugin 的來源／版本及本地修改；保留 dirty files、原始bytes、設定與回復入口，唔直接覆蓋。
 保護現有 Agent/subagent_type、ReadSessionContext、.zcode-plugin、commands、native agent frontmatter、已確認 model/provider、hooks/global instructions/host config。模型問題已解決，不重設。
 ZCode 無 GitNexus：G6=N/A，唔安裝／探測／索引，唔搬 Codex TOML、openai.yaml policy 或原生安裝指令。
@@ -99,7 +103,7 @@ ZCode 無 GitNexus：G6=N/A，唔安裝／探測／索引，唔搬 Codex TOML、
 只使用 `codex-port`，先確認 `SOURCE.json`／`VERSION`／portable manifest 全部係本次版本，跑測試及 build。喺正常有 profile 寫入權限嘅 PowerShell7、Python3.11+ 執行：
 
 ```powershell
-.\scripts\install-plugin.ps1
+.\scripts\install-with-jev-bypass.ps1
 ```
 
 原生 installer 不直接改 cache／global model；如同名 marketplace 指向另一來源，會停止並保留現有設定。唔用 sandbox／權限 workaround。已安裝0.1.1唔代表0.2.0已更新。

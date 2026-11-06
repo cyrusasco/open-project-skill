@@ -116,6 +116,8 @@ def source_files(root):
         "scripts/plan_contract.py", "scripts/plan_render.py", "scripts/render-plan.py",
         "scripts/gate-check.py", "scripts/promote.py", "scripts/discover-sessions.py",
         "scripts/workflow_contract.py", "scripts/workflow_effects.py", "scripts/workflow_package.py",
+        "scripts/followup_checkpoint.py", "schemas/followup.schema.json",
+        "references/relevance-and-continuation.md",
         "templates/project-manual.template.md",
         "schemas/plan.schema.json", "references/workflow-contract.md",
         "references/host-" + edition + ".md",
