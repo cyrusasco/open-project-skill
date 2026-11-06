@@ -157,3 +157,8 @@ Codex schema2 VERIFIED evidence 必須以 source:<ID> 綁 plan.sources 真實 ca
 2.0 係 breaking contract。舊 1.0 用 `gate-check.py <PROJECT_ROOT> --legacy-diagnostic` 可診斷，但永遠 MIGRATION_REQUIRED／ready=false。保留舊 packet／approval／journal／baseline／失敗；新工作由已核實來源重建 v2 roots／五角色／coverage／drafts，重新 render／gate及取得匹配新 bytes 嘅決定，不默認升級舊批准。
 
 只有已有相同舊 packet＋原批准 journal 嘅中斷恢復，才用 `promote.py <PROJECT_ROOT> --approval <APPROVAL_JSON> --legacy-recovery --resume`（寫入仍需 --apply），唔藉此開始新 v1 promotion。legacy 診斷／recovery 不代表 v2 PLAN_READY 或 COMPLETE。
+
+
+## Relevance and continuation checkpoint
+
+全系統搜尋只用嚟發現相關歷史，唔要求深讀無關session。按 [relevance-and-continuation.md](relevance-and-continuation.md) 記篩選、有限上下文及相關閱讀範圍；數量差異唔當漏讀證據。PARTIAL前用 `gate-check.py <PROJECT> --stage checkpoint --strict --json` 檢查來源綁定及剩餘可做工作。此新增stage只批准暫停說明，唔授權完成或任何副作用；既有packet2.0及正式gate不變。大型Git原輸出改串流hash／計數，64KiB chunk、1MiB單record、256MiB整檔profile；超限不截斷冒充完整。

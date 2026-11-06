@@ -113,3 +113,8 @@ porcelain 有 ?? DOCUMENTATION.md 就如實記一個 untracked，唔稱 git clea
 ### 有限 terminal 證據區
 
 {{只喺既有明確 evidence_policy 授權下記 typed JSONL terminal records；唔改已審 body；記批准 ref、paths／record_types、已審 prefix length/hash。無授權留 staging。唔改舊 body／prefix，唔以「同 scope」自行重鑄批准；新實質內容需新 revision／覆核。}}
+
+
+### 剩餘工作與關聯範圍
+
+{{篩選覆蓋、相關閱讀、無關跳過、關聯未明分開；READY即繼續，BLOCKED附證據／owner，DEFERRED附用戶決定。列checkpoint命令／exit／結果；CHECKPOINT_JUSTIFIED唔係COMPLETE。}}

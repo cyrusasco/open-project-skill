@@ -1,3 +1,7 @@
+> Current release (2026-11-07): Skill 3.1.2-codex.1 / Plugin 0.2.3; packet 2.0 unchanged. Evidence: [IMPROVEMENTS-RESULT.json](IMPROVEMENTS-RESULT.json), [independent review](IMPROVEMENTS-REVIEW.md).
+> Related-project history only: global relevance search, bounded screening, then relevant deep reading.
+> New `--stage checkpoint` checks continuation; streaming Git capture accepts large valid output without loading it all.
+
 # 3.1.1-codex.1 — plugin 0.2.2: explicit open-project Jev bypass
 
 The invoked workflow uses the owner-authorized task-scoped Jev exception. A separate bounded host-instruction installer preserves all existing bytes and raw backups. Native model/provider/agent entrypoints, manual invocation policy, approval gates and host-specific GitNexus policy are preserved.

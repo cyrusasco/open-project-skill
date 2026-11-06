@@ -1,3 +1,7 @@
+> Current release (2026-11-07): Skill 3.1.2-codex.1 / Plugin 0.2.3; packet 2.0 unchanged.
+> Related-project history only: global relevance search, bounded screening, then relevant deep reading.
+> New `--stage checkpoint` checks continuation; streaming Git capture accepts large valid output without loading it all.
+
 # open-project — Jev bypass update (2026-11-06)
 
 | Host | Branch | Skill | Plugin |
@@ -84,7 +88,7 @@ python scripts/configure-jev-bypass.py --instructions PATH --remove --apply --ex
 
 ```text
 請更新 open-project，只用 https://github.com/cyrusasco/open-project-skill 的 main。
-目標：Skill3.1.0／Plugin0.2.0／packet2.0；先核對實際遠端HEAD與來源。
+目標：Skill3.1.2／Plugin0.2.2／packet2.0；先核對實際遠端HEAD與來源。
 先盤點已安裝 standalone skill、command、plugin 的來源／版本及本地修改；保留 dirty files、原始bytes、設定與回復入口，唔直接覆蓋。
 保護現有 Agent/subagent_type、ReadSessionContext、.zcode-plugin、commands、native agent frontmatter、已確認 model/provider、hooks/global instructions/host config。模型問題已解決，不重設。
 ZCode 無 GitNexus：G6=N/A，唔安裝／探測／索引，唔搬 Codex TOML、openai.yaml policy 或原生安裝指令。
@@ -99,7 +103,7 @@ ZCode 無 GitNexus：G6=N/A，唔安裝／探測／索引，唔搬 Codex TOML、
 只使用 `codex-port`，先確認 `SOURCE.json`／`VERSION`／portable manifest 全部係本次版本，跑測試及 build。喺正常有 profile 寫入權限嘅 PowerShell7、Python3.11+ 執行：
 
 ```powershell
-.\scripts\install-plugin.ps1
+.\scripts\install-with-jev-bypass.ps1
 ```
 
 原生 installer 不直接改 cache／global model；如同名 marketplace 指向另一來源，會停止並保留現有設定。唔用 sandbox／權限 workaround。已安裝0.1.1唔代表0.2.0已更新。
@@ -120,6 +124,15 @@ $open-project-codex:open-project reorg <project folder>
 新版本 host load、真模型叫用或真 GitNexus 未實測就 UNKNOWN／BLOCKED。回復使用保留嘅上版來源及原生 host 操作；唔 reset 用戶其他改動或混合兩版設定。
 
 
-## Codex-only 0.2.1 follow-up
+## Historical Codex-only 0.2.1 follow-up
 
 This branch adds the real Python plugin onboarding adapter. ZCode main stays on 0.2.0 and requires no GitNexus update. Preserve `allow_implicit_invocation: false`. Read `skills/open-project/references/gitnexus-real-adapter.md`, then use plan/build/verify/complete for an explicitly authorized source. A native plugin update and actual model invocation remain separate from graph/catalog onboarding; source updates do not silently rewrite the current session or global hooks.
+
+
+## 安裝一致性（本次0.2.3）
+
+標準更新入口係 `scripts/install-with-jev-bypass.ps1`，會按已授權scope加入有界Jev例外、用原生installer更新，再核對native登記、installed全部資源bytes、有效AGENTS／override政策。只用低層 `install-plugin.ps1` 得到INSTALL_VERIFIED唔代表Jev例外已同步；兩者必須分開驗。
+
+唯讀驗證：`.\scripts\verify-installation.ps1`。任一版本／來源bytes／政策缺失，結果INSTALLATION_INCOMPLETE、exit1；重開app本身唔會補寫政策。SOURCE_AND_POLICY_VERIFIED仍唔等於真模型invocation測試。無profile寫入權限就報實際阻礙，唔用其他工具繞過。
+
+舊專案r4 packet可先用新checker唯讀診斷，唔直接改舊證據／批准。要採用checkpoint或補歷史，先按最新用戶scope形成新revision；無關session毋須全文讀。

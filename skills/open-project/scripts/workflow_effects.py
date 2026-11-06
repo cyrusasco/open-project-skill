@@ -6,13 +6,19 @@ module never moves files, invokes Git, changes cwd, or edits repository state.
 from __future__ import annotations
 
 from datetime import datetime
+import hashlib
 import json
+import os
 from pathlib import Path
 
 from plan_contract import PacketError, _hash, _relative, packet_digest, resolve_inside, sha256
 
 MAX_RECEIPT_BYTES = 64 * 1024
 MAX_GIT_STDOUT_BYTES = 1024 * 1024
+# The old total-size ceiling is retained as a per-record memory bound. A large
+# repository may legitimately produce millions of small porcelain records.
+GIT_READ_CHUNK_BYTES = 64 * 1024
+MAX_GIT_CAPTURE_BYTES = 256 * 1024 * 1024
 GIT_COMMAND = ['git', 'status', '--porcelain=v1', '--untracked-files=all', '--ignored']
 TEXT = {'type': 'string', 'minLength': 1, 'pattern': r'\S'}
 STRING = {'type': 'string'}
@@ -290,6 +296,56 @@ def porcelain_counts(raw):
     return counts
 
 
+def streamed_git_observation(plan, reference):
+    """Verify every captured byte to EOF with bounded memory; never execute Git.
+
+    Preserve the existing receipt/hash/command contract. Counts are observations,
+    not a clean-working-tree claim. Reject drift, malformed records and wrong
+    hashes; never treat an oversized or truncated prefix as a complete capture.
+    """
+    location = _location(plan, reference)
+    digest = hashlib.sha256()
+    counts = {'tracked': 0, 'untracked': 0, 'ignored': 0}
+    total = 0
+    pending = b''
+    def identity(s):
+        # On Windows/Python 3.14, stat() and fstat() can expose different ctime
+        # semantics (birth time vs change time). Compare common fields and hash
+        # every byte instead of treating that API difference as file drift.
+        return (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns)
+    def record(raw):
+        if len(raw) > MAX_GIT_STDOUT_BYTES:
+            raise PacketError('git record exceeds bounded capture record size')
+        row = porcelain_counts(raw)
+        if sum(row.values()) != 1:
+            raise PacketError('malformed git porcelain record')
+        for key in counts:
+            counts[key] += row[key]
+    with location.open('rb') as stream:
+        before = os.fstat(stream.fileno())
+        if before.st_size > MAX_GIT_CAPTURE_BYTES:
+            raise PacketError('git capture exceeds streaming profile total limit')
+        while chunk := stream.read(GIT_READ_CHUNK_BYTES):
+            total += len(chunk)
+            if total > MAX_GIT_CAPTURE_BYTES:
+                raise PacketError('git capture exceeds streaming profile total limit')
+            digest.update(chunk)
+            pieces = (pending + chunk).split(b'\n')
+            pending = pieces.pop()
+            for line in pieces:
+                record(line + b'\n')
+            if len(pending) > MAX_GIT_STDOUT_BYTES:
+                raise PacketError('git record exceeds bounded capture record size')
+        if pending:
+            record(pending)
+        after = os.fstat(stream.fileno())
+    if identity(before) != identity(after) or identity(after) != identity(location.stat()) or total != after.st_size:
+        raise PacketError('git capture changed during verification')
+    if digest.hexdigest() != reference['sha256']:
+        raise PacketError('effect reference hash mismatch: ' + reference['path'])
+    return counts, total
+
+
 def effects_findings(plan, project, stage='plan'):
     """Return errors for missing/inconsistent effects; never grant or execute them."""
     if stage not in ('plan', 'completion'):
@@ -333,11 +389,10 @@ def effects_findings(plan, project, stage='plan'):
         else:
             if not resolve_inside(_roots(plan)[git['root_id']], '.git').exists():
                 raise PacketError('observed git root has no Git metadata')
-            _, raw = _read_reference(plan, project, git['stdout'], MAX_GIT_STDOUT_BYTES)
-            counts = porcelain_counts(raw)
+            counts, byte_count = streamed_git_observation(plan, git['stdout'])
             if counts != git['counts']:
                 raise PacketError('git tracked/untracked/ignored counts contradict captured stdout')
-            if git['claimed_clean'] is not (raw == b''):
+            if git['claimed_clean'] is not (byte_count == 0):
                 raise PacketError('git clean claim contradicts captured porcelain stdout')
     except (PacketError, OSError, UnicodeError) as exc:
         fail('W_EFFECT_GIT', str(exc))

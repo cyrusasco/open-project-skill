@@ -429,13 +429,17 @@ def inspect_packet(project, plan=None, *, stage='plan', legacy_diagnostic=False)
 def main(argv=None):
     parser = argparse.ArgumentParser(description='Read-only plan packet gate (advisory by default)')
     parser.add_argument('project',type=Path)
-    parser.add_argument('--stage',choices=('plan','completion'),default='plan',help='Readiness stage; plan readiness never claims completion')
+    parser.add_argument('--stage',choices=('plan','completion','checkpoint'),default='plan',help='Plan, completion, or relevance/continuation checkpoint; checkpoint never grants completion')
     parser.add_argument('--legacy-diagnostic',action='store_true',help='Read legacy packet details without granting current readiness')
     parser.add_argument('--strict',action='store_true')
     parser.add_argument('--json',action='store_true',dest='as_json')
     parser.add_argument('--out',type=Path,help='Optional report path explicitly selected by the caller')
     args = parser.parse_args(argv)
-    result = inspect_packet(args.project,stage=args.stage,legacy_diagnostic=args.legacy_diagnostic)
+    if args.stage == 'checkpoint':
+        from followup_checkpoint import inspect_checkpoint
+        result = inspect_checkpoint(args.project)
+    else:
+        result = inspect_packet(args.project,stage=args.stage,legacy_diagnostic=args.legacy_diagnostic)
     if args.as_json:
         output = json.dumps(result,ensure_ascii=False,sort_keys=True) + '\n'
     else:
@@ -447,7 +451,7 @@ def main(argv=None):
     if args.out:
         args.out.write_text(output,encoding='utf-8',newline='\n')
     print(output,end='')
-    return 1 if args.strict and not result['ready'] else 0
+    return 1 if args.strict and not result.get('ready', result.get('can_stop', False)) else 0
 
 if __name__ == '__main__':
     raise SystemExit(main())

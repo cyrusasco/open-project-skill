@@ -227,6 +227,35 @@ class WorkflowEffectsTests(unittest.TestCase):
             with self.assertRaises(PacketError):
                 porcelain_counts(raw)
 
+    def test_large_valid_capture_is_streamed_and_every_byte_hash_checked(self):
+        raw = b'!! synthetic-dependencies/ignored-file\n' * 310000
+        observation = self.git(raw)
+        with mock.patch.object(Path, 'read_bytes', side_effect=AssertionError('No full-file read')):
+            self.assertEqual(effects_findings(self.plan, self.project), [])
+        self.assertEqual(observation['counts']['ignored'], 310000)
+        observation['stdout']['sha256'] = '0' * 64
+        self.assertTrue(any('hash mismatch' in x['message'] for x in effects_findings(self.plan, self.project)))
+
+    def test_chunk_boundary_utf8_crlf_and_final_unterminated_record(self):
+        from workflow_effects import GIT_READ_CHUNK_BYTES
+        raw = b'!! ' + b'a' * (GIT_READ_CHUNK_BYTES - 4) + '圖'.encode() + b'\r\n?? last.md'
+        self.git(raw)
+        self.assertEqual(effects_findings(self.plan, self.project), [])
+
+    def test_total_stream_limit_stops_without_accepting_prefix(self):
+        self.git(b'!! cache/\n' * 10)
+        with mock.patch('workflow_effects.MAX_GIT_CAPTURE_BYTES', 20):
+            self.assertTrue(any('total limit' in x['message'] for x in effects_findings(self.plan, self.project)))
+
+    def test_mutated_capture_identity_is_rejected(self):
+        self.git(b'!! cache/\n')
+        from types import SimpleNamespace
+        actual = os.stat(self.project/'evidence/git-porcelain.txt')
+        changed = SimpleNamespace(**{k:getattr(actual,k) for k in ('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns')})
+        changed.st_mtime_ns += 1
+        with mock.patch('workflow_effects.os.fstat', side_effect=[actual, changed]):
+            self.assertTrue(any('changed during' in x['message'] for x in effects_findings(self.plan, self.project)))
+
 
 if __name__ == '__main__':
     unittest.main()

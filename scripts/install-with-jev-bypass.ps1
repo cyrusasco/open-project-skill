@@ -9,6 +9,7 @@ $helper = Join-Path $SourceRoot 'scripts/configure-jev-bypass.py'
 $stage = 'source-validation'
 $policy = $null
 $installed = $null
+$verification = $null
 function Get-EffectiveInstructions {
     $override = Join-Path $hostRoot 'AGENTS.override.md'
     if ((Test-Path -LiteralPath $override) -and
@@ -53,12 +54,17 @@ if info['edition'] != 'codex':
     if (-not $current.active -or $current.before_sha256 -cne $policy.after_sha256) {
         throw 'Host policy changed during installation; not verified.'
     }
-    [ordered]@{status=if ($installExit -eq 0) {'SOURCE_AND_POLICY_VERIFIED'} else {'PARTIAL_INSTALL'};
-        policy=$policy; installation=$installed; invocation_behavior_verified=$false} | ConvertTo-Json -Depth 8
-    exit $installExit
+    $stage = 'installed-source-and-policy-verification'
+    $raw = & (Join-Path $SourceRoot 'scripts/verify-installation.ps1') -SourceRoot $SourceRoot -CodexCommand $CodexCommand -PythonCommand $PythonCommand
+    $verifyExit = $LASTEXITCODE
+    $verification = ($raw -join "`n") | ConvertFrom-Json
+    $ok = $installExit -eq 0 -and $verifyExit -eq 0 -and $verification.status -ceq 'SOURCE_AND_POLICY_VERIFIED'
+    [ordered]@{status=if ($ok) {'SOURCE_AND_POLICY_VERIFIED'} else {'PARTIAL_INSTALL'};
+        policy=$policy; installation=$installed; verification=$verification; invocation_behavior_verified=$false} | ConvertTo-Json -Depth 8
+    if ($ok) { exit 0 } else { exit 1 }
 } catch {
     [ordered]@{status=if ($null -ne $policy) {'PARTIAL_UPDATE'} else {'UPDATE_BLOCKED'};
-        stage=$stage; policy=$policy; installation=$installed;
+        stage=$stage; policy=$policy; installation=$installed; verification=$verification;
         error=$_.Exception.Message; invocation_behavior_verified=$false} | ConvertTo-Json -Depth 8
     exit 1
 }

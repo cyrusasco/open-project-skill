@@ -1,14 +1,14 @@
 {
   "edition": "codex",
   "command": "python -m unittest discover -s tests -v",
-  "tests": 294,
-  "passed": 293,
+  "tests": 317,
+  "passed": 316,
   "failures": 0,
   "errors": 0,
   "skipped": 1,
   "exit_code": 0,
-  "at": "2026-11-06T12:32:53.819785+00:00",
+  "at": "2026-11-06T17:30:03.282403+00:00",
   "skip_reasons": [
-    "Windows lacks real symlink creation privilege; synthetic path/reparse checks pass."
+    "Windows symlink creation privilege unavailable; synthetic reparse/path checks pass."
   ]
 }

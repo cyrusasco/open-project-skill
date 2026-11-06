@@ -72,3 +72,8 @@ Five required document roles exist independently of the draft manifest. The manu
 ## Scoped Jev exception
 
 明確叫用 open-project 後用 [jev-bypass.md](jev-bypass.md) 政策，parent直接執行及原生派工；不要求Jev route／scores／monitoring receipt。此例外需於已授權更新時同步所選host的user AGENTS.md；其他host設定／模型／GUI/browser／JevCompact保持原有政策。安裝與fresh-session invocation分開驗證，不改security hook來繞過OS限制。
+
+
+## Installed source and effective policy
+
+The authoring repository standard updater is `scripts/install-with-jev-bypass.ps1`; the protected lower-level native installer alone does not provision the scoped exception. Run `scripts/verify-installation.ps1` read-only to compare native identity/version/enabled/source, exact installed runtime files and effective AGENTS.override.md or AGENTS.md policy. Missing/mismatched state is INSTALLATION_INCOMPLETE, never fixed merely by restarting the host. This observation does not prove a model turn followed the policy.

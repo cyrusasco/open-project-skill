@@ -10,23 +10,23 @@
     },
     {
       "path": "SOURCE.json",
-      "bytes": 898,
-      "sha256": "6d159416679b2b1605b28dfbe75895795ae701208bb4e8f7d2f6d41e2f2bfcb1"
+      "bytes": 950,
+      "sha256": "a60f2df360dd847bcd10db763d7d2bba592cf474d07a2eb20080f06f29ba06c1"
     },
     {
       "path": "VERSION",
-      "bytes": 14,
-      "sha256": "ae8a36b04d33573d2e5471f93cd3c91f2bc60b10e917bebca7a0d385f4873d52"
+      "bytes": 15,
+      "sha256": "c9242c3459a8f2cee15347a92fa6b395accb5fcc31e915b99830fdf45d901749"
     },
     {
       "path": "plugin.json",
       "bytes": 949,
-      "sha256": "186959800d80a17e4804f0e1ac20e354fdda1d2c696d002f557062218b27709d"
+      "sha256": "12ead529cdac3b868bce522aa7e2c983200c86b3b2c4774524d3e72a54a89e16"
     },
     {
       "path": "scripts/build-plugin.py",
-      "bytes": 11292,
-      "sha256": "8d4e56004512c30bcde690b828bdafa7b8c1dc1aeb8c7cf98f63f66e98aff857"
+      "bytes": 11418,
+      "sha256": "7671a8925f85f61f4aedf5e441e099422ffbd4247cae2de13bf12b0eb8811189"
     },
     {
       "path": "scripts/configure-jev-bypass.py",
@@ -40,13 +40,23 @@
     },
     {
       "path": "scripts/install-with-jev-bypass.ps1",
-      "bytes": 3304,
-      "sha256": "23e2169ae4508face6cf5672d05d36b8d38656b828ae8ab11d528365e0586281"
+      "bytes": 3795,
+      "sha256": "f7844da48d0f11df97813c23187c9deb491b674cebce99b52954cbc6f2cb019d"
+    },
+    {
+      "path": "scripts/verify-installation.ps1",
+      "bytes": 913,
+      "sha256": "e069ac763f2988a0599da83ba4f373462d7a6bac9ad1d4b5009034a2ccaa7341"
+    },
+    {
+      "path": "scripts/verify-installation.py",
+      "bytes": 4460,
+      "sha256": "4fd8f57ad150cf40d539d0393acea8942740e3045577d755db89f1506a53b652"
     },
     {
       "path": "skills/open-project/SKILL.md",
-      "bytes": 21357,
-      "sha256": "b5f287acd208be9e4971d902d9015e93bc9d0a59f67146a242ef7f3e81ea4a02"
+      "bytes": 22212,
+      "sha256": "77e39d5cf48c264e63ee5e3b61559601035a3058b28d9a7385a089267ef52511"
     },
     {
       "path": "skills/open-project/agents/openai.yaml",
@@ -65,8 +75,8 @@
     },
     {
       "path": "skills/open-project/references/host-codex.md",
-      "bytes": 7201,
-      "sha256": "35bdab41d3b2014583a133a8497f6e4fd04ab71e24b82ef06c27475763dc4561"
+      "bytes": 7764,
+      "sha256": "7a5d74decfa3029fe04f3f28903fadb7484e40849f3fd5ef5578ccc2616dbcb8"
     },
     {
       "path": "skills/open-project/references/jev-bypass.md",
@@ -74,9 +84,19 @@
       "sha256": "ee3caa2a73adf094e8c7520c761e4d54689bf65a94c1ff48782139e81cb600d3"
     },
     {
+      "path": "skills/open-project/references/relevance-and-continuation.md",
+      "bytes": 4988,
+      "sha256": "854aee4fe0ac856d7dbb450aca0f121ca617286763ef415ebba07d01ec64e428"
+    },
+    {
       "path": "skills/open-project/references/workflow-contract.md",
-      "bytes": 23160,
-      "sha256": "c53b3f19e3b8c80685e69f03b1eb98ffe116ed6926c0d4d39dedf20ab012e149"
+      "bytes": 23785,
+      "sha256": "b73f461af324485d882690fa047dc934449f001107c1450e80aaa737c366fa43"
+    },
+    {
+      "path": "skills/open-project/schemas/followup.schema.json",
+      "bytes": 4868,
+      "sha256": "d2a70efaaad04be0bf9169c2cca9651763b4240b62e3eb81bdb8ddd2f8497c4e"
     },
     {
       "path": "skills/open-project/schemas/plan-v1.schema.json",
@@ -94,9 +114,14 @@
       "sha256": "dc87e830923882b70d092a4f734d440be9ffba3c6c7507bd9bedbe5cb38b5916"
     },
     {
+      "path": "skills/open-project/scripts/followup_checkpoint.py",
+      "bytes": 6905,
+      "sha256": "4e4825633a078dd21c1bfcdd2313ed91d89bd8685e45d22e9ade58dd3f00966c"
+    },
+    {
       "path": "skills/open-project/scripts/gate-check.py",
-      "bytes": 24951,
-      "sha256": "27ae4923a7f027a8ffb7f31be0984d4ffa85997ab92144f2c2f410e0777b5c10"
+      "bytes": 25192,
+      "sha256": "f1afbd375f928bc08fb938b88712eb9515f9efd03f90924c325969a335eee4a5"
     },
     {
       "path": "skills/open-project/scripts/gitnexus_onboard.py",
@@ -130,8 +155,8 @@
     },
     {
       "path": "skills/open-project/scripts/workflow_effects.py",
-      "bytes": 17511,
-      "sha256": "0fdadc7668112962903438f1bac3887c58af4f18bb4634baff3515b5bc01e871"
+      "bytes": 20119,
+      "sha256": "38a22e1e31ea7cd69468a5350cdf8ca12023a4e55c2474ec9d04a7b106afc483"
     },
     {
       "path": "skills/open-project/scripts/workflow_package.py",
@@ -150,8 +175,8 @@
     },
     {
       "path": "skills/open-project/templates/REVIEW_REPORT.template.md",
-      "bytes": 9243,
-      "sha256": "69ad0e188a0cfb46ee52c40be4f860a7ee765bc13426aa388396b29096937d35"
+      "bytes": 9646,
+      "sha256": "15c2a53cdc0bfb7c0a3831ef2a391b573d08aa12b7f88b8f596fb30dafc1a4f3"
     },
     {
       "path": "skills/open-project/templates/agent.template.md",
@@ -195,8 +220,8 @@
     },
     {
       "path": "skills/open-project/templates/project_status.template.md",
-      "bytes": 6820,
-      "sha256": "daf26342b53181a5b7d9b0f9bdb1d81fa0554af57a0d8e214669525f4bd2ac00"
+      "bytes": 7071,
+      "sha256": "2ee8c25e4cc8c9fe3ae8e26cafd0d471062435ec2ff774db7aecb560eeccc54b"
     },
     {
       "path": "tests/support.py",
@@ -229,6 +254,11 @@
       "sha256": "2516214feadcf80aaab496f80fb1b3d365d2443037f2a8d766c88bbabc0e6dbd"
     },
     {
+      "path": "tests/test_followup_checkpoint.py",
+      "bytes": 7400,
+      "sha256": "e057ec814336a1ae9d41bea21b25355ae1ed2df93ce165df3468102b0fb68efe"
+    },
+    {
       "path": "tests/test_gitnexus_plan.py",
       "bytes": 12814,
       "sha256": "1dc510ab4c3ddc50913492cc391d07eb2ab7aa7152ded01a27707f96082bef10"
@@ -240,8 +270,8 @@
     },
     {
       "path": "tests/test_install_plugin.py",
-      "bytes": 12122,
-      "sha256": "242174842046326ed5ec8fc79052b53e9ea7563dec3db35974f6a4da45ec21ca"
+      "bytes": 16106,
+      "sha256": "4116bb2db52fc71090b15bff512590643102067ddf13b77c9ec16d94f145bf43"
     },
     {
       "path": "tests/test_jev_bypass.py",
@@ -265,8 +295,8 @@
     },
     {
       "path": "tests/test_release_contract.py",
-      "bytes": 3030,
-      "sha256": "2f8ed9fe3a166be19642608815cd240c8b8524a15e7e45c2a86ce0ed5e2594b6"
+      "bytes": 3140,
+      "sha256": "bda60443fc952686e1088ceabca1c3e56824512bae6143e832b3f12ba9e69db7"
     },
     {
       "path": "tests/test_renderer.py",
@@ -285,8 +315,8 @@
     },
     {
       "path": "tests/test_workflow_effects.py",
-      "bytes": 13193,
-      "sha256": "e82d638c6ea957db49bdb6a7d40e7b9cacc88f555127ab570dc0b0406eba2248"
+      "bytes": 14965,
+      "sha256": "140ed53073af2192b477bb3dcfaaec1d4f796e7b94a050ec152957111df982db"
     },
     {
       "path": "tests/test_workflow_gate.py",

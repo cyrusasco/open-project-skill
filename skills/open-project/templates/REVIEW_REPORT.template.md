@@ -118,3 +118,8 @@ GitNexus PLAN齊件／G6通過不代表onboarding完成。PLANNED／BLOCKED／st
 ### Final report 發布身份
 
 保留原已批revision，先開未批准candidate revision再review；凍定其material／status-memoryprefix，snapshot排除report自身hash。實際report全文及對應結果只在該未批candidate定稿，render／gate後取得匹配最終packet／selectedfiles嘅實際批准，再promote及completion。其他material改動另開candidate／重審，唔用同revision偷偷換稿；NOT_RUN草稿不當最終已完成report。
+
+
+### 關聯篩選及停止前核對
+
+{{對照已盤點來源與source/session ID：RELATED／UNRELATED／UNDETERMINED數量及證據；無關毋須深讀。核對關聯範圍／必要上下文、相關附件存在性、BLOCKED嘅實際限制及DEFERRED用戶來源。引用當前packet綁定嘅checkpoint結果及READY工作；數量差異本身不算漏讀，唔把可繼續工作當工具邊界。}}

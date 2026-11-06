@@ -74,7 +74,7 @@ schema 2.0 嘅 workflow.documents 將 role→draft_id→必需 section IDs／實
 Codex runtime、CLI、model／reasoning 由用戶及 host 管理；唔把其他 harness 的模型限制搬入。
 定位現有 gitnexus-project-onboarding（CODEX_HOME／已設定 skill root），實讀當前 SKILL 及 admission／verification-rollback／freshness references，記來源版本／hash及執行範圍。缺失記 BLOCKED；唔安裝替代品或複製佢嘅 backend。原 owner 入口仍係 fixture-only；真實 Python plugin 可使用本包 references/gitnexus-real-adapter.md 所列獨立 adapter，先核對支援範圍及 source-derived oracle。
 
-## Phase 2 — 全系統 session 發現與深讀
+## Phase 2 — 全系統關聯搜尋與相關內容深讀
 
 1. 列所有實際可讀來源：native app list/read/archived tools（有先用）、CLI JSONL、已授權匯出；未知來源記 UNKNOWN。不先按 directory／title 過濾。
 2. native list 全部分頁；CLI fallback用 scripts/discover-sessions.py 指定整個來源 root，按專案別名／repo／功能詞／檔名／URL 全域內容搜尋。opaque IDs；不用前綴推斷種類。
@@ -86,6 +86,8 @@ Codex runtime、CLI、model／reasoning 由用戶及 host 管理；唔把其他 
 8. 只用可見 user／assistant 文字作對話證據；reasoning、encrypted_content、未核實 inter-agent 訊息、工具內容分層跳過或標限制。原始歷史不包入插件。
 
 輸出痛點表、需求來源、角色統計及方法口徑；零發現合法，未深讀如實記。
+
+**關聯先行**：全系統係搜尋範圍，只有本 project 相關內容先深讀。按 RELATED／UNRELATED／UNDETERMINED 記篩選證據；無關跳過，關聯未明先最少上下文核對。唔由清單數量差推論全部漏讀，唔因無關 session 未全文讀而擋完成。按 [relevance-and-continuation.md](references/relevance-and-continuation.md) 對照來源／ID、查相關延續及需要嘅附件。
 
 ## Phase 3 — 檔案／代碼／git review
 
@@ -148,6 +150,8 @@ review 綁當前 revision／output-evidence snapshot，12 個共同 area 使用 
 P0必修；required P1／coverage未知未處理不能ACCEPTED。非required建議可roadmap；書面豁免要綁項目／範圍，唔假綠。修後按最終snapshot覆核。
 
 ## Phase 9 — Handover／follow-up
+
+任何 PARTIAL 交接前，按 references/relevance-and-continuation.md 建 followup-checkpoint.json，跑 `gate-check.py <PROJECT_ROOT> --stage checkpoint --strict --json`。有 READY 繼續；BLOCKED 附限制證據及owner；DEFERRED 綁用戶決定。CHECKPOINT_JUSTIFIED 唔係 COMPLETE；未篩選、相關未讀及真實不可讀分開報。獨立 reviewer 對照篩選來源及可繼續task，唔只抄總數。
 
 完成前跑 `python <SKILL_ROOT>/scripts/gate-check.py <PROJECT_ROOT> --stage completion --strict --json --out <REPORT_JSON>`；報告嘅 completion_receipt 要對應當前 snapshot，無 receipt 就未驗收。git porcelain 有任何改動就唔稱 clean；預期 untracked 指路牌可接受，但如實列數量／路徑。
 
