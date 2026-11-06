@@ -11,6 +11,8 @@
 
 只適用用戶明確啟動嘅 open-project 任務；S/M/L 只縮深度，不刪 Phase 0–9、11 節 PLAN、必交角色或完整草稿。checker 係 advisory；`--strict` 改失敗 exit，唔提供 host／OS 強制。已有明確授權持續有效，routine 工作唔重複請批。
 
+明確叫用後採用 [Jev bypass policy](jev-bypass.md)：只略過派工／評分治理，唔刪五稿、來源深讀、獨立review、精準批准或completion義務。已有可執行工作不可只交PARTIAL就停。host user instructions要有對應有界例外；不改system／platform權限。
+
 ## Roots and first-read evidence
 
 `PLUGIN_ROOT` 係帶 skills/ 嘅 package 根；`SKILL_ROOT=<PLUGIN_ROOT>/skills/open-project`。`PROJECT_ROOT=workflow.roots.docs_root`，staging 只係 `<PROJECT_ROOT>/md-drafts/`。腳本用絕對 resource path、明傳 PROJECT_ROOT，不依賴 cwd；source、package、installed、loaded 分開記。

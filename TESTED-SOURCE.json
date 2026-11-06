@@ -1,205 +1,277 @@
 {
-  "fingerprint": "cc7fcbb196a2c9476b1b0f4f8fb4090984d7c369b410d3e188bf7620ff6973d3",
+  "schema": "tested-source/1",
+  "edition": "zcode",
+  "scope": "runtime package, root authoring helpers, tests and fixtures; excludes evidence and generated outputs",
   "files": [
     {
+      "path": ".zcode-plugin/plugin.json",
+      "bytes": 290,
+      "sha256": "8dccbb07aef0318dc906c27a5dc1387597ae40b8078937a9875499444c5e50c2"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1066,
+      "sha256": "da9c207ac178f429ac002df6617a18633a4629ec8d0db86f6e92f1a04cb8422c"
+    },
+    {
+      "path": "SOURCE.json",
+      "bytes": 542,
+      "sha256": "c1fa360fd34eafe715c3bd6a357e5a0f94f0bea9e4287ccf89fde4785126f7bc"
+    },
+    {
+      "path": "VERSION",
+      "bytes": 6,
+      "sha256": "6dc3b2dc3139b7d421b6fc26a7f853389a9b035ea4f2e9047b9516050dd6ac73"
+    },
+    {
+      "path": "commands/open-project.md",
+      "bytes": 2285,
+      "sha256": "435193a73418f06dc635629906e63468d8aea895e24d3b49d49c7847a76950af"
+    },
+    {
+      "path": "scripts/build-plugin.py",
+      "bytes": 11178,
+      "sha256": "dfee1521f36e1812e61ea36ff8a3107ef0de37809e8e834425d585208c28e1d7"
+    },
+    {
+      "path": "scripts/configure-jev-bypass.py",
+      "bytes": 6425,
+      "sha256": "1f79a3cdcc6599c6d8025a1da7c55a86d510fa1fdfb8346d0b254664e7859e65"
+    },
+    {
+      "path": "skills/open-project/SKILL.md",
+      "bytes": 26545,
+      "sha256": "3a43e613f3fbddbff161cef27e347485e012561e8242189f7c5b44f5db341f49"
+    },
+    {
       "path": "skills/open-project/references/host-zcode.md",
-      "sha256": "7d004f1eabb3a1a0264faf82ec01d3570b1fb3f3feb4f22c4e38725fa1bded5c"
+      "bytes": 7222,
+      "sha256": "bc3d2b203b257f7ccd2c9c60a6af6b80c74ba3486a46d4c24d74f7e762968217"
+    },
+    {
+      "path": "skills/open-project/references/jev-bypass.md",
+      "bytes": 3704,
+      "sha256": "ee3caa2a73adf094e8c7520c761e4d54689bf65a94c1ff48782139e81cb600d3"
     },
     {
       "path": "skills/open-project/references/workflow-contract.md",
-      "sha256": "8a564a149e7eed035b5b239f66208d058e40dd94235c73b6b24a1c0cc082bfec"
+      "bytes": 23160,
+      "sha256": "c53b3f19e3b8c80685e69f03b1eb98ffe116ed6926c0d4d39dedf20ab012e149"
     },
     {
       "path": "skills/open-project/schemas/plan-v1.schema.json",
+      "bytes": 9584,
       "sha256": "6e4423cc81707b689bde32acf5b36323291b86a3453f84210df2069f9ab11add"
     },
     {
       "path": "skills/open-project/schemas/plan.schema.json",
+      "bytes": 45743,
       "sha256": "fa14c0cb7b0c52b1ba8fd6b2fc514573856a0bc42d8b90860acacbb61d7f3dd1"
     },
     {
       "path": "skills/open-project/scripts/discover-sessions.py",
+      "bytes": 50464,
       "sha256": "dc87e830923882b70d092a4f734d440be9ffba3c6c7507bd9bedbe5cb38b5916"
     },
     {
       "path": "skills/open-project/scripts/gate-check.py",
+      "bytes": 24951,
       "sha256": "27ae4923a7f027a8ffb7f31be0984d4ffa85997ab92144f2c2f410e0777b5c10"
     },
     {
       "path": "skills/open-project/scripts/plan_contract.py",
+      "bytes": 17977,
       "sha256": "0cdc2483105172bec0a2e2ffb8648ebcd07dda4685963d89593e8d5c5cfa43ff"
     },
     {
       "path": "skills/open-project/scripts/plan_render.py",
+      "bytes": 25577,
       "sha256": "b092c4c85557641ee8624508c72214369c2535bf6202fc377a159976999746ce"
     },
     {
       "path": "skills/open-project/scripts/promote.py",
+      "bytes": 38492,
       "sha256": "e66c9d792cbd5e2797388f5b48f62786c556f83efe212a3178ef82ab18a2f0f5"
     },
     {
       "path": "skills/open-project/scripts/render-plan.py",
+      "bytes": 181,
       "sha256": "2afbc69d9afeaf9afd1dd15c29c5139b8d116bd1adf1088efbf1ee562a1925cd"
     },
     {
       "path": "skills/open-project/scripts/workflow_contract.py",
+      "bytes": 44630,
       "sha256": "d9a48822301d51996fc13eca8f1c3c5440552af7f0a8b23c71cad389ca0ec9a8"
     },
     {
       "path": "skills/open-project/scripts/workflow_effects.py",
+      "bytes": 17511,
       "sha256": "0fdadc7668112962903438f1bac3887c58af4f18bb4634baff3515b5bc01e871"
     },
     {
       "path": "skills/open-project/scripts/workflow_package.py",
+      "bytes": 9789,
       "sha256": "734d0f6dbaa708231c8385a14753faf1bbf9a40b595552a4f288040b38028318"
     },
     {
-      "path": "skills/open-project/SKILL.md",
-      "sha256": "56aa70a26f3375f27d05cf8023f05fd5f36dc7fdd307b0eb74bb248c71cbe214"
-    },
-    {
-      "path": "skills/open-project/templates/agent.template.md",
-      "sha256": "05c467cd2acd7c4b1b4541e32ace88a042a04665201be1f43269a6f3055c711b"
-    },
-    {
       "path": "skills/open-project/templates/FROZEN.template.md",
+      "bytes": 2785,
       "sha256": "5ea0ec62cb60ebdb18099b60e7e6ed057a87693345ee0432167dfb177fa50597"
     },
     {
+      "path": "skills/open-project/templates/PLAN.template.md",
+      "bytes": 12315,
+      "sha256": "f86eb7b63950c9a3c897ebe1a8c70e918a9748856f8e29b650c4311a50617b41"
+    },
+    {
+      "path": "skills/open-project/templates/REVIEW_REPORT.template.md",
+      "bytes": 8479,
+      "sha256": "63a5b9967697d180470ebde5c5b6596fbe07b6726857fcfe84a00ee85c7c023c"
+    },
+    {
+      "path": "skills/open-project/templates/agent.template.md",
+      "bytes": 4675,
+      "sha256": "05c467cd2acd7c4b1b4541e32ace88a042a04665201be1f43269a6f3055c711b"
+    },
+    {
       "path": "skills/open-project/templates/marketplace.template.json",
+      "bytes": 297,
       "sha256": "a5ab21669caf1b8b639966d6393f3b1febec2973776909fc6339ebf94ec24c52"
     },
     {
       "path": "skills/open-project/templates/memory.template.md",
+      "bytes": 5386,
       "sha256": "e86682ea0a2f0f387365bfdba3f3c9ae22a2c59427463384c07ee2402620dd3d"
     },
     {
       "path": "skills/open-project/templates/plan-report.template.html",
+      "bytes": 6060,
       "sha256": "0f51fab47f77c37b5bcca0cf22f80bf4e9a1ec2f01d5af581f2200fcb3571f35"
     },
     {
-      "path": "skills/open-project/templates/PLAN.template.md",
-      "sha256": "f86eb7b63950c9a3c897ebe1a8c70e918a9748856f8e29b650c4311a50617b41"
-    },
-    {
       "path": "skills/open-project/templates/plugin.template.json",
+      "bytes": 317,
       "sha256": "3c33d9e6c1cf34663983d957a1771254e1c5ab26124107de990afcdb0a5e6624"
     },
     {
       "path": "skills/open-project/templates/product_specification.template.md",
+      "bytes": 4150,
       "sha256": "68d4bcfa1c18a8b6c2f9cefff5fc46bc2dbd79c654d1a9da8f198fecb4f20238"
     },
     {
       "path": "skills/open-project/templates/project-manual.template.md",
+      "bytes": 4238,
       "sha256": "5de76c8e1e0ddf7224f1234e72d1d1df70980e58eae65cf3903f2978fcb19f1f"
     },
     {
       "path": "skills/open-project/templates/project_status.template.md",
+      "bytes": 5735,
       "sha256": "d12369f5be63af8468e3de99596ca91913fba93c758e1f92efec815f3d841f0e"
     },
     {
-      "path": "skills/open-project/templates/REVIEW_REPORT.template.md",
-      "sha256": "63a5b9967697d180470ebde5c5b6596fbe07b6726857fcfe84a00ee85c7c023c"
-    },
-    {
-      "path": "scripts/build-plugin.py",
-      "sha256": "dfee1521f36e1812e61ea36ff8a3107ef0de37809e8e834425d585208c28e1d7"
-    },
-    {
       "path": "tests/support.py",
+      "bytes": 2085,
       "sha256": "ffafc049fb98935ab683b11ca2546f5678ea51b74f021827253c620e381fcb3b"
     },
     {
       "path": "tests/test_codex_discovery.py",
+      "bytes": 17127,
       "sha256": "46bb5e6cd0af58646c3db6c6db1953bdf0ac46a339b8f0432ba5567950ed01ee"
     },
     {
       "path": "tests/test_completion_bridge.py",
+      "bytes": 4005,
       "sha256": "0064b47ec0baeca211dca274e46e1876e2075407f58837909f0f502890c58287"
     },
     {
       "path": "tests/test_contract_gate.py",
+      "bytes": 22162,
       "sha256": "2d83068700c86d42cff486cd2f9e91fe42eb36125ba5f5d9f7cdd6efa951b42b"
     },
     {
       "path": "tests/test_discovery.py",
+      "bytes": 16358,
       "sha256": "0311598205b7424dcfa407e1c705bb03973e5a823e17571d3635ace553561643"
     },
     {
       "path": "tests/test_discovery_coverage.py",
+      "bytes": 10300,
       "sha256": "2516214feadcf80aaab496f80fb1b3d365d2443037f2a8d766c88bbabc0e6dbd"
     },
     {
       "path": "tests/test_incident_replays.py",
+      "bytes": 2800,
       "sha256": "8d8f5a65ba2c10e5e6bf22fc80a973f311d9eea2ff7d6801cc48b54d3c9112ed"
     },
     {
+      "path": "tests/test_jev_bypass.py",
+      "bytes": 4579,
+      "sha256": "49988df7c7c9644fa73753940644683d199ae629a53c6f42ab9fa568aecdfa74"
+    },
+    {
       "path": "tests/test_packaging.py",
+      "bytes": 6456,
       "sha256": "9305c12222c51facc367d93a9f838dc8da0e2653516063a19f364ecf3d959313"
     },
     {
       "path": "tests/test_promote.py",
+      "bytes": 24837,
       "sha256": "adbb0ded6602e4f1635490336322f12d0d5e4edea100f75121ddabdc62f7b4b0"
     },
     {
       "path": "tests/test_release_contract.py",
-      "sha256": "437dc9fc1fda1b0f415a5724c2fbdf9f07ea8e52e219da092f53fce8b38c9ea9"
+      "bytes": 2946,
+      "sha256": "6a973063bfb117ad3797b7d1108d3c38f92745da72e03222f22b084eba3d1474"
     },
     {
       "path": "tests/test_renderer.py",
+      "bytes": 11120,
       "sha256": "33925aacc246c8cc723173d44c324629eb9aa73ef49a31d803b7ac5346c463b7"
     },
     {
       "path": "tests/test_reorg_workflow.py",
+      "bytes": 11880,
       "sha256": "7ff465be5a2d9519bc229c549fa2ac71010916d683948418c0ec2002ad86b7ed"
     },
     {
       "path": "tests/test_workflow_contract.py",
+      "bytes": 25163,
       "sha256": "44ac24303fe985863d64932ef10f245834a5e073852606c9bdf7757814e5dd28"
     },
     {
       "path": "tests/test_workflow_effects.py",
+      "bytes": 13193,
       "sha256": "e82d638c6ea957db49bdb6a7d40e7b9cacc88f555127ab570dc0b0406eba2248"
     },
     {
       "path": "tests/test_workflow_gate.py",
+      "bytes": 17294,
       "sha256": "f2a1fc4eda003f189e9b117afcf575ea22b1924086055e618a07c6dcb4cb0d2b"
     },
     {
       "path": "tests/test_workflow_gate_promote.py",
+      "bytes": 9733,
       "sha256": "b97ac4d6a927541d6636ff8755f18bff29d4ccc8753429bd42485da66bb88b34"
     },
     {
       "path": "tests/test_workflow_package.py",
+      "bytes": 9715,
       "sha256": "a9e8ae65fac2b8aad3ebb3178f29902e15ac48308fc5c1ed712c73523fc51864"
     },
     {
       "path": "tests/test_workflow_promote.py",
+      "bytes": 5335,
       "sha256": "02dc30091775bd4887aba88cd7c54b4b51136857de47a3921c2ca574c0622d72"
     },
     {
       "path": "tests/test_workflow_renderer.py",
+      "bytes": 8487,
       "sha256": "fea40d8e1319d3a753a270b7cc6231bb9f4fcd1e2be9e2df185e4dd895503f0f"
     },
     {
       "path": "tests/workflow_support.py",
+      "bytes": 9848,
       "sha256": "f9ef96e8d60b608f1a2cfc08a31e8f1b18ded8455dd66d5e54e4bde0f7b3ba00"
-    },
-    {
-      "path": "SOURCE.json",
-      "sha256": "b782cdc3846bc4ba8aca6bc1a64eca744b05cf510556795b73898a661703dc74"
-    },
-    {
-      "path": "VERSION",
-      "sha256": "b2f44d3b6e29f8b1b73ea4735f006affc4d198e1fd9c7d50e736159b1ef636c6"
-    },
-    {
-      "path": ".zcode-plugin/plugin.json",
-      "sha256": "f5dfb5927b6fcbe6372a4ef33062bf37b41675871fc8e0ddb1e4d9c57342bd44"
-    },
-    {
-      "path": "HOST-PROTECTION.json",
-      "sha256": "2dadb5879b96570acbfb940ca9bc44b468f46e92dcbd42bce890950fc6dd0bd1"
     }
   ]
 }

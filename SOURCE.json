@@ -2,11 +2,13 @@
   "upstream_repository": "https://github.com/cyrusasco/open-project-skill",
   "upstream_commit": "44f5d3129cfe46e9646286a49ee552c0429d608c",
   "edition": "zcode",
-  "skill_version": "3.1.0",
-  "plugin_version": "0.2.0",
+  "skill_version": "3.1.1",
+  "plugin_version": "0.2.1",
   "contract_version": "2.0",
   "native_manual_only_verified": false,
   "correction_base_commit": "1c29c6d8b2a3d99e4e7801b0f794da23c499897b",
   "approved_plan": "correction-20261102-v2.1",
-  "gitnexus_applicability": "NOT_APPLICABLE"
+  "gitnexus_applicability": "NOT_APPLICABLE",
+  "jev_policy": "explicit-open-project-bypass/v1",
+  "jev_behavior_verified": false
 }

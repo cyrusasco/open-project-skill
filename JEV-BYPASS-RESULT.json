@@ -1,0 +1,41 @@
+{
+  "schema": "open-project-jev-bypass-release/1",
+  "edition": "zcode",
+  "plugin_version": "0.2.1",
+  "skill_version": "3.1.1",
+  "base_commit": "d03984df6a13de52777d95245d34d8f054fb333f",
+  "policy": "explicit-open-project-bypass/v1",
+  "status": "SOURCE_TESTED_AND_PACKAGED",
+  "tests": {
+    "edition": "zcode",
+    "command": "python -m unittest discover -s tests -v",
+    "tests": 242,
+    "passed": 241,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "exit_code": 0,
+    "at": "2026-11-06T12:29:21.643012+00:00",
+    "skip_reasons": [
+      "Windows lacks real symlink creation privilege; synthetic path/reparse checks pass."
+    ]
+  },
+  "package_tree_sha256": "f8cf7694b3b7eb49270e2f7739c28237f64dd037c496eac7d2d90b9bd676c54b",
+  "independent_review": "ACCEPTED_WITH_INSTALLATION_LIMITATIONS",
+  "review_ref": "JEV-BYPASS-REVIEW.md",
+  "protected_native_files": "UNCHANGED",
+  "manual_invocation_only": true,
+  "real_host_policy": "NOT_INSTALLED_BY_THIS_TASK",
+  "real_host_plugin_update": "NOT_INSTALLED_BY_THIS_TASK",
+  "invocation_behavior_verified": false,
+  "installation_entry": "UPDATE-GUIDE.md",
+  "gitnexus": {
+    "status": "NOT_APPLICABLE"
+  },
+  "limitations": [
+    "Checks and instructions do not prove model obedience or OS enforcement.",
+    "Host installation requires writable profile and exact effective instructions.",
+    "Scoped exception preserves substantive approvals, native settings and unrelated governance."
+  ],
+  "observed_at": "2026-11-06T12:34:57.603835+00:00"
+}

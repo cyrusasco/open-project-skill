@@ -60,3 +60,7 @@ PowerShell REST 用 `curl.exe`，process 列表用 `tasklist /FO CSV`；長腳�
 用 templates/project-manual.template.md 建必交 agent.md；原 native agent.template.md 保持ZCode YAML／AP-17，唔將兩者混為一份。無native agent只豁免該原生元件，唔取消手冊。
 
 route與destination分開；docs/source roots明確。搬文件前形成完整revision／drafts／適用批准；搬後驗packet、links、decisions、package及受影響獨立review。source refs加root_id，避免CODE_ROOT evidence被解析成DOCS_ROOT。completion用當前receipt；host/tool清單載入與實際執行證據仍分開，唔改既有模型設定。
+
+## Scoped Jev exception
+
+明確叫用 open-project 後用 [jev-bypass.md](jev-bypass.md) 政策，parent直接執行及原生派工；不要求Jev route／scores／monitoring receipt。此例外需於已授權更新時同步所選host的user AGENTS.md；其他host設定／模型／GUI/browser／JevCompact保持原有政策。安裝與fresh-session invocation分開驗證，不改security hook來繞過OS限制。

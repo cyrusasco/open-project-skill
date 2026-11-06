@@ -1,3 +1,11 @@
+# 3.1.1 — plugin 0.2.1: explicit open-project Jev bypass
+
+The invoked workflow uses the owner-authorized task-scoped Jev exception. A separate bounded host-instruction installer preserves all existing bytes and raw backups. Native model/provider/agent entrypoints, manual invocation policy, approval gates and host-specific GitNexus policy are preserved.
+
+Current validation and installation outcomes: JEV-BYPASS-RESULT.json. Fresh-session model behavior is reported separately from source/config checks.
+
+## Prior release evidence (historical, not current validation)
+
 # 3.1.0 — plugin 0.2.0, packet 2.0
 
 This release repairs workflow omissions across the separate ZCode and Codex editions. ZCode has **no GitNexus dependency**; Codex alone retains G6 onboarding.
