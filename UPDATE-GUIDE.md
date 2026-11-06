@@ -1,3 +1,58 @@
+# open-project — Jev bypass update (2026-11-06)
+
+| Host | Branch | Skill | Plugin |
+|---|---|---|---|
+| ZCode | main | 3.1.1 | 0.2.1 |
+| Codex | codex-port | 3.1.1-codex.1 | 0.2.2 |
+
+## 本次行為
+
+明確叫用 open-project 後自動使用 USER_AUTHORIZED_BYPASS，唔再要求 Jev route、feasibility、score、monitoring、completion 或重問 bypass。仍須完成已授權盤點、相關歷史深讀、五稿、render/gate及獨立review；PARTIAL係checkpoint，唔係剩餘可做工作嘅終點。
+
+只限本次明確啟動任務及已授權child；普通工作／引文／安裝不觸發。用戶可明確要求恢復Jev。正式寫入、部署、push、OS/sandbox、實際security hook、模型/provider、JevCompact及GUI/browser規則保留；ZCode無GitNexus，Codex保留既有接入義務。
+
+## Codex 更新（來源＋有界用戶指令例外）
+
+在已選定來源根以正常 PowerShell7 執行：
+
+```powershell
+.\scripts\install-with-jev-bypass.ps1
+```
+
+此入口會先選實際生效的user instructions（Codex非空AGENTS.override.md優先，否則AGENTS.md），預檢並備份原bytes，只追加精確標記的 open-project Jev 例外，再調用原生 installer。已加相同例外時no-op；有本地修改或漂移時停止，不覆蓋。原 install-plugin.ps1 保持原有單純安裝行為，不能單靠它解決全域「每個任務必經Jev」指令衝突。步驟失敗會如實報PARTIAL/BLOCKED，不移除其他插件或重設設定。
+
+## ZCode 更新 prompt
+
+```text
+請從 cyrusasco/open-project-skill main 更新 open-project：Skill3.1.1 / Plugin0.2.1。
+保留既有未提交修改，先核對版本、hash、native agent/AP-17、model/provider、commands及hook設定。
+本用戶已要求：明確叫用open-project時自動bypass TypeSafe/Jev orchestration，不再重問；其他任務照舊。
+按下方helper先preview ~/.zcode/AGENTS.md，再用preview的before_sha256做精確apply，只追加有界例外並保留原bytes backup。不要修改或停用security hooks。若hook本身真強制阻擋，保留阻擋證據並報該host限制，不能冒稱已成功。
+用ZCode原生方法更新已選plugin／skill來源；GitNexus=N/A。新session核對實際載入及明確叫用時免Jev行為；沒有實測則UNKNOWN。不要修改原項目／舊session的失敗紀錄。
+```
+
+## 預檢、套用與回復
+
+以下 PATH 為已選定 host 的 AGENTS.md 絕對路徑，HASH 使用剛取得的 before_sha256：
+
+```text
+python scripts/configure-jev-bypass.py --instructions PATH
+python scripts/configure-jev-bypass.py --instructions PATH --apply --expected-sha256 HASH
+```
+
+回復只移除自己完整且未修改的block；保留block前後其他用戶文字。先preview再apply：
+
+```text
+python scripts/configure-jev-bypass.py --instructions PATH --remove
+python scripts/configure-jev-bypass.py --instructions PATH --remove --apply --expected-sha256 HASH
+```
+
+此helper不提供OS權限；不要經另一工具繞過權限拒絕。普通SKILL執行不自動編輯global instructions。安裝／配置／模型行為三層分開驗證，現有session可能保留舊context；恢復前重新讀實際已安裝版本及例外。沿用Project Pair及未完成packet，受影響內容用新revision，不重用舊批准。
+
+## 既有 packet 與保護規則
+
+以下是0.2.0共同修訂的歷史指引；版本及本次Jev例外以本頁上方為準。原有五角色、exact approval、drift及completion規則繼續適用。
+
 # open-project 0.2.0 — 兩個 host 更新指引
 
 | Host | Branch | Skill | Plugin | GitNexus |

@@ -1,25 +1,14 @@
 {
-  "schema_version": "release-tests/1.0",
   "edition": "codex",
-  "run_at": "2026-11-05T17:42:05+00:00",
-  "python": "3.14.4",
-  "seconds": 95.829,
-  "tests_run": 278,
-  "passed": 277,
-  "failures": [],
-  "errors": [],
-  "skipped": [
-    {
-      "test": "test_output_symlink_is_rejected_even_when_target_is_inside (test_renderer.RendererTests.test_output_symlink_is_rejected_even_when_target_is_inside)",
-      "reason": "symlink creation unavailable: [WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\cyrus\\\\Documents\\\\Codex\\\\2026-10-26\\\\new-chat-3\\\\open-project-codex\\\\tmpznji_s18\\\\project\\\\owned-review.md' -> 'C:\\\\Users\\\\cyrus\\\\Documents\\\\Codex\\\\2026-10-26\\\\new-chat-3\\\\open-project-codex\\\\tmpznji_s18\\\\project\\\\md-drafts\\\\PLAN.DRAFT.md'"
-    }
-  ],
-  "source_changed_during_test": false,
-  "tested_source_sha256": "6461d0cb7c3b60d32d0352482271fb4e7a7676c7d1494ca04018332b6eadb031",
-  "scope": "Synthetic tests only; no live history, project, installed plugin or host config changes.",
-  "limits": [
-    "Native host loading and actual model invocation are not proved by these tests.",
-    "This synthetic suite does not execute GitNexus; real execution has separate captured evidence."
-  ],
-  "status": "PASSED_WITH_SKIPS"
+  "command": "python -m unittest discover -s tests -v",
+  "tests": 294,
+  "passed": 293,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 1,
+  "exit_code": 0,
+  "at": "2026-11-06T12:32:53.819785+00:00",
+  "skip_reasons": [
+    "Windows lacks real symlink creation privilege; synthetic path/reparse checks pass."
+  ]
 }

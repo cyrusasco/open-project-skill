@@ -1,6 +1,6 @@
 # open-project — Codex
 
-Skill **3.1.0-codex.1**, plugin **0.2.0**, packet contract **2.0**.
+Skill **3.1.1-codex.1**, plugin **0.2.2**, packet contract **2.0**.
 
 只在用戶明確叫用時執行完整開案／重整。五個核心文件角色、全系統歷史覆蓋、輸出根、exact approval、獨立review及completion證據各自驗收。安裝本身不建project folder。
 
@@ -21,3 +21,7 @@ python scripts/build-plugin.py
 ## Codex real onboarding adapter (0.2.1)
 
 The Python-backed plugin profile now has an executable real GitNexus adapter: [contract and commands](skills/open-project/references/gitnexus-real-adapter.md). It uses the existing pinned backend, an explicitly admitted source snapshot, source-derived structural queries, native Codex catalog lookup, freshness, bounded symbol lookup and retained rollback. It runs only on explicit onboarding/UPDATE requests. ZCode is unchanged. Current local execution evidence is separate from synthetic tests and native model invocation.
+
+## Explicit open-project Jev bypass
+
+Explicit invocation now uses a task-scoped, user-authorized Jev orchestration exception. Continue all authorized preparation, retain independent review and exact effect approvals. Unrelated tasks keep their governance. See UPDATE-GUIDE.md for the matching host-instruction installation; source changes alone do not prove a running session adopted it.

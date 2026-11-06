@@ -7,6 +7,16 @@ description: "只在用戶明確要求用 open-project、選取此 skill，或�
 
 只限明確叫用嘅開案／重整流程。完整 Phase 0–9；規模縮深度，唔刪必要交付物。文件／對話用繁體中文或粵語，代碼／路徑用英文。此包只提供 workflow，無常駐服務、全域自動規則或自動安裝。
 
+## Jev：明確叫用後自動 bypass
+
+明確叫用本流程即按本 plugin 嘅用戶授權政策使用 `USER_AUTHORIZED_BYPASS`：由開工、規劃至已授權後續，略過 TypeSafe/Jev 派工、可行性／評分、monitoring 及 completion arbitration。唔先提交 Jev，唔等佢揀 route，唔再問 bypass。parent 直接用本 host 可用工具／agents 完成工作及獨立 review；模型／provider／原生 agent 政策不變。詳讀 [jev-bypass.md](references/jev-bypass.md)。
+
+只限當前明確啟動嘅 open-project 任務及其已授權 child；引文／review、本 plugin 安裝或一般工作唔觸發。完成／取消即結束；用戶明確要求恢復 Jev 先覆蓋此例外。記當前 invocation＋政策版本＋範圍，不造 Jev PASS／receipt，不清除舊 blocked 紀錄。沿用原 Project Pair，先核對在途 child/effect，唔重複執行。
+
+安裝更新時須核對 user-level host instructions 有相同有界例外，否則只改 skill 不能解決全域 Jev 必行規則。普通執行不改全域指令；例外不能越過 system/developer/platform、OS/sandbox、實際 security hook、用戶 scope 或正式副作用批准。JevCompact、GUI/browser policy、獨立驗收與 GitNexus host 邊界照舊。
+
+`PARTIAL` 係 checkpoint，唔係完成條件：仍有已授權可執行工作就繼續；destination 未定先做獨立唯讀盤點／歷史深讀。Jev route／tool 缺失、abstention 或舊 `BLOCKED_ROUTING` 不再阻塞本範圍。真實非 Jev 限制只阻相依步驟，列明證據並繼續其他工作。
+
 ## 啟動與退出
 
 - 明確用 open-project 先開始；貼上本檔供 review、只提名稱、一般 project 工作不算啟動。

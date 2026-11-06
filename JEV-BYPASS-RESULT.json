@@ -1,0 +1,50 @@
+{
+  "schema": "open-project-jev-bypass-release/1",
+  "edition": "codex",
+  "plugin_version": "0.2.2",
+  "skill_version": "3.1.1-codex.1",
+  "base_commit": "18d89897ec2545784fc5a75abf1e6a0591703c17",
+  "policy": "explicit-open-project-bypass/v1",
+  "status": "SOURCE_TESTED_AND_PACKAGED",
+  "tests": {
+    "edition": "codex",
+    "command": "python -m unittest discover -s tests -v",
+    "tests": 294,
+    "passed": 293,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "exit_code": 0,
+    "at": "2026-11-06T12:32:53.819785+00:00",
+    "skip_reasons": [
+      "Windows lacks real symlink creation privilege; synthetic path/reparse checks pass."
+    ]
+  },
+  "package_tree_sha256": "407cde3f78e21e99c73c4b3664b27196d71689c954a2df7dc873a47185e4e19f",
+  "independent_review": "ACCEPTED_WITH_INSTALLATION_LIMITATIONS",
+  "review_ref": "JEV-BYPASS-REVIEW.md",
+  "protected_native_files": "UNCHANGED",
+  "manual_invocation_only": true,
+  "real_host_policy": "BLOCKED_WRITE_PERMISSION",
+  "real_host_plugin_update": "BLOCKED_WRITE_PERMISSION",
+  "invocation_behavior_verified": false,
+  "installation_entry": "scripts/install-with-jev-bypass.ps1",
+  "gitnexus": {
+    "status": "VERIFIED",
+    "source_sha256": "87ecf3697d1fbd00286b20fabcce039b709227f4868056774887b672558b7f95",
+    "generation": "g-cdf69f2262a8-f1510e41",
+    "python_files": 10,
+    "query_groups": 6,
+    "verification_sha256": "984e6263baa0723b1f5ce82a2eb7180bcb0086c930d83e874bfaa2a75e026019",
+    "catalog": "VERIFIED",
+    "installation_current": false,
+    "installed_version_observed": "0.2.1",
+    "scope": "Existing bounded Python runtime graph and native source catalog; not root authoring/installer scripts or model invocation."
+  },
+  "limitations": [
+    "Checks and instructions do not prove model obedience or OS enforcement.",
+    "Host installation requires writable profile and exact effective instructions.",
+    "Scoped exception preserves substantive approvals, native settings and unrelated governance."
+  ],
+  "observed_at": "2026-11-06T12:34:57.158766+00:00"
+}

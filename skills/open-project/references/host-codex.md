@@ -68,3 +68,7 @@ These are host contracts, not evidence that this particular package was installe
 Codex uses workflow.gitnexus applicability REQUIRED pointing to the unique tools row gitnexus-project-onboarding. That row owns status/artifacts; do not duplicate current states. ZCode has no GitNexus and uses N/A without probes or onboarding blockers. Invalid/missing host never silently selects N/A.
 
 Five required document roles exist independently of the draft manifest. The manual is separate from optional native TOML; an explicit AGENTS.md mapping may refer to it without invoking open-project automatically. route and output destination are independent; docs roots and code/evidence source roots remain distinct. Current completion requires the final output/evidence snapshot, affected independent review, and gate completion_receipt. Promotion alone is not completion.
+
+## Scoped Jev exception
+
+明確叫用 open-project 後用 [jev-bypass.md](jev-bypass.md) 政策，parent直接執行及原生派工；不要求Jev route／scores／monitoring receipt。此例外需於已授權更新時同步所選host的user AGENTS.md；其他host設定／模型／GUI/browser／JevCompact保持原有政策。安裝與fresh-session invocation分開驗證，不改security hook來繞過OS限制。

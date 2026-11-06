@@ -60,16 +60,92 @@ throw 'Unexpected native call'
                                         'version': version, 'installed': True, 'enabled': True,
                                         'source': {'source': 'local', 'path': str(self.source)}}]}
 
-    def run_installer(self):
+    def run_installer(self, *, with_bypass=False):
         self.config.write_text(json.dumps(self.scenario), encoding='utf-8')
         env = os.environ.copy()
         env.update(INSTALL_TEST_SCENARIO=str(self.config), INSTALL_TEST_LOG=str(self.log))
-        result = subprocess.run([PWSH, '-NoLogo', '-NoProfile', '-File', str(ROOT / 'scripts/install-plugin.ps1'),
+        if with_bypass:
+            host = self.work / 'host'
+            host.mkdir(exist_ok=True)
+            env['CODEX_HOME'] = str(host)
+        entry = 'install-with-jev-bypass.ps1' if with_bypass else 'install-plugin.ps1'
+        result = subprocess.run([PWSH, '-NoLogo', '-NoProfile', '-File', str(ROOT / 'scripts' / entry),
                                  '-SourceRoot', str(self.source), '-CodexCommand', str(self.stub),
                                  '-PythonCommand', sys.executable], capture_output=True, text=True,
                                 encoding='utf-8', env=env, timeout=30)
         calls = [json.loads(line) for line in self.log.read_text(encoding='utf-8-sig').splitlines()] if self.log.exists() else []
         return result, calls
+
+    def test_scoped_wrapper_installs_policy_and_plugin(self):
+        host = self.work / 'host'
+        host.mkdir()
+        original = b'# Existing rules\r\nKeep models.\r\n'
+        (host/'AGENTS.md').write_bytes(original)
+        result, calls = self.run_installer(with_bypass=True)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        report = json.loads(result.stdout)
+        self.assertEqual(report['status'], 'SOURCE_AND_POLICY_VERIFIED')
+        self.assertTrue(report['policy']['active'])
+        self.assertEqual(report['installation']['status'], 'INSTALL_VERIFIED')
+        self.assertFalse(report['invocation_behavior_verified'])
+        self.assertTrue((host/'AGENTS.md').read_bytes().startswith(original))
+        self.assertEqual(Path(report['policy']['backup']).read_bytes(), original)
+        self.assertTrue(any(call[:2] == ['plugin', 'add'] for call in calls))
+
+    def test_scoped_wrapper_rejects_modified_policy_before_native_install(self):
+        host = self.work / 'host'
+        host.mkdir()
+        raw = b'<!-- open-project-jev-bypass:v1:begin -->\nuser edited\n'
+        (host/'AGENTS.md').write_bytes(raw)
+        result, calls = self.run_installer(with_bypass=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(json.loads(result.stdout)['status'], 'UPDATE_BLOCKED')
+        self.assertEqual(calls, [])
+        self.assertEqual((host/'AGENTS.md').read_bytes(), raw)
+
+    def test_scoped_wrapper_uses_nonempty_override_without_changing_default(self):
+        host = self.work / 'host'
+        host.mkdir()
+        original = b'Generic Jev rule\n'
+        (host/'AGENTS.md').write_bytes(original)
+        override = host/'AGENTS.override.md'
+        override.write_bytes(b'Active custom rule\n')
+        result, _ = self.run_installer(with_bypass=True)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(json.loads(result.stdout)['policy']['target'], str(override))
+        self.assertEqual((host/'AGENTS.md').read_bytes(), original)
+        self.assertIn(b'open-project-jev-bypass:v1:begin', override.read_bytes())
+
+    def test_scoped_wrapper_ignores_empty_override(self):
+        host = self.work / 'host'
+        host.mkdir()
+        override = host/'AGENTS.override.md'
+        override.write_bytes(b' \r\n')
+        result, _ = self.run_installer(with_bypass=True)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(json.loads(result.stdout)['policy']['target'], str(host/'AGENTS.md'))
+        self.assertEqual(override.read_bytes(), b' \r\n')
+
+    def test_scoped_wrapper_missing_installer_does_not_mutate_policy(self):
+        (self.source/'scripts/install-plugin.ps1').unlink()
+        result, calls = self.run_installer(with_bypass=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(json.loads(result.stdout)['stage'], 'source-validation')
+        self.assertFalse((self.work/'host/AGENTS.md').exists())
+        self.assertEqual(calls, [])
+
+    def test_scoped_wrapper_native_failure_retains_policy_and_backup_evidence(self):
+        host = self.work/'host'
+        host.mkdir()
+        original = b'Existing rules\n'
+        (host/'AGENTS.md').write_bytes(original)
+        self.stub.write_text("Write-Output 'not-json'\nexit 0\n", encoding='utf-8')
+        result, _ = self.run_installer(with_bypass=True)
+        self.assertNotEqual(result.returncode, 0)
+        report = json.loads(result.stdout)
+        self.assertIn(report['status'], ['PARTIAL_UPDATE', 'PARTIAL_INSTALL'])
+        self.assertTrue(report['policy']['active'])
+        self.assertEqual(Path(report['policy']['backup']).read_bytes(), original)
 
     def test_success_uses_native_registration_install_and_exact_state_verification(self):
         result, calls = self.run_installer()

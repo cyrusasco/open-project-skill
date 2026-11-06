@@ -24,7 +24,7 @@ class ReleaseContractTests(unittest.TestCase):
     def test_release_contract_and_resources_match(self):
         info, files = builder.source_files(ROOT)
         self.assertEqual(info['contract_version'], '2.0')
-        self.assertEqual(info['plugin_version'], '0.2.0' if info['edition'] == 'zcode' else '0.2.1')
+        self.assertEqual(info['plugin_version'], '0.2.1' if info['edition'] == 'zcode' else '0.2.2')
         self.assertIn('skills/open-project/scripts/workflow_contract.py', files)
         self.assertIn('skills/open-project/scripts/workflow_effects.py', files)
         self.assertIn('skills/open-project/scripts/workflow_package.py', files)
